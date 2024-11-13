@@ -9,31 +9,16 @@ if (!$conn) {
     exit;
 }
 
-$data = json_decode(file_get_contents('php://input'), true);
 
-if (!isset($data['MaNguoiDung']) || !isset($data['MatKhau'])) {
-    echo json_encode(['status' => 'error', 'message' => 'Dữ liệu không hợp lệ']);
-    exit;
-}
-
-$maNguoiDung = $data['MaNguoiDung'];
-$matKhau = $data['MatKhau'];
-
-$sql = "SELECT * FROM NguoiDung WHERE MaNguoiDung = :maNguoiDung AND MatKhau = :matKhau";
-$stmt = $conn->prepare($sql);
-
-if ($stmt) {
-    $stmt->bindValue(':maNguoiDung', $maNguoiDung);
-    $stmt->bindValue(':matKhau', $matKhau);
+try {
+    $sql = "SELECT MaNguoiDung, VaiTro, MaNhanVien FROM NguoiDung";
+    $stmt = $conn->prepare($sql);
     $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result) {
-        echo json_encode(['status' => 'success', 'data' => $result]);
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid credentials']);
-    }
-} else {
-    echo "Lỗi truy vấn SQL.";
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode([ 'data' => $users], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+} catch (PDOException $e) {
+    echo json_encode([ 'message' => 'Lỗi truy vấn: ' . $e->getMessage()]);
 }
 ?>
