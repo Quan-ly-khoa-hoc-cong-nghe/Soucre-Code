@@ -47,21 +47,21 @@ const Layout = ({ children }) => {
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-                            <Link to="topic-approal" className="flex items-center space-x-3">
+                            <Link to="lecturer-topic-approval" className="flex items-center space-x-3">
                                 <FaClipboardList />
-                                <span className="font-semibold">Topic Approval</span>
+                                <span className="font-semibold">Lecturer Topic Approva</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-                            <Link to="/video-categories" className="flex items-center space-x-3">
-                                <FaList />
-                                <span className="font-semibold">ádasd</span>
+                            <Link to="/student-topic-approval" className="flex items-center space-x-3">
+                            <FaClipboardList />
+                            <span className="font-semibold">Student Topic Approval</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-                            <Link to="/point-management" className="flex items-center space-x-3">
+                            <Link to="/science-seminar" className="flex items-center space-x-3">
                                 <FaGift />
-                                <span className="font-semibold">sadsa</span>
+                                <span className="font-semibold"> Science Seminar</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
