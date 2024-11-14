@@ -47,7 +47,7 @@ switch ($action) {
 // Hàm lấy tất cả người dùng
 function getAllUsers($conn) {
     try {
-        $sql = "SELECT * FROM NguoiDung";
+        $sql = "SELECT * FROM NguoiDung where MaNhanVien  = 'NV01' and MatKhau = 'admin123' ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
