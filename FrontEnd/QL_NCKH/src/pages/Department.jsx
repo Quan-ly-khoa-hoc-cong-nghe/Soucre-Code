@@ -1,22 +1,22 @@
 import React from 'react';
-import LayoutAdmin from '../component/Layout';  // Layout dành cho Admin
+import LayoutDepartment from '../component/LayoutDepartment';  // Layout dành cho Department
 import { Routes, Route } from 'react-router-dom';
 import ArticleReview from '../component/ArticleReview/ArticleReview';
 import TopicApproval from '../component/LecturerTopicApproval/TopicApproval';
 import StudentTopicApproval from '../component/StudentTopicApproval/StudentTopicApproval';
 import ScienceSeminar from '../component/ScienceSeminar/ScienceSeminar';
 
-function Admin() {
+function Department() {
   return (
-    <LayoutAdmin>
+    <LayoutDepartment>
       <Routes>
         <Route path="article-review" element={<ArticleReview />} />
         <Route path="lecturer-topic-approval" element={<TopicApproval />} />
         <Route path="student-topic-approval" element={<StudentTopicApproval />} />
         <Route path="science-seminar" element={<ScienceSeminar />} />
       </Routes>
-    </LayoutAdmin>
+    </LayoutDepartment>
   );
 }
 
-export default Admin;
+export default Department;
