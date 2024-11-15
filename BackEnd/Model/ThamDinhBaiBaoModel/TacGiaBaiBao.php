@@ -1,30 +1,28 @@
 <?php
-class TacGiaGiangVien {
+class TacGiaBaiBao {
     private $conn;
-    private $table_name = "TacGiaGiangVien";
+    private $table_name = "TacGiaBaiBao";
 
     public $MaTacGia;
-    public $MaGV;
-    public $VaiTro;
+    public $MaBaiBao;
 
     public function __construct($db) {
         $this->conn = $db;
     }
 
-    // Thêm tác giả giảng viên
+    // Thêm tác giả bài báo
     public function add() {
-        $query = "INSERT INTO " . $this->table_name . " SET MaTacGia=:MaTacGia, MaGV=:MaGV, VaiTro=:VaiTro";
+        $query = "INSERT INTO " . $this->table_name . " SET MaTacGia=:MaTacGia, MaBaiBao=:MaBaiBao";
         $stmt = $this->conn->prepare($query);
 
         // Ràng buộc dữ liệu
         $stmt->bindParam(":MaTacGia", $this->MaTacGia);
-        $stmt->bindParam(":MaGV", $this->MaGV);
-        $stmt->bindParam(":VaiTro", $this->VaiTro);
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
 
         return $stmt->execute();
     }
 
-    // Lấy tất cả tác giả giảng viên
+    // Lấy tất cả tác giả bài báo
     public function getAll() {
         $query = "SELECT * FROM " . $this->table_name;
         $stmt = $this->conn->prepare($query);
@@ -32,25 +30,23 @@ class TacGiaGiangVien {
         return $stmt;
     }
 
-    // Cập nhật vai trò của tác giả giảng viên
+    // Cập nhật thông tin tác giả bài báo
     public function update() {
-        $query = "UPDATE " . $this->table_name . " SET VaiTro=:VaiTro WHERE MaTacGia=:MaTacGia AND MaGV=:MaGV";
+        $query = "UPDATE " . $this->table_name . " SET MaBaiBao=:MaBaiBao WHERE MaTacGia=:MaTacGia";
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":MaTacGia", $this->MaTacGia);
-        $stmt->bindParam(":MaGV", $this->MaGV);
-        $stmt->bindParam(":VaiTro", $this->VaiTro);
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
 
         return $stmt->execute();
     }
 
-    // Xóa tác giả giảng viên
+    // Xóa tác giả bài báo
     public function delete() {
-        $query = "DELETE FROM " . $this->table_name . " WHERE MaTacGia=:MaTacGia AND MaGV=:MaGV";
+        $query = "DELETE FROM " . $this->table_name . " WHERE MaTacGia=:MaTacGia";
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":MaTacGia", $this->MaTacGia);
-        $stmt->bindParam(":MaGV", $this->MaGV);
 
         return $stmt->execute();
     }

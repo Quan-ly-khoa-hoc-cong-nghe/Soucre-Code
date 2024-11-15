@@ -1,11 +1,11 @@
 <?php
 header("Content-Type: application/json");
 require_once __DIR__. '/../../config/Database.php';
-require_once __DIR__. '/../../Model/ThamDinhBaiBaoModel/HoSoBaiBaoKH.php';
+require_once __DIR__ . '/../../Model/ThamDinhBaiBaoModel/GiaiThuongBaiBao.php';
 
 $database = new Database();
 $db = $database->getConn();
-$hosobaibao = new HoSoBaiBaoKH($db);
+$giaithuong = new GiaiThuongBaiBao($db);
 
 // Lấy phương thức HTTP và tham số `action`
 $method = $_SERVER['REQUEST_METHOD'];
@@ -21,7 +21,7 @@ if (!$action) {
 switch ($method) {
     case 'GET':
         if ($action === "get") {
-            $stmt = $hosobaibao->getAll();
+            $stmt = $giaithuong->getAll();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($result);
         } else {
@@ -38,23 +38,20 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaHoSo, $data->TrangThai, $data->MaNguoiDung, $data->NgayNop, $data->MaTacGia, $data->MaKhoa)) {
+        if (!isset($data->NgayKhenThuong, $data->SoTienThuong, $data->MaBaiBao)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $hosobaibao->MaHoSo = $data->MaHoSo;
-        $hosobaibao->TrangThai = $data->TrangThai;
-        $hosobaibao->MaNguoiDung = $data->MaNguoiDung;
-        $hosobaibao->NgayNop = $data->NgayNop;
-        $hosobaibao->MaTacGia = $data->MaTacGia;
-        $hosobaibao->MaKhoa = $data->MaKhoa;
+        $giaithuong->NgayKhenThuong = $data->NgayKhenThuong;
+        $giaithuong->SoTienThuong = $data->SoTienThuong;
+        $giaithuong->MaBaiBao = $data->MaBaiBao;
 
-        if ($hosobaibao->add()) {
-            echo json_encode(["message" => "Thêm hồ sơ bài báo thành công"]);
+        if ($giaithuong->add()) {
+            echo json_encode(["message" => "Thêm giải thưởng thành công"]);
         } else {
-            echo json_encode(["message" => "Thêm hồ sơ bài báo thất bại"]);
+            echo json_encode(["message" => "Thêm giải thưởng thất bại"]);
             http_response_code(500);
         }
         break;
@@ -67,23 +64,20 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaHoSo, $data->TrangThai, $data->MaNguoiDung, $data->NgayNop, $data->MaTacGia, $data->MaKhoa)) {
+        if (!isset($data->NgayKhenThuong, $data->SoTienThuong, $data->MaBaiBao)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $hosobaibao->MaHoSo = $data->MaHoSo;
-        $hosobaibao->TrangThai = $data->TrangThai;
-        $hosobaibao->MaNguoiDung = $data->MaNguoiDung;
-        $hosobaibao->NgayNop = $data->NgayNop;
-        $hosobaibao->MaTacGia = $data->MaTacGia;
-        $hosobaibao->MaKhoa = $data->MaKhoa;
+        $giaithuong->NgayKhenThuong = $data->NgayKhenThuong;
+        $giaithuong->SoTienThuong = $data->SoTienThuong;
+        $giaithuong->MaBaiBao = $data->MaBaiBao;
 
-        if ($hosobaibao->update()) {
-            echo json_encode(["message" => "Cập nhật hồ sơ bài báo thành công"]);
+        if ($giaithuong->update()) {
+            echo json_encode(["message" => "Cập nhật giải thưởng thành công"]);
         } else {
-            echo json_encode(["message" => "Cập nhật hồ sơ bài báo thất bại"]);
+            echo json_encode(["message" => "Cập nhật giải thưởng thất bại"]);
             http_response_code(500);
         }
         break;
@@ -96,18 +90,19 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaHoSo)) {
+        if (!isset($data->NgayKhenThuong, $data->MaBaiBao)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $hosobaibao->MaHoSo = $data->MaHoSo;
+        $giaithuong->NgayKhenThuong = $data->NgayKhenThuong;
+        $giaithuong->MaBaiBao = $data->MaBaiBao;
 
-        if ($hosobaibao->delete()) {
-            echo json_encode(["message" => "Xóa hồ sơ bài báo thành công"]);
+        if ($giaithuong->delete()) {
+            echo json_encode(["message" => "Xóa giải thưởng thành công"]);
         } else {
-            echo json_encode(["message" => "Xóa hồ sơ bài báo thất bại"]);
+            echo json_encode(["message" => "Xóa giải thưởng thất bại"]);
             http_response_code(500);
         }
         break;
