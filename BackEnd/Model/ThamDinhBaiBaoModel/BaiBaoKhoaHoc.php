@@ -1,80 +1,62 @@
 <?php
-
-class BaiBaoKhoaHoc
-{
+class BaiBaoKhoaHoc {
     private $conn;
     private $table_name = "BaiBaoKhoaHoc";
 
-    // Các thuộc tính
-    public $maBaiBaoKhoaHoc;
-    public $tenBaiBaoKhoaHoc;
-    public $urlBaiBaoKhoaHoc;
+    public $MaBaiBao;
+    public $TenBaiBao;
+    public $urlBaiBao;
     public $NgayXuatBan;
+    public $MaThamDinh;
 
-    // Constructor
-    public function __construct($db)
-    {
+    public function __construct($db) {
         $this->conn = $db;
     }
 
-    // Phương thức lấy tất cả bài báo
-    public function readAll()
-    {
-        try {
-            $sql = "SELECT * FROM " . $this->table_name . " ORDER BY NgayXuatBan DESC";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
-        }
+    // Thêm bài báo khoa học
+    public function add() {
+        $query = "INSERT INTO " . $this->table_name . " SET MaBaiBao=:MaBaiBao, TenBaiBao=:TenBaiBao, urlBaiBao=:urlBaiBao, NgayXuatBan=:NgayXuatBan, MaThamDinh=:MaThamDinh";
+        $stmt = $this->conn->prepare($query);
+
+        // Ràng buộc dữ liệu
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
+        $stmt->bindParam(":TenBaiBao", $this->TenBaiBao);
+        $stmt->bindParam(":urlBaiBao", $this->urlBaiBao);
+        $stmt->bindParam(":NgayXuatBan", $this->NgayXuatBan);
+        $stmt->bindParam(":MaThamDinh", $this->MaThamDinh);
+
+        return $stmt->execute();
     }
 
-    // Phương thức thêm bài báo
-    public function add()
-    {
-        try {
-            $sql = "INSERT INTO " . $this->table_name . " (tenBaiBaoKhoaHoc, urlBaiBaoKhoaHoc, NgayXuatBan) 
-                    VALUES (:ten, :url, :ngay)";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':ten', $this->tenBaiBaoKhoaHoc);
-            $stmt->bindParam(':url', $this->urlBaiBaoKhoaHoc);
-            $stmt->bindParam(':ngay', $this->NgayXuatBan);
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];
-        }
+    // Lấy tất cả bài báo khoa học
+    public function getAll() {
+        $query = "SELECT * FROM " . $this->table_name;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
     }
 
-    // Phương thức cập nhật bài báo
-    public function update()
-    {
-        try {
-            $sql = "UPDATE " . $this->table_name . " 
-                    SET tenBaiBaoKhoaHoc = :ten, urlBaiBaoKhoaHoc = :url, NgayXuatBan = :ngay 
-                    WHERE maBaiBaoKhoaHoc = :id";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':id', $this->maBaiBaoKhoaHoc);
-            $stmt->bindParam(':ten', $this->tenBaiBaoKhoaHoc);
-            $stmt->bindParam(':url', $this->urlBaiBaoKhoaHoc);
-            $stmt->bindParam(':ngay', $this->NgayXuatBan);
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];
-        }
+    // Cập nhật bài báo khoa học
+    public function update() {
+        $query = "UPDATE " . $this->table_name . " SET TenBaiBao=:TenBaiBao, urlBaiBao=:urlBaiBao, NgayXuatBan=:NgayXuatBan, MaThamDinh=:MaThamDinh WHERE MaBaiBao=:MaBaiBao";
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
+        $stmt->bindParam(":TenBaiBao", $this->TenBaiBao);
+        $stmt->bindParam(":urlBaiBao", $this->urlBaiBao);
+        $stmt->bindParam(":NgayXuatBan", $this->NgayXuatBan);
+        $stmt->bindParam(":MaThamDinh", $this->MaThamDinh);
+
+        return $stmt->execute();
     }
 
-    // Phương thức xóa bài báo
-    public function delete()
-    {
-        try {
-            $sql = "DELETE FROM " . $this->table_name . " WHERE maBaiBaoKhoaHoc = :id";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':id', $this->maBaiBaoKhoaHoc);
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];
-        }
+    // Xóa bài báo khoa học
+    public function delete() {
+        $query = "DELETE FROM " . $this->table_name . " WHERE MaBaiBao=:MaBaiBao";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
+
+        return $stmt->execute();
     }
 }
 ?>
