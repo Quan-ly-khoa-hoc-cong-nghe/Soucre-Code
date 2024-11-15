@@ -13,7 +13,7 @@ const LoginLayout = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('http://localhost/Soucre-Code/BackEnd/DangNhap_Api.php?action=get', {
+      const response = await axios.post('http://localhost/Soucre-Code/BackEnd/Api/DangNhap_Api.php?action=get', {
         MaNguoiDung: username,
         MatKhau: password
       });

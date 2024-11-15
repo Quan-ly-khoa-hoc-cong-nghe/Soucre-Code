@@ -41,19 +41,19 @@ const Layout = ({ children }) => {
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-                            <Link to="/article-review" className="flex items-center space-x-3">
+                            <Link to="/admin/article-review" className="flex items-center space-x-3">
                                 <FaBook />
                                 <span className="font-semibold">Article Review</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-                            <Link to="lecturer-topic-approval" className="flex items-center space-x-3">
+                            <Link to="/admin/lecturer-topic-approval" className="flex items-center space-x-3">
                                 <FaClipboardList />
                                 <span className="font-semibold">Lecturer Topic Approva</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-                            <Link to="/student-topic-approval" className="flex items-center space-x-3">
+                            <Link to="/admin/student-topic-approval" className="flex items-center space-x-3">
                             <FaClipboardList />
                             <span className="font-semibold">Student Topic Approval</span>
                             </Link>

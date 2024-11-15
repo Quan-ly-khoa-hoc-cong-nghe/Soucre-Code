@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 header("Content-Type: application/json; charset=UTF-8");
-require_once 'Database.php';
+require_once '../config/Database.php';
 
 // Kết nối cơ sở dữ liệu
 $db = new Database();
