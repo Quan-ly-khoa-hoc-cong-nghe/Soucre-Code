@@ -5,7 +5,8 @@ require_once __DIR__ . '/../../Model/DeTaiCapCoSoModel/DeTaiCapSo.php';
 
 $database = new Database();
 $db = $database->getConn();
-$detai = new DeTaiCapSo($db);
+$accessToken = 'YOUR_ACCESS_TOKEN_HERE';
+$deTai = new DeTaiCapSo($db, $accessToken);
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET['action']) ? $_GET['action'] : null;
@@ -18,19 +19,19 @@ if (!$action) {
 
 switch ($method) {
     case 'GET':
-        if ($action === "get") {
-            $stmt = $detai->getAll();
+        if ($action === "getAll") {
+            $stmt = $deTai->getAll();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($result);
         } elseif ($action === "getOne") {
-            $maDTCS = isset($_GET['ma_dtcs']) ? $_GET['ma_dtcs'] : null;
-            if (!$maDTCS) {
-                echo json_encode(["message" => "Thiếu mã đề tài cấp sơ"]);
+            $ma_dtcs = isset($_GET['ma_dtcs']) ? $_GET['ma_dtcs'] : null;
+            if (!$ma_dtcs) {
+                echo json_encode(["message" => "Thiếu mã đề tài"]);
                 http_response_code(400);
                 exit;
             }
-            $detai->ma_dtcs = $maDTCS;
-            $data = $detai->getOne();
+            $deTai->ma_dtcs = $ma_dtcs;
+            $data = $deTai->getOne();
             echo json_encode($data);
         } else {
             echo json_encode(["message" => "Action không hợp lệ"]);
@@ -45,22 +46,23 @@ switch ($method) {
             exit;
         }
 
-        $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_dtcs, $data->ten_de_tai, $data->ngay_bat_dau, $data->ngay_ket_thuc, $data->file_hop_dong, $data->trang_thai, $data->ma_ho_so)) {
+        if (!isset($_FILES['file']) || !isset($_POST['ma_dtcs']) || !isset($_POST['ten_de_tai']) || !isset($_POST['ngay_bat_dau']) || !isset($_POST['ngay_ket_thuc']) || !isset($_POST['trang_thai']) || !isset($_POST['ma_ho_so'])) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $detai->ma_dtcs = $data->ma_dtcs;
-        $detai->ten_de_tai = $data->ten_de_tai;
-        $detai->ngay_bat_dau = $data->ngay_bat_dau;
-        $detai->ngay_ket_thuc = $data->ngay_ket_thuc;
-        $detai->file_hop_dong = $data->file_hop_dong;
-        $detai->trang_thai = $data->trang_thai;
-        $detai->ma_ho_so = $data->ma_ho_so;
+        $filePath = $_FILES['file']['tmp_name'];
+        $fileName = $_FILES['file']['name'];
 
-        if ($detai->add()) {
+        $deTai->ma_dtcs = $_POST['ma_dtcs'];
+        $deTai->ten_de_tai = $_POST['ten_de_tai'];
+        $deTai->ngay_bat_dau = $_POST['ngay_bat_dau'];
+        $deTai->ngay_ket_thuc = $_POST['ngay_ket_thuc'];
+        $deTai->trang_thai = $_POST['trang_thai'];
+        $deTai->ma_ho_so = $_POST['ma_ho_so'];
+
+        if ($deTai->add($filePath, $fileName)) {
             echo json_encode(["message" => "Đề tài được thêm thành công"]);
         } else {
             echo json_encode(["message" => "Thêm đề tài thất bại"]);
@@ -75,22 +77,24 @@ switch ($method) {
             exit;
         }
 
-        $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_dtcs, $data->ten_de_tai, $data->ngay_bat_dau, $data->ngay_ket_thuc, $data->file_hop_dong, $data->trang_thai, $data->ma_ho_so)) {
+        parse_str(file_get_contents("php://input"), $_PUT);
+        if (!isset($_PUT['ma_dtcs']) || !isset($_PUT['ten_de_tai']) || !isset($_PUT['ngay_bat_dau']) || !isset($_PUT['ngay_ket_thuc']) || !isset($_PUT['trang_thai']) || !isset($_PUT['ma_ho_so'])) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $detai->ma_dtcs = $data->ma_dtcs;
-        $detai->ten_de_tai = $data->ten_de_tai;
-        $detai->ngay_bat_dau = $data->ngay_bat_dau;
-        $detai->ngay_ket_thuc = $data->ngay_ket_thuc;
-        $detai->file_hop_dong = $data->file_hop_dong;
-        $detai->trang_thai = $data->trang_thai;
-        $detai->ma_ho_so = $data->ma_ho_so;
+        $filePath = isset($_FILES['file']['tmp_name']) ? $_FILES['file']['tmp_name'] : null;
+        $fileName = isset($_FILES['file']['name']) ? $_FILES['file']['name'] : null;
 
-        if ($detai->update()) {
+        $deTai->ma_dtcs = $_PUT['ma_dtcs'];
+        $deTai->ten_de_tai = $_PUT['ten_de_tai'];
+        $deTai->ngay_bat_dau = $_PUT['ngay_bat_dau'];
+        $deTai->ngay_ket_thuc = $_PUT['ngay_ket_thuc'];
+        $deTai->trang_thai = $_PUT['trang_thai'];
+        $deTai->ma_ho_so = $_PUT['ma_ho_so'];
+
+        if ($deTai->update($filePath, $fileName)) {
             echo json_encode(["message" => "Đề tài được cập nhật thành công"]);
         } else {
             echo json_encode(["message" => "Cập nhật đề tài thất bại"]);
@@ -105,19 +109,19 @@ switch ($method) {
             exit;
         }
 
-        $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_dtcs)) {
-            echo json_encode(["message" => "Thiếu mã đề tài cấp sơ"]);
+        parse_str(file_get_contents("php://input"), $_DELETE);
+        if (!isset($_DELETE['ma_dtcs'])) {
+            echo json_encode(["message" => "Thiếu mã đề tài"]);
             http_response_code(400);
             exit;
         }
 
-        $detai->ma_dtcs = $data->ma_dtcs;
+        $deTai->ma_dtcs = $_DELETE['ma_dtcs'];
 
-        if ($detai->delete()) {
-            echo json_encode(["message" => "Đề tài được xóa thành công"]);
+        if ($deTai->delete()) {
+            echo json_encode(["message" => "Đề tài và file trên Google Drive đã được xóa thành công"]);
         } else {
-            echo json_encode(["message" => "Xóa đề tài thất bại"]);
+            echo json_encode(["message" => "Xóa đề tài hoặc file thất bại"]);
             http_response_code(500);
         }
         break;
