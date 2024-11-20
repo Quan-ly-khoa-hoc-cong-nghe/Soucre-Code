@@ -1,11 +1,16 @@
 <?php
 header("Content-Type: application/json");
-require_once __DIR__. '/../../config/Database.php';
+require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../../Model/DeTaiCapCoSoModel/KeHoachDTCS.php';
 
+// Thiết lập database và khởi tạo đối tượng KeHoachDTCS
 $database = new Database();
 $db = $database->getConn();
-$kehoach = new KeHoachDTCS($db);
+$accessToken = "YOUR_ACCESS_TOKEN"; // Thay bằng Access Token hợp lệ
+$refreshToken = "YOUR_REFRESH_TOKEN"; // Thay bằng Refresh Token
+$clientId = "YOUR_CLIENT_ID"; // Thay bằng Client ID từ Google API
+$clientSecret = "YOUR_CLIENT_SECRET"; // Thay bằng Client Secret từ Google API
+$kehoach = new KeHoachDTCS($db, $accessToken, $refreshToken, $clientId, $clientSecret);
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET['action']) ? $_GET['action'] : null;
@@ -16,111 +21,120 @@ if (!$action) {
     exit;
 }
 
-switch ($method) {
-    case 'GET':
-        if ($action === "get") {
-            $stmt = $kehoach->getAll();
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode($result);
-        } elseif ($action === "getOne") {
-            $maDTCS = isset($_GET['ma_dtcs']) ? $_GET['ma_dtcs'] : null;
-            if (!$maDTCS) {
-                echo json_encode(["message" => "Thiếu mã đề tài cơ sở"]);
+try {
+    switch ($method) {
+        case 'GET':
+            if ($action === "get") {
+                $stmt = $kehoach->getAll();
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                echo json_encode(["data" => $result, "message" => "Lấy tất cả kế hoạch thành công"]);
+            } elseif ($action === "getOne") {
+                $maDTCS = $_GET['ma_dtcs'] ?? null;
+                if (!$maDTCS) {
+                    echo json_encode(["message" => "Thiếu mã đề tài cơ sở"]);
+                    http_response_code(400);
+                    exit;
+                }
+                $kehoach->ma_dtcs = $maDTCS;
+                $data = $kehoach->getOne();
+                echo json_encode(["data" => $data, "message" => "Lấy kế hoạch thành công"]);
+            } else {
+                echo json_encode(["message" => "Action không hợp lệ"]);
+                http_response_code(400);
+            }
+            break;
+
+        case 'POST':
+            if ($action !== "add") {
+                echo json_encode(["message" => "Action không hợp lệ cho phương thức POST"]);
                 http_response_code(400);
                 exit;
             }
-            $kehoach->ma_dtcs = $maDTCS;
-            $data = $kehoach->getOne();
-            echo json_encode($data);
-        } else {
-            echo json_encode(["message" => "Action không hợp lệ"]);
-            http_response_code(400);
-        }
-        break;
 
-    case 'POST':
-        if ($action !== "add") {
-            echo json_encode(["message" => "Action không hợp lệ cho phương thức POST"]);
-            http_response_code(400);
-            exit;
-        }
+            if (!isset($_FILES['file']) || !isset($_POST['ngay_bat_dau'], $_POST['ngay_ket_thuc'], $_POST['kinh_phi'], $_POST['ma_dtcs'])) {
+                echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+                http_response_code(400);
+                exit;
+            }
 
-        $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ngay_bat_dau, $data->ngay_ket_thuc, $data->kinh_phi, $data->file_ke_hoach, $data->ma_dtcs)) {
-            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
-            http_response_code(400);
-            exit;
-        }
+            $filePath = $_FILES['file']['tmp_name'];
+            $fileName = $_FILES['file']['name'];
 
-        $kehoach->ngay_bat_dau = $data->ngay_bat_dau;
-        $kehoach->ngay_ket_thuc = $data->ngay_ket_thuc;
-        $kehoach->kinh_phi = $data->kinh_phi;
-        $kehoach->file_ke_hoach = $data->file_ke_hoach;
-        $kehoach->ma_dtcs = $data->ma_dtcs;
+            $kehoach->ngay_bat_dau = $_POST['ngay_bat_dau'];
+            $kehoach->ngay_ket_thuc = $_POST['ngay_ket_thuc'];
+            $kehoach->kinh_phi = $_POST['kinh_phi'];
+            $kehoach->ma_dtcs = $_POST['ma_dtcs'];
 
-        if ($kehoach->add()) {
-            echo json_encode(["message" => "Kế hoạch được thêm thành công"]);
-        } else {
-            echo json_encode(["message" => "Thêm kế hoạch thất bại"]);
-            http_response_code(500);
-        }
-        break;
+            if ($kehoach->add($filePath, $fileName)) {
+                echo json_encode(["message" => "Kế hoạch được thêm thành công"]);
+            } else {
+                echo json_encode(["message" => "Thêm kế hoạch thất bại"]);
+                http_response_code(500);
+            }
+            break;
 
-    case 'PUT':
-        if ($action !== "update") {
-            echo json_encode(["message" => "Action không hợp lệ cho phương thức PUT"]);
-            http_response_code(400);
-            exit;
-        }
+        case 'PUT':
+            if ($action !== "update") {
+                echo json_encode(["message" => "Action không hợp lệ cho phương thức PUT"]);
+                http_response_code(400);
+                exit;
+            }
 
-        $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ngay_bat_dau, $data->ngay_ket_thuc, $data->kinh_phi, $data->file_ke_hoach, $data->ma_dtcs)) {
-            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
-            http_response_code(400);
-            exit;
-        }
+            parse_str(file_get_contents("php://input"), $_PUT);
 
-        $kehoach->ngay_bat_dau = $data->ngay_bat_dau;
-        $kehoach->ngay_ket_thuc = $data->ngay_ket_thuc;
-        $kehoach->kinh_phi = $data->kinh_phi;
-        $kehoach->file_ke_hoach = $data->file_ke_hoach;
-        $kehoach->ma_dtcs = $data->ma_dtcs;
+            if (!isset($_PUT['ngay_bat_dau'], $_PUT['ngay_ket_thuc'], $_PUT['kinh_phi'], $_PUT['ma_dtcs'])) {
+                echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+                http_response_code(400);
+                exit;
+            }
 
-        if ($kehoach->update()) {
-            echo json_encode(["message" => "Kế hoạch được cập nhật thành công"]);
-        } else {
-            echo json_encode(["message" => "Cập nhật kế hoạch thất bại"]);
-            http_response_code(500);
-        }
-        break;
+            $filePath = isset($_FILES['file']['tmp_name']) ? $_FILES['file']['tmp_name'] : null;
+            $fileName = isset($_FILES['file']['name']) ? $_FILES['file']['name'] : null;
 
-    case 'DELETE':
-        if ($action !== "delete") {
-            echo json_encode(["message" => "Action không hợp lệ cho phương thức DELETE"]);
-            http_response_code(400);
-            exit;
-        }
+            $kehoach->ngay_bat_dau = $_PUT['ngay_bat_dau'];
+            $kehoach->ngay_ket_thuc = $_PUT['ngay_ket_thuc'];
+            $kehoach->kinh_phi = $_PUT['kinh_phi'];
+            $kehoach->ma_dtcs = $_PUT['ma_dtcs'];
 
-        $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_dtcs)) {
-            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
-            http_response_code(400);
-            exit;
-        }
+            if ($kehoach->update($filePath, $fileName)) {
+                echo json_encode(["message" => "Kế hoạch được cập nhật thành công"]);
+            } else {
+                echo json_encode(["message" => "Cập nhật kế hoạch thất bại"]);
+                http_response_code(500);
+            }
+            break;
 
-        $kehoach->ma_dtcs = $data->ma_dtcs;
+        case 'DELETE':
+            if ($action !== "delete") {
+                echo json_encode(["message" => "Action không hợp lệ cho phương thức DELETE"]);
+                http_response_code(400);
+                exit;
+            }
 
-        if ($kehoach->delete()) {
-            echo json_encode(["message" => "Kế hoạch được xóa thành công"]);
-        } else {
-            echo json_encode(["message" => "Xóa kế hoạch thất bại"]);
-            http_response_code(500);
-        }
-        break;
+            parse_str(file_get_contents("php://input"), $_DELETE);
+            if (!isset($_DELETE['ma_dtcs'])) {
+                echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+                http_response_code(400);
+                exit;
+            }
 
-    default:
-        echo json_encode(["message" => "Phương thức không được hỗ trợ"]);
-        http_response_code(405);
-        break;
+            $kehoach->ma_dtcs = $_DELETE['ma_dtcs'];
+
+            if ($kehoach->delete()) {
+                echo json_encode(["message" => "Kế hoạch được xóa thành công"]);
+            } else {
+                echo json_encode(["message" => "Xóa kế hoạch thất bại"]);
+                http_response_code(500);
+            }
+            break;
+
+        default:
+            echo json_encode(["message" => "Phương thức không được hỗ trợ"]);
+            http_response_code(405);
+            break;
+    }
+} catch (Exception $e) {
+    echo json_encode(["message" => "Có lỗi xảy ra: " . $e->getMessage()]);
+    http_response_code(500);
 }
 ?>

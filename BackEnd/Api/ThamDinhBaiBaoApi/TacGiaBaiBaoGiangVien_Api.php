@@ -30,7 +30,7 @@ switch ($method) {
         }
         break;
 
-    case 'add':
+    case 'POST':
         if ($action !== "add") {
             echo json_encode(["message" => "Action không hợp lệ cho phương thức POST"]);
             http_response_code(400);
@@ -56,7 +56,7 @@ switch ($method) {
         }
         break;
 
-    case 'update':
+    case 'PUT':
         if ($action !== "update") {
             echo json_encode(["message" => "Action không hợp lệ cho phương thức PUT"]);
             http_response_code(400);
@@ -82,7 +82,7 @@ switch ($method) {
         }
         break;
 
-    case 'delete':
+    case 'DELETE':
         if ($action !== "delete") {
             echo json_encode(["message" => "Action không hợp lệ cho phương thức DELETE"]);
             http_response_code(400);
