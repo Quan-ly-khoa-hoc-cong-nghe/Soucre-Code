@@ -35,6 +35,16 @@ class NhomNCNT {
         return $stmt->execute();
     }
 
+    // Cập nhật mã giảng viên trong nhóm
+    public function update($ma_gv_moi) {
+        $query = "UPDATE " . $this->table . " SET ma_gv=? WHERE ma_ho_so=? AND ma_gv=?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $ma_gv_moi);
+        $stmt->bindParam(2, $this->ma_ho_so);
+        $stmt->bindParam(3, $this->ma_gv);
+        return $stmt->execute();
+    }
+
     // Xóa thành viên khỏi nhóm
     public function delete() {
         $query = "DELETE FROM " . $this->table . " WHERE ma_ho_so = ? AND ma_gv = ?";

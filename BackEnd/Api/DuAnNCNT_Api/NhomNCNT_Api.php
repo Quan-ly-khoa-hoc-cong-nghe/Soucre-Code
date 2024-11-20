@@ -41,7 +41,7 @@ switch ($method) {
         break;
 
     case 'POST':
-        if ($action !== "add") {
+        if ($action !== "post") {
             echo json_encode(["message" => "Action không hợp lệ cho phương thức POST"]);
             http_response_code(400);
             exit;
@@ -61,6 +61,32 @@ switch ($method) {
             echo json_encode(["message" => "Thêm thành viên vào nhóm thành công"]);
         } else {
             echo json_encode(["message" => "Thêm thành viên vào nhóm thất bại"]);
+            http_response_code(500);
+        }
+        break;
+
+    case 'PUT':
+        if ($action !== "update") {
+            echo json_encode(["message" => "Action không hợp lệ cho phương thức PUT"]);
+            http_response_code(400);
+            exit;
+        }
+
+        parse_str(file_get_contents("php://input"), $_PUT);
+        if (!isset($_PUT['ma_ho_so'], $_PUT['ma_gv'], $_PUT['ma_gv_moi'])) {
+            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            http_response_code(400);
+            exit;
+        }
+
+        $nhom->ma_ho_so = $_PUT['ma_ho_so'];
+        $nhom->ma_gv = $_PUT['ma_gv'];
+        $maGVMoi = $_PUT['ma_gv_moi'];
+
+        if ($nhom->update($maGVMoi)) {
+            echo json_encode(["message" => "Cập nhật thông tin thành viên trong nhóm thành công"]);
+        } else {
+            echo json_encode(["message" => "Cập nhật thông tin thành viên thất bại"]);
             http_response_code(500);
         }
         break;
