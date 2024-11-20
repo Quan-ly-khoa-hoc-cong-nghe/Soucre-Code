@@ -16,7 +16,7 @@ switch ($method) {
         echo json_encode($result);
         break;
 
-    case 'ADD':
+    case 'POST':
         $data = json_decode(file_get_contents("php://input"));
         $thamdinh->MaThamDinh = $data->MaThamDinh;
         $thamdinh->NgayThamDinh = $data->NgayThamDinh;
@@ -31,7 +31,7 @@ switch ($method) {
         }
         break;
 
-    case 'UPDATE':
+    case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
         $thamdinh->MaThamDinh = $data->MaThamDinh;
         $thamdinh->NgayThamDinh = $data->NgayThamDinh;

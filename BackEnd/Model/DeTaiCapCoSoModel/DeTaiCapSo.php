@@ -1,4 +1,6 @@
 <?php
+use Google\Client;
+use Google\Service\Drive;
 
 class DeTaiCapSo {
     private $conn;
@@ -11,17 +13,23 @@ class DeTaiCapSo {
     public $file_hop_dong; // URL file trên Google Drive
     public $trang_thai;
     public $ma_ho_so;
-    private $accessToken;
+    private $driveService;
 
     public function __construct($db, $accessToken) {
         $this->conn = $db;
-        $this->accessToken = $accessToken;
+
+        // Khởi tạo Google Client
+        $client = new Client();
+        $client->setAccessToken($accessToken);
+        $this->driveService = new Drive($client);
     }
 
     // Lấy tất cả đề tài
     public function getAll() {
         $query = "SELECT * FROM " . $this->table;
-        return $this->conn->query($query);
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Lấy thông tin một đề tài
@@ -35,154 +43,122 @@ class DeTaiCapSo {
 
     // Upload file lên Google Drive
     private function uploadFileToGoogleDrive($filePath, $fileName) {
-        $url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+        try {
+            $fileMetadata = new Drive\DriveFile([
+                'name' => $fileName,
+                'parents' => ['YOUR_FOLDER_ID'] // Thay YOUR_FOLDER_ID bằng ID thư mục Google Drive
+            ]);
 
-        $fileMetadata = ['name' => $fileName];
-        $fileData = file_get_contents($filePath);
+            $fileContent = file_get_contents($filePath);
 
-        $boundary = uniqid();
-        $delimiter = "--" . $boundary;
-        $eol = "\r\n";
-        $body = '';
+            $uploadedFile = $this->driveService->files->create($fileMetadata, [
+                'data' => $fileContent,
+                'mimeType' => mime_content_type($filePath),
+                'uploadType' => 'multipart',
+                'fields' => 'id'
+            ]);
 
-        $body .= $delimiter . $eol;
-        $body .= 'Content-Type: application/json; charset=UTF-8' . $eol . $eol;
-        $body .= json_encode($fileMetadata) . $eol;
+            $fileId = $uploadedFile->id;
 
-        $body .= $delimiter . $eol;
-        $body .= 'Content-Type: ' . mime_content_type($filePath) . $eol . $eol;
-        $body .= $fileData . $eol;
-        $body .= $delimiter . "--";
+            // Thiết lập quyền công khai
+            $permission = new Drive\Permission([
+                'type' => 'anyone',
+                'role' => 'reader',
+            ]);
+            $this->driveService->permissions->create($fileId, $permission);
 
-        $headers = [
-            "Authorization: Bearer {$this->accessToken}",
-            "Content-Type: multipart/related; boundary={$boundary}",
-            "Content-Length: " . strlen($body)
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-
-        $response = curl_exec($ch);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        if ($error) {
-            echo "Lỗi upload: " . $error;
-            return null;
-        }
-
-        $responseData = json_decode($response, true);
-        if (isset($responseData['id'])) {
-            $fileId = $responseData['id'];
+            // Tạo link công khai
             $fileUrl = "https://drive.google.com/file/d/$fileId/view";
             return ['fileId' => $fileId, 'fileUrl' => $fileUrl];
+        } catch (Exception $e) {
+            throw new Exception("Lỗi upload file: " . $e->getMessage());
         }
-
-        return null;
     }
 
     // Xóa file trên Google Drive
     private function deleteFileFromGoogleDrive($fileId) {
-        $url = "https://www.googleapis.com/drive/v3/files/$fileId";
-
-        $headers = [
-            "Authorization: Bearer {$this->accessToken}"
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $response = curl_exec($ch);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        if ($error) {
-            echo "Lỗi xóa file: " . $error;
-            return false;
+        try {
+            $this->driveService->files->delete($fileId);
+            return true;
+        } catch (Exception $e) {
+            throw new Exception("Lỗi xóa file Google Drive: " . $e->getMessage());
         }
-
-        return true;
     }
 
     // Thêm đề tài và upload file hợp đồng lên Google Drive
     public function add($filePath, $fileName) {
-        $uploadResult = $this->uploadFileToGoogleDrive($filePath, $fileName);
+        try {
+            $uploadResult = $this->uploadFileToGoogleDrive($filePath, $fileName);
 
-        if (!$uploadResult) {
-            return false;
+            $this->file_hop_dong = $uploadResult['fileUrl'];
+
+            $query = "INSERT INTO " . $this->table . " SET ma_dtcs=?, ten_de_tai=?, ngay_bat_dau=?, ngay_ket_thuc=?, file_hop_dong=?, trang_thai=?, ma_ho_so=?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(1, $this->ma_dtcs);
+            $stmt->bindParam(2, $this->ten_de_tai);
+            $stmt->bindParam(3, $this->ngay_bat_dau);
+            $stmt->bindParam(4, $this->ngay_ket_thuc);
+            $stmt->bindParam(5, $this->file_hop_dong);
+            $stmt->bindParam(6, $this->trang_thai);
+            $stmt->bindParam(7, $this->ma_ho_so);
+
+            return $stmt->execute();
+        } catch (Exception $e) {
+            throw new Exception("Lỗi thêm đề tài: " . $e->getMessage());
         }
-
-        $this->file_hop_dong = $uploadResult['fileUrl'];
-
-        $query = "INSERT INTO " . $this->table . " SET ma_dtcs=?, ten_de_tai=?, ngay_bat_dau=?, ngay_ket_thuc=?, file_hop_dong=?, trang_thai=?, ma_ho_so=?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ma_dtcs);
-        $stmt->bindParam(2, $this->ten_de_tai);
-        $stmt->bindParam(3, $this->ngay_bat_dau);
-        $stmt->bindParam(4, $this->ngay_ket_thuc);
-        $stmt->bindParam(5, $this->file_hop_dong);
-        $stmt->bindParam(6, $this->trang_thai);
-        $stmt->bindParam(7, $this->ma_ho_so);
-
-        return $stmt->execute();
     }
 
     // Cập nhật đề tài và upload file mới lên Google Drive nếu có
     public function update($filePath = null, $fileName = null) {
-        if ($filePath && $fileName) {
-            $hoSo = $this->getOne();
-            preg_match('/\/d\/(.*?)\/view/', $hoSo['file_hop_dong'], $matches);
-            $oldFileId = $matches[1] ?? null;
+        try {
+            if ($filePath && $fileName) {
+                $currentRecord = $this->getOne();
+                preg_match('/\/d\/(.*?)\/view/', $currentRecord['file_hop_dong'], $matches);
+                $oldFileId = $matches[1] ?? null;
 
-            $uploadResult = $this->uploadFileToGoogleDrive($filePath, $fileName);
-            if (!$uploadResult) {
-                return false;
+                $uploadResult = $this->uploadFileToGoogleDrive($filePath, $fileName);
+                $this->file_hop_dong = $uploadResult['fileUrl'];
+
+                if ($oldFileId) {
+                    $this->deleteFileFromGoogleDrive($oldFileId);
+                }
             }
 
-            $this->file_hop_dong = $uploadResult['fileUrl'];
+            $query = "UPDATE " . $this->table . " SET ten_de_tai=?, ngay_bat_dau=?, ngay_ket_thuc=?, file_hop_dong=?, trang_thai=?, ma_ho_so=? WHERE ma_dtcs=?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(1, $this->ten_de_tai);
+            $stmt->bindParam(2, $this->ngay_bat_dau);
+            $stmt->bindParam(3, $this->ngay_ket_thuc);
+            $stmt->bindParam(4, $this->file_hop_dong);
+            $stmt->bindParam(5, $this->trang_thai);
+            $stmt->bindParam(6, $this->ma_ho_so);
+            $stmt->bindParam(7, $this->ma_dtcs);
 
-            if ($oldFileId && !$this->deleteFileFromGoogleDrive($oldFileId)) {
-                echo "Không thể xóa file cũ trên Google Drive.";
-            }
+            return $stmt->execute();
+        } catch (Exception $e) {
+            throw new Exception("Lỗi cập nhật đề tài: " . $e->getMessage());
         }
-
-        $query = "UPDATE " . $this->table . " SET ten_de_tai=?, ngay_bat_dau=?, ngay_ket_thuc=?, file_hop_dong=?, trang_thai=?, ma_ho_so=? WHERE ma_dtcs=?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ten_de_tai);
-        $stmt->bindParam(2, $this->ngay_bat_dau);
-        $stmt->bindParam(3, $this->ngay_ket_thuc);
-        $stmt->bindParam(4, $this->file_hop_dong);
-        $stmt->bindParam(5, $this->trang_thai);
-        $stmt->bindParam(6, $this->ma_ho_so);
-        $stmt->bindParam(7, $this->ma_dtcs);
-
-        return $stmt->execute();
     }
 
     // Xóa đề tài và file trên Google Drive
     public function delete() {
-        $hoSo = $this->getOne();
-        preg_match('/\/d\/(.*?)\/view/', $hoSo['file_hop_dong'], $matches);
-        $fileId = $matches[1] ?? null;
+        try {
+            $currentRecord = $this->getOne();
+            preg_match('/\/d\/(.*?)\/view/', $currentRecord['file_hop_dong'], $matches);
+            $fileId = $matches[1] ?? null;
 
-        if ($fileId && !$this->deleteFileFromGoogleDrive($fileId)) {
-            echo "Không thể xóa file trên Google Drive.";
-            return false;
+            if ($fileId) {
+                $this->deleteFileFromGoogleDrive($fileId);
+            }
+
+            $query = "DELETE FROM " . $this->table . " WHERE ma_dtcs = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(1, $this->ma_dtcs);
+
+            return $stmt->execute();
+        } catch (Exception $e) {
+            throw new Exception("Lỗi xóa đề tài: " . $e->getMessage());
         }
-
-        $query = "DELETE FROM " . $this->table . " WHERE ma_dtcs = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ma_dtcs);
-
-        return $stmt->execute();
     }
 }
 ?>
