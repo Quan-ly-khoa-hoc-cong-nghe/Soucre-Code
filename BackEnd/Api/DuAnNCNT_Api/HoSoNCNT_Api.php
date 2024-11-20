@@ -46,7 +46,7 @@ try {
             break;
 
         case 'POST':
-            if ($action !== "add") {
+            if ($action !== "post") {
                 echo json_encode(["message" => "Action không hợp lệ cho phương thức POST"]);
                 http_response_code(400);
                 exit;
@@ -76,7 +76,7 @@ try {
             break;
 
         case 'PUT':
-            if ($action !== "update") {
+            if ($action !== "put") {
                 echo json_encode(["message" => "Action không hợp lệ cho phương thức PUT"]);
                 http_response_code(400);
                 exit;
