@@ -59,21 +59,21 @@ const Layout = ({ children }) => {
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-                            <Link to="/science-seminar" className="flex items-center space-x-3">
+                            <Link to="/admin/science-seminar" className="flex items-center space-x-3">
                                 <FaGift />
                                 <span className="font-semibold"> Science Seminar</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-                            <Link to="/content-uploaded" className="flex items-center space-x-3">
+                            <Link to="/admin/edit-student" className="flex items-center space-x-3">
                                 <FaUpload />
-                                <span className="font-semibold">ádsa sad</span>
+                                <span className="font-semibold">Edir Student</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-                            <Link to="/cmt-manage" className="flex items-center space-x-3">
+                            <Link to="/admin/product-manager" className="flex items-center space-x-3">
                                 <FaComment />
-                                <span className="font-semibold">ádsa</span>
+                                <span className="font-semibold">Product Manager</span>
                             </Link>
                         </li>
                         <hr className="border-gray-400 my-4" />

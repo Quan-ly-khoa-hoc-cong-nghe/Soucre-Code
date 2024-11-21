@@ -20,7 +20,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 $action = $_GET['action'] ?? '';
 
 switch ($action) {
-    case 'read':
+    case 'get':  // Thêm case 'get' ở đây
         $result = $article->readAll();
         echo json_encode([ 'BaiBaoKhoaHoc' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
@@ -64,4 +64,5 @@ switch ($action) {
         echo json_encode(['message' => 'Action không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
 }
+
 ?>

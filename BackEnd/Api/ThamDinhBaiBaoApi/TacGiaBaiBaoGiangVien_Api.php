@@ -34,7 +34,7 @@ switch ($action) {
         }
         break;
 
-    case 'read':
+    case 'get':
         $stmt = $tacGia->read();
         $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode( ['TacGiaGiangVien'=> $records],JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

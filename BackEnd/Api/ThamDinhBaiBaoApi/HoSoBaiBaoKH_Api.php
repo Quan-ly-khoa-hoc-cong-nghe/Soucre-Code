@@ -29,7 +29,7 @@ switch ($action) {
         }
         break;
 
-    case 'read':
+    case 'get':
         $stmt = $hoSo->read();
         $num = $stmt->rowCount();
 

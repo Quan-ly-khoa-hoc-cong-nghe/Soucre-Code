@@ -30,7 +30,7 @@ switch ($action) {
         }
         break;
 
-    case 'read':
+    case 'get':
         $stmt = $tacGia->read();
         $num = $stmt->rowCount();
 
