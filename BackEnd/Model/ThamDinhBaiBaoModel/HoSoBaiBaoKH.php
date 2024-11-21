@@ -1,11 +1,8 @@
 <?php
-
-class HoSoBaiBaoKH
-{
+class HoSoBaiBaoKH {
     private $conn;
     private $table_name = "HoSoBaiBaoKH";
 
-    // Các thuộc tính
     public $MaHoSo;
     public $TrangThai;
     public $MaNguoiDung;
@@ -13,80 +10,56 @@ class HoSoBaiBaoKH
     public $MaTacGia;
     public $MaKhoa;
 
-    // Constructor
-    public function __construct($db)
-    {
+    public function __construct($db) {
         $this->conn = $db;
     }
 
-    // Phương thức tạo mới hồ sơ
-    public function add()
-    {
-        $query = "INSERT INTO " . $this->table_name . " (MaHoSo, TrangThai, MaNguoiDung, NgayNop, MaTacGia, MaKhoa)
-                  VALUES (:MaHoSo, :TrangThai, :MaNguoiDung, :NgayNop, :MaTacGia, :MaKhoa)";
+    // Thêm hồ sơ bài báo
+    public function add() {
+        $query = "INSERT INTO " . $this->table_name . " SET MaHoSo=:MaHoSo, TrangThai=:TrangThai, MaNguoiDung=:MaNguoiDung, NgayNop=:NgayNop, MaTacGia=:MaTacGia, MaKhoa=:MaKhoa";
         $stmt = $this->conn->prepare($query);
 
         // Ràng buộc dữ liệu
-        $stmt->bindParam(':MaHoSo', $this->MaHoSo);
-        $stmt->bindParam(':TrangThai', $this->TrangThai);
-        $stmt->bindParam(':MaNguoiDung', $this->MaNguoiDung);
-        $stmt->bindParam(':NgayNop', $this->NgayNop);
-        $stmt->bindParam(':MaTacGia', $this->MaTacGia);
-        $stmt->bindParam(':MaKhoa', $this->MaKhoa);
+        $stmt->bindParam(":MaHoSo", $this->MaHoSo);
+        $stmt->bindParam(":TrangThai", $this->TrangThai);
+        $stmt->bindParam(":MaNguoiDung", $this->MaNguoiDung);
+        $stmt->bindParam(":NgayNop", $this->NgayNop);
+        $stmt->bindParam(":MaTacGia", $this->MaTacGia);
+        $stmt->bindParam(":MaKhoa", $this->MaKhoa);
 
-        // Thực thi truy vấn
-        if ($stmt->execute()) {
-            return true;
-        }
-        return false;
+        return $stmt->execute();
     }
 
-    // Phương thức đọc tất cả hồ sơ
-    public function read()
-    {
+    // Lấy tất cả hồ sơ bài báo
+    public function getAll() {
         $query = "SELECT * FROM " . $this->table_name;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
     }
 
-    // Phương thức cập nhật hồ sơ
-    public function update()
-    {
-        $query = "UPDATE " . $this->table_name . "
-                  SET TrangThai = :TrangThai, MaNguoiDung = :MaNguoiDung, NgayNop = :NgayNop, MaTacGia = :MaTacGia, MaKhoa = :MaKhoa
-                  WHERE MaHoSo = :MaHoSo";
+    // Cập nhật hồ sơ bài báo
+    public function update() {
+        $query = "UPDATE " . $this->table_name . " SET TrangThai=:TrangThai, MaNguoiDung=:MaNguoiDung, NgayNop=:NgayNop, MaTacGia=:MaTacGia, MaKhoa=:MaKhoa WHERE MaHoSo=:MaHoSo";
         $stmt = $this->conn->prepare($query);
 
-        // Ràng buộc dữ liệu
-        $stmt->bindParam(':MaHoSo', $this->MaHoSo);
-        $stmt->bindParam(':TrangThai', $this->TrangThai);
-        $stmt->bindParam(':MaNguoiDung', $this->MaNguoiDung);
-        $stmt->bindParam(':NgayNop', $this->NgayNop);
-        $stmt->bindParam(':MaTacGia', $this->MaTacGia);
-        $stmt->bindParam(':MaKhoa', $this->MaKhoa);
+        $stmt->bindParam(":MaHoSo", $this->MaHoSo);
+        $stmt->bindParam(":TrangThai", $this->TrangThai);
+        $stmt->bindParam(":MaNguoiDung", $this->MaNguoiDung);
+        $stmt->bindParam(":NgayNop", $this->NgayNop);
+        $stmt->bindParam(":MaTacGia", $this->MaTacGia);
+        $stmt->bindParam(":MaKhoa", $this->MaKhoa);
 
-        // Thực thi truy vấn
-        if ($stmt->execute()) {
-            return true;
-        }
-        return false;
+        return $stmt->execute();
     }
 
-    // Phương thức xóa hồ sơ
-    public function delete()
-    {
-        $query = "DELETE FROM " . $this->table_name . " WHERE MaHoSo = :MaHoSo";
+    // Xóa hồ sơ bài báo
+    public function delete() {
+        $query = "DELETE FROM " . $this->table_name . " WHERE MaHoSo=:MaHoSo";
         $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":MaHoSo", $this->MaHoSo);
 
-        // Ràng buộc dữ liệu
-        $stmt->bindParam(':MaHoSo', $this->MaHoSo);
-
-        // Thực thi truy vấn
-        if ($stmt->execute()) {
-            return true;
-        }
-        return false;
+        return $stmt->execute();
     }
 }
 ?>

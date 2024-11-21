@@ -1,85 +1,120 @@
 <?php
-
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../../Model/ThamDinhBaiBaoModel/HoSoBaiBaoKH.php';
+header("Content-Type: application/json");
+require_once __DIR__. '/../../config/Database.php';
+require_once __DIR__. '/../../Model/ThamDinhBaiBaoModel/HoSoBaiBaoKH.php';
 
 $database = new Database();
 $db = $database->getConn();
+$hosobaibao = new HoSoBaiBaoKH($db);
 
-$hoSo = new HoSoBaiBaoKH($db);
-$data = json_decode(file_get_contents("php://input"));
-$action = $_GET['action'] ?? '';
+// Lấy phương thức HTTP và tham số `action`
+$method = $_SERVER['REQUEST_METHOD'];
+$action = isset($_GET['action']) ? $_GET['action'] : null;
 
-switch ($action) {
-    case 'create':
-        $hoSo->MaHoSo = $data->MaHoSo;
-        $hoSo->TrangThai = $data->TrangThai;
-        $hoSo->MaNguoiDung = $data->MaNguoiDung;
-        $hoSo->NgayNop = $data->NgayNop;
-        $hoSo->MaTacGia = $data->MaTacGia;
-        $hoSo->MaKhoa = $data->MaKhoa;
+// Kiểm tra tham số `action`
+if (!$action) {
+    echo json_encode(["message" => "Yêu cầu không hợp lệ: thiếu tham số action"]);
+    http_response_code(400);
+    exit;
+}
 
-        if ($hoSo->add()) {
-            echo json_encode(["message" => "Record created successfully."]);
+switch ($method) {
+    case 'GET':
+        if ($action === "get") {
+            $stmt = $hosobaibao->getAll();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($result);
         } else {
-            echo json_encode(["message" => "Failed to create record."]);
+            echo json_encode(["message" => "Action không hợp lệ"]);
+            http_response_code(400);
         }
         break;
 
-    case 'get':
-        $stmt = $hoSo->read();
-        $num = $stmt->rowCount();
+    case 'POST':
+        if ($action !== "add") {
+            echo json_encode(["message" => "Action không hợp lệ cho phương thức POST"]);
+            http_response_code(400);
+            exit;
+        }
 
-        if ($num > 0) {
-            $records = [];
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                extract($row);
-                $record_item = [
-                    "MaHoSo" => $MaHoSo,
-                    "TrangThai" => $TrangThai,
-                    "MaNguoiDung" => $MaNguoiDung,
-                    "NgayNop" => $NgayNop,
-                    "MaTacGia" => $MaTacGia,
-                    "MaKhoa" => $MaKhoa
-                ];
-                $records[] = $record_item;
-            }
-            echo json_encode(["HoSoBaiBaoKhoaHoc" => $records],JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $data = json_decode(file_get_contents("php://input"));
+        if (!isset($data->MaHoSo, $data->TrangThai, $data->MaNguoiDung, $data->NgayNop, $data->MaTacGia, $data->MaKhoa)) {
+            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            http_response_code(400);
+            exit;
+        }
+
+        $hosobaibao->MaHoSo = $data->MaHoSo;
+        $hosobaibao->TrangThai = $data->TrangThai;
+        $hosobaibao->MaNguoiDung = $data->MaNguoiDung;
+        $hosobaibao->NgayNop = $data->NgayNop;
+        $hosobaibao->MaTacGia = $data->MaTacGia;
+        $hosobaibao->MaKhoa = $data->MaKhoa;
+
+        if ($hosobaibao->add()) {
+            echo json_encode(["message" => "Thêm hồ sơ bài báo thành công"]);
         } else {
-            echo json_encode(["message" => "No records found."]);
+            echo json_encode(["message" => "Thêm hồ sơ bài báo thất bại"]);
+            http_response_code(500);
         }
         break;
 
-    case 'update':
-        $hoSo->MaHoSo = $data->MaHoSo;
-        $hoSo->TrangThai = $data->TrangThai;
-        $hoSo->MaNguoiDung = $data->MaNguoiDung;
-        $hoSo->NgayNop = $data->NgayNop;
-        $hoSo->MaTacGia = $data->MaTacGia;
-        $hoSo->MaKhoa = $data->MaKhoa;
+    case 'PUT':
+        if ($action !== "update") {
+            echo json_encode(["message" => "Action không hợp lệ cho phương thức PUT"]);
+            http_response_code(400);
+            exit;
+        }
 
-        if ($hoSo->update()) {
-            echo json_encode(["message" => "Record updated successfully."]);
+        $data = json_decode(file_get_contents("php://input"));
+        if (!isset($data->MaHoSo, $data->TrangThai, $data->MaNguoiDung, $data->NgayNop, $data->MaTacGia, $data->MaKhoa)) {
+            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            http_response_code(400);
+            exit;
+        }
+
+        $hosobaibao->MaHoSo = $data->MaHoSo;
+        $hosobaibao->TrangThai = $data->TrangThai;
+        $hosobaibao->MaNguoiDung = $data->MaNguoiDung;
+        $hosobaibao->NgayNop = $data->NgayNop;
+        $hosobaibao->MaTacGia = $data->MaTacGia;
+        $hosobaibao->MaKhoa = $data->MaKhoa;
+
+        if ($hosobaibao->update()) {
+            echo json_encode(["message" => "Cập nhật hồ sơ bài báo thành công"]);
         } else {
-            echo json_encode(["message" => "Failed to update record."]);
+            echo json_encode(["message" => "Cập nhật hồ sơ bài báo thất bại"]);
+            http_response_code(500);
         }
         break;
 
-    case 'delete':
-        $hoSo->MaHoSo = $data->MaHoSo;
+    case 'DELETE':
+        if ($action !== "delete") {
+            echo json_encode(["message" => "Action không hợp lệ cho phương thức DELETE"]);
+            http_response_code(400);
+            exit;
+        }
 
-        if ($hoSo->delete()) {
-            echo json_encode(["message" => "Record deleted successfully."]);
+        $data = json_decode(file_get_contents("php://input"));
+        if (!isset($data->MaHoSo)) {
+            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            http_response_code(400);
+            exit;
+        }
+
+        $hosobaibao->MaHoSo = $data->MaHoSo;
+
+        if ($hosobaibao->delete()) {
+            echo json_encode(["message" => "Xóa hồ sơ bài báo thành công"]);
         } else {
-            echo json_encode(["message" => "Failed to delete record."]);
+            echo json_encode(["message" => "Xóa hồ sơ bài báo thất bại"]);
+            http_response_code(500);
         }
         break;
 
     default:
-        echo json_encode(["message" => "Invalid action."]);
+        echo json_encode(["message" => "Phương thức không được hỗ trợ"]);
+        http_response_code(405);
         break;
 }
 ?>

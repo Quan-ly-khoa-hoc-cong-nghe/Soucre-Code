@@ -31,10 +31,10 @@ switch ($action) {
     case 'get':
         getAllUsers($conn);  // Lấy tất cả người dùng
         break;
-    case 'add':
+    case 'POST':
         addUser($conn, $data);  // Thêm người dùng
         break;
-    case 'update':
+    case 'PUT':
         updateUser($conn, $data);  // Cập nhật người dùng
         break;
     case 'delete':
