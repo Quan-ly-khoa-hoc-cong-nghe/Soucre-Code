@@ -28,7 +28,25 @@ class DeTaiNCKHSV {
             return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
         }
     }
-
+    public function updateGroup() {
+        // Câu lệnh SQL để cập nhật chỉ mã nhóm
+        $query = "UPDATE " . $this->table_name . " SET maNhomNCKHSV = :maNhomNCKHSV WHERE maDeTaiSV = :maDeTaiSV";
+    
+        // Chuẩn bị câu lệnh SQL
+        $stmt = $this->conn->prepare($query);
+    
+        // Liên kết các giá trị
+        $stmt->bindParam(':maDeTaiSV', $this->maDeTaiSV);  // Giữ nguyên mã đề tài
+        $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);  // Chỉ thay đổi mã nhóm
+    
+        // Thực thi câu lệnh SQL
+        if ($stmt->execute()) {
+            return true;
+        }
+    
+        return false;
+    }
+    
     // Phương thức thêm đề tài
     public function add() {
         try {
@@ -46,6 +64,18 @@ class DeTaiNCKHSV {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
+public function readByMaDeTaiSV($maDeTaiSV) {
+    $query = "SELECT * FROM DeTaiNCKHSV WHERE maDeTaiSV = :maDeTaiSV";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':maDeTaiSV', $maDeTaiSV);
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } else {
+        return false; // Không tìm thấy dữ liệu
+    }
+}
 
     // Phương thức cập nhật đề tài
     public function update() {

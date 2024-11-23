@@ -37,6 +37,19 @@ switch ($action) {
             echo json_encode(['message' => 'Dữ liệu không đầy đủ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
+        case 'autoUpdateGroups':
+            $url = "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/DeTaiNCKHSV_Api.php?action=get";
+            $response = file_get_contents($url);
+            $dataDeTai = json_decode($response, true);
+        
+            if (isset($dataDeTai['DeTaiNCKHSV'])) {
+                $result = $nhomNCKHSV->autoUpdateGroups($dataDeTai['DeTaiNCKHSV']);
+                echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            } else {
+                echo json_encode(['error' => 'Không lấy được dữ liệu từ bảng Đề Tài'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            }
+            break;
+        
 
     case 'update':
         if (!empty($data['MaNhomNCKHSV'])) {
@@ -51,7 +64,21 @@ switch ($action) {
             echo json_encode(['message' => 'Thiếu mã nhóm NCKHSV'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
-
+        case 'addGroup':
+            if (!empty($data['MaDeTaiSV']) && !empty($data['MaNhomNCKHSV'])) {
+                $nhomNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+                $nhomNCKHSV->MaDeTaiSV = $data['MaDeTaiSV'];
+                // Thực hiện thêm mới
+                if ($nhomNCKHSV->addNewGroup()) {
+                    echo json_encode(['success' => true, 'message' => 'Thêm nhóm NCKHSV thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Không thể thêm nhóm NCKHSV'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                }
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Dữ liệu không đầy đủ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            }
+            break;
+        
     case 'delete':
         if (!empty($data['MaNhomNCKHSV'])) {
             $nhomNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
