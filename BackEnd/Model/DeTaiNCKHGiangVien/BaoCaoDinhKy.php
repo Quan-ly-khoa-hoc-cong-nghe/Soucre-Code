@@ -1,79 +1,81 @@
 <?php
-class BaoCaoDinhKy {
-    private $conn;
-    private $table_name = "BaoCaoDinhKy";
 
-    public $noiDungBaoCao;
-    public $ngayNop;
-    public $fileBaoCao;
-    public $maDeTaiNCHKGV;
-    
+class BaoCaoDinhKy
+{
+    private $db;
 
-    public function __construct($db) {
-        $this->conn = $db;
+    public function __construct($pdo)
+    {
+        $this->db = $pdo;
     }
 
-    // Lấy tất cả đề tài NCKH
-    public function read() {
-        $query = "SELECT * FROM " . $this->table_name;
-        $stmt = $this->conn->prepare($query);
+    // Lấy tất cả báo cáo
+    public function getAllReports()
+    {
+        $stmt = $this->db->prepare("SELECT * FROM BaoCaoDinhKy");
         $stmt->execute();
-        return $stmt;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Lấy một đề tài NCKH
-    public function readOne() {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE maDeTaiNCHKGV = ? LIMIT 0,1";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->maDeTaiNCHKGV);
+    // Lấy báo cáo theo mã đề tài
+    public function getReportByMaDeTai($maDeTai)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM BaoCaoDinhKy WHERE MaDeTaiNCKHGV = :maDeTai");
+        $stmt->bindParam(':maDeTai', $maDeTai);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Tạo mới đề tài NCKH
-    public function create() {
-        $query = "INSERT INTO " . $this->table_name . " SET NoiDungBaoCao=:noiDungBaoCao, NgayNop=:ngayNop, FileBaoCao=:fileBaoCao, MaDeTaiNCHKGV=:maDeTaiNCHKGV";
-        $stmt = $this->conn->prepare($query);
-
-        // Gắn dữ liệu
-        $stmt->bindParam(":NoiDungBaoCao", $this->noiDungBaoCao);
-        $stmt->bindParam(":NgayNop", $this->ngayNop);
-        $stmt->bindParam(":FileBaoCao", $this->fileBaoCao);
-        $stmt->bindParam(":MaDeTaiNCHKGV", $this->maDeTaiNCHKGV);
-
-        if ($stmt->execute()) {
-            return true;
-        }
-        return false;
+    // Thêm báo cáo mới
+    public function addReport($noiDung, $ngayNop, $fileBaoCao, $maDeTai)
+    {
+        $stmt = $this->db->prepare("INSERT INTO BaoCaoDinhKy (NoiDungBaoCao, NgayNop, FileBaoBao, MaDeTaiNCKHGV) 
+                                    VALUES (:noiDung, :ngayNop, :fileBaoCao, :maDeTai)");
+        $stmt->bindParam(':noiDung', $noiDung);
+        $stmt->bindParam(':ngayNop', $ngayNop);
+        $stmt->bindParam(':fileBaoCao', $fileBaoCao);
+        $stmt->bindParam(':maDeTai', $maDeTai);
+        return $stmt->execute();
     }
 
-    // Cập nhật đề tài NCKH
-    public function update() {
-        $query = "UPDATE " . $this->table_name . "SET NoiDungBaoCao=:noiDungBaoCao, NgayNop=:ngayNop, FileBaoCao=:fileBaoCao, MaDeTaiNCHKGV=:maDeTaiNCHKGV";
-        $stmt = $this->conn->prepare($query);
-
-        // Gắn dữ liệu
-        $stmt->bindParam(":NoiDungBaoCao", $this->noiDungBaoCao);
-        $stmt->bindParam(":NgayNop", $this->ngayNop);
-        $stmt->bindParam(":FileBaoCao", $this->fileBaoCao);
-        $stmt->bindParam(":MaDeTaiNCHKGV", $this->maDeTaiNCHKGV);
-
-        if ($stmt->execute()) {
-            return true;
-        }
-        return false;
+    // Kiểm tra mã đề tài có tồn tại không
+    public function checkMaDeTaiExists($maDeTai)
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM BaoCaoDinhKy WHERE MaDeTaiNCKHGV = :maDeTai");
+        $stmt->bindParam(':maDeTai', $maDeTai);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['count'] > 0;
     }
 
-    // Xóa đề tài NCKH
-    public function delete() {
-        $query = "DELETE FROM " . $this->table_name . " WHERE MaDeTaiNCKHGV = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->maDeTaiNCHKGV);
-
-        if ($stmt->execute()) {
-            return true;
+    // Cập nhật báo cáo theo mã đề tài
+    public function updateReportByMaDeTai($maDeTai, $noiDung, $ngayNop, $fileBaoCao)
+    {
+        if (!$this->checkMaDeTaiExists($maDeTai)) {
+            return false;
         }
-        return false;
+
+        $stmt = $this->db->prepare("
+            UPDATE BaoCaoDinhKy 
+            SET NoiDungBaoCao = :noiDung, NgayNop = :ngayNop, FileBaoBao = :fileBaoCao
+            WHERE MaDeTaiNCKHGV = :maDeTai
+        ");
+        $stmt->bindParam(':noiDung', $noiDung);
+        $stmt->bindParam(':ngayNop', $ngayNop);
+        $stmt->bindParam(':fileBaoCao', $fileBaoCao);
+        $stmt->bindParam(':maDeTai', $maDeTai);
+        return $stmt->execute();
+    }
+
+    // Xóa báo cáo theo mã đề tài
+    public function deleteReportByMaDeTai($maDeTai)
+    {
+        if (!$this->checkMaDeTaiExists($maDeTai)) {
+            return false;
+        }
+
+        $stmt = $this->db->prepare("DELETE FROM BaoCaoDinhKy WHERE MaDeTaiNCKHGV = :maDeTai");
+        $stmt->bindParam(':maDeTai', $maDeTai);
+        return $stmt->execute();
     }
 }
-?>
