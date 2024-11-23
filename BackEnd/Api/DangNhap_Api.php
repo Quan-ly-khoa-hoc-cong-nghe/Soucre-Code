@@ -22,14 +22,13 @@ if (!$conn) {
     exit;
 }
 
-// Lấy dữ liệu từ yêu cầu
 $data = json_decode(file_get_contents('php://input'), true);
-$action = $_GET['action'] ?? ''; // Thực hiện hành động từ tham số 'action' trong URL
+$action = $_GET['action'] ?? '';
 
 // Xử lý các hành động CRUD
 switch ($action) {
-    case 'get':
-        getAllUsers($conn);  // Lấy tất cả người dùng
+    case 'login':
+        loginUser($conn, $data);
         break;
     case 'POST':
         addUser($conn, $data);  // Thêm người dùng
@@ -44,18 +43,34 @@ switch ($action) {
         echo json_encode(['status' => 'error', 'message' => 'Hành động không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 }
 
-// Hàm lấy tất cả người dùng
-function getAllUsers($conn) {
+function loginUser($conn, $data) {
+    if (!isset($data['MaNguoiDung']) || !isset($data['MatKhau'])) {
+        echo json_encode(['status' => 'error', 'message' => 'Thiếu thông tin đăng nhập'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        return;
+    }
+
+    $maNguoiDung = $data['MaNguoiDung'];
+    $matKhau = $data['MatKhau'];
+
     try {
-        $sql = "SELECT * FROM NguoiDung where MaNhanVien  = 'NV01' and MatKhau = 'admin123' ";
+        $sql = "SELECT * FROM NguoiDung WHERE MaNguoiDung = :MaNguoiDung";
         $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':MaNguoiDung', $maNguoiDung);
         $stmt->execute();
-        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(['data' => $users], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && $user['MatKhau'] === $matKhau) {
+            // Đăng nhập thành công
+            echo json_encode(['status' => 'success', 'data' => $user], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } else {
+            // Đăng nhập thất bại
+            echo json_encode(['status' => 'error', 'message' => 'Thông tin đăng nhập không đúng'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
     } catch (PDOException $e) {
-        echo json_encode(['message' => 'Lỗi truy vấn: ' . $e->getMessage()], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        echo json_encode(['status' => 'error', 'message' => 'Lỗi truy vấn: ' . $e->getMessage()], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 }
+
 
 // Hàm thêm người dùng
 function addUser($conn, $data) {
