@@ -38,7 +38,12 @@ switch ($action) {
             echo json_encode(['message' => 'Dữ liệu không đầy đủ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
-
+        case 'autoUpdate':
+            $apiUrl = "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/NhomNCKHSV_Api.php?action=get";
+            $result = $sinhVienNCKHSV->autoUpdateFromAPI($apiUrl);
+            echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;        
+        
     case 'update':
         if (!empty($data['MaNhomNCKHSV'])) {
             $sinhVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
@@ -52,6 +57,7 @@ switch ($action) {
             echo json_encode(['message' => 'Thiếu mã nhóm sinh viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
+        
 
         case 'delete':
             $data = json_decode(file_get_contents('php://input'), true);

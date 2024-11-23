@@ -44,7 +44,40 @@ class SinhVienNCKHSV {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
-
+    public function autoUpdateFromAPI($apiUrl) {
+        try {
+            // Lấy dữ liệu từ API
+            $jsonData = file_get_contents($apiUrl);
+            $data = json_decode($jsonData, true);
+    
+            if (isset($data['NhomNCKHSV'])) {
+                foreach ($data['NhomNCKHSV'] as $item) {
+                    if (!empty($item['MaNhomNCKHSV'])) {
+                        // Kiểm tra xem `MaNhomNCKHSV` đã tồn tại trong bảng chưa
+                        $checkSql = "SELECT COUNT(*) FROM " . $this->table_name . " WHERE MaNhomNCKHSV = :maNhomNCKHSV";
+                        $checkStmt = $this->conn->prepare($checkSql);
+                        $checkStmt->bindParam(':maNhomNCKHSV', $item['MaNhomNCKHSV']);
+                        $checkStmt->execute();
+                        $count = $checkStmt->fetchColumn();
+    
+                        if ($count == 0) {
+                            // Nếu chưa tồn tại, thêm mới
+                            $sql = "INSERT INTO " . $this->table_name . " (MaNhomNCKHSV, MaSinhVien) VALUES (:maNhomNCKHSV, NULL)";
+                            $stmt = $this->conn->prepare($sql);
+                            $stmt->bindParam(':maNhomNCKHSV', $item['MaNhomNCKHSV']);
+                            $stmt->execute();
+                        }
+                    }
+                }
+                return ['message' => 'Cập nhật dữ liệu từ API thành công'];
+            } else {
+                return ['error' => 'Dữ liệu từ API không hợp lệ'];
+            }
+        } catch (Exception $e) {
+            return ['error' => 'Lỗi: ' . $e->getMessage()];
+        }
+    }
+    
     public function delete() {
         try {
             $sql = "DELETE FROM " . $this->table_name . " WHERE MaNhomNCKHSV = :maNhomNCKHSV";
