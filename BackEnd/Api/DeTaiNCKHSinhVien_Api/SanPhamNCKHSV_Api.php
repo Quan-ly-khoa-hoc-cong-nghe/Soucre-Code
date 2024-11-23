@@ -6,11 +6,11 @@ header("Access-Control-Allow-Methods: POST, GET, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 require_once __DIR__ . '/../../config/Database.php';
-require_once __DIR__ . '/../../Model/DeTaiNCKHGiangVien/SanPhamNCKHGV.php';
+require_once __DIR__ . '/../../Model/DeTaiNCKHSinhVien/SanPhamNCKHSV.php';
 
 $database = new Database();
 $db = $database->getConn();
-$sanPham = new SanPhamNCKHGV($db);
+$sanPham = new SanPhamNCKHSV($db);
 
 // Lấy action từ query string
 $action = isset($_GET['action']) ? strtoupper(trim($_GET['action'])) : null;
@@ -24,14 +24,14 @@ if ($action === null) {
 switch ($action) {
     case 'GET':
         // Lấy tất cả sản phẩm
-        $result = $sanPham->getAllProducts();
+        $result = $sanPham->getAllSanPham();
         echo json_encode($result);
         break;
 
-    case 'GET_BY_ID':
-        // Lấy sản phẩm theo MaDeTaiNCKHGV
+    case 'GET_BY_MA_DETAI':
+        // Lấy sản phẩm theo mã đề tài
         if (isset($_GET['maDeTai'])) {
-            $result = $sanPham->getProductByMaDeTai($_GET['maDeTai']);
+            $result = $sanPham->getSanPhamByMaDeTai($_GET['maDeTai']);
             if ($result) {
                 echo json_encode($result);
             } else {
@@ -45,42 +45,45 @@ switch ($action) {
     case 'POST':
         // Thêm sản phẩm mới
         $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'], $data['MaDeTaiNCKHGV'])) {
-            if ($sanPham->addProduct($data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'], $data['MaDeTaiNCKHGV'])) {
+        if (isset($data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'], $data['MaDeTaiSV'])) {
+            $result = $sanPham->addSanPham($data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'], $data['MaDeTaiSV']);
+            if ($result === true) {
                 echo json_encode(["message" => "Thêm sản phẩm thành công."]);
             } else {
-                echo json_encode(["message" => "Thêm sản phẩm thất bại."]);
+                echo json_encode(["message" => $result]); // Trả về lỗi nếu có
             }
         } else {
-            echo json_encode(["message" => "Thiếu thông tin sản phẩm để tạo."]);
+            echo json_encode(["message" => "Thiếu thông tin để thêm sản phẩm."]);
         }
         break;
 
     case 'PUT':
-        // Cập nhật sản phẩm theo MaDeTaiNCKHGV
+        // Cập nhật sản phẩm
         $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['MaDeTaiNCKHGV'], $data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'])) {
-            if ($sanPham->updateProductByMaDeTai($data['MaDeTaiNCKHGV'], $data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'])) {
+        if (isset($data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'], $data['MaDeTaiSV'])) {
+            $result = $sanPham->updateSanPham($data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'], $data['MaDeTaiSV']);
+            if ($result === true) {
                 echo json_encode(["message" => "Cập nhật sản phẩm thành công."]);
             } else {
-                echo json_encode(["message" => "Cập nhật thất bại hoặc MaDeTaiNCKHGV không tồn tại."]);
+                echo json_encode(["message" => $result]); // Trả về lỗi nếu có
             }
         } else {
-            echo json_encode(["message" => "Thiếu thông tin cần thiết để cập nhật."]);
+            echo json_encode(["message" => "Thiếu thông tin để cập nhật sản phẩm."]);
         }
         break;
 
     case 'DELETE':
-        // Xóa sản phẩm theo MaDeTaiNCKHGV
+        // Xóa sản phẩm theo mã đề tài
         $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['MaDeTaiNCKHGV'])) {
-            if ($sanPham->deleteProductByMaDeTai($data['MaDeTaiNCKHGV'])) {
+        if (isset($data['MaDeTaiSV'])) {
+            $result = $sanPham->deleteSanPhamByMaDeTai($data['MaDeTaiSV']);
+            if ($result === true) {
                 echo json_encode(["message" => "Xóa sản phẩm thành công."]);
             } else {
-                echo json_encode(["message" => "Xóa thất bại hoặc MaDeTaiNCKHGV không tồn tại."]);
+                echo json_encode(["message" => $result]); // Trả về lỗi nếu có
             }
         } else {
-            echo json_encode(["message" => "Thiếu MaDeTaiNCKHGV để xóa."]);
+            echo json_encode(["message" => "Thiếu mã đề tài để xóa sản phẩm."]);
         }
         break;
 

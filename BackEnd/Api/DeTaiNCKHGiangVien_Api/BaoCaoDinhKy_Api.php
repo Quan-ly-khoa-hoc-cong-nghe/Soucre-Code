@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../Model/DeTaiNCKHGiangVien/BaoCaoDinhKy.php';
 
 $database = new Database();
 $db = $database->getConn();
-$detai = new BaoCaoDinhKy($db);
+$baoCao = new BaoCaoDinhKy($db);
 
 // Lấy action từ query string
 $action = isset($_GET['action']) ? strtoupper(trim($_GET['action'])) : null;
@@ -19,76 +19,72 @@ if ($action === null) {
     exit;
 }
 
+// Xử lý các action
 switch ($action) {
     case 'GET':
-        $stmt = $detai->read();
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($data);
+        // Lấy tất cả báo cáo
+        $result = $baoCao->getAllReports();
+        echo json_encode($result);
         break;
 
-    case 'GET_ONE':
-        if (!empty($_GET["MaDeTaiNCKHGV"])) {
-            $detai->maDeTaiNCHKGV = $_GET["MaDeTaiNCKHGV"];
-            $data = $detai->readOne();
-            if ($data) {
-                echo json_encode($data);
+    case 'GET_BY_ID':
+        // Lấy báo cáo theo MaDeTaiNCKHGV
+        if (isset($_GET['maDeTai'])) {
+            $result = $baoCao->getReportByMaDeTai($_GET['maDeTai']);
+            if ($result) {
+                echo json_encode($result);
             } else {
-                echo json_encode(["message" => "Đề tài NCKH không tồn tại."]);
+                echo json_encode(["message" => "Không tìm thấy báo cáo với mã đề tài này."]);
             }
         } else {
-            echo json_encode(["message" => "Tham số MaDeTaiNCKHGV không được cung cấp."]);
+            echo json_encode(["message" => "Thiếu mã đề tài (maDeTai)."]);
         }
         break;
 
     case 'POST':
-        $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->MaDeTaiNCKHGV) && !empty($data->TenDeTai)) {
-            $detai->noiDungBaoCao = $data->noiDungBaoCao;
-            $detai->ngayNop = $data->ngayNop;
-            $detai->fileBaoCao = $data->fileBaoCao;
-            $detai->maDeTaiNCHKGV = $data->maDeTaiNCHKGV;
-
-            if ($detai->create()) {
-                echo json_encode(["message" => "Đề tài NCKH được tạo thành công."]);
+        // Thêm báo cáo mới
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (isset($data['NoiDungBaoCao'], $data['NgayNop'], $data['FileBaoCao'], $data['MaDeTaiNCKHGV'])) {
+            if ($baoCao->addReport($data['NoiDungBaoCao'], $data['NgayNop'], $data['FileBaoCao'], $data['MaDeTaiNCKHGV'])) {
+                echo json_encode(["message" => "Thêm báo cáo thành công."]);
             } else {
-                echo json_encode(["message" => "Không thể tạo đề tài NCKH."]);
+                echo json_encode(["message" => "Thêm báo cáo thất bại."]);
             }
         } else {
-            echo json_encode(["message" => "Dữ liệu không hợp lệ."]);
+            echo json_encode(["message" => "Thiếu thông tin báo cáo để tạo."]);
         }
         break;
 
     case 'PUT':
-        $data = json_decode(file_get_contents("php://input"));
-       
-            $detai->noiDungBaoCao = $data->noiDungBaoCao;
-            $detai->ngayNop = $data->ngayNop;
-            $detai->fileBaoCao = $data->fileBaoCao;
-            $detai->maDeTaiNCHKGV = $data->maDeTaiNCHKGV;
-
-            if ($detai->update()) {
-                echo json_encode(["message" => "Đề tài NCKH được cập nhật thành công."]);
+        // Cập nhật báo cáo theo MaDeTaiNCKHGV
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (isset($data['MaDeTaiNCKHGV'], $data['NoiDungBaoCao'], $data['NgayNop'], $data['FileBaoCao'])) {
+            if ($baoCao->updateReportByMaDeTai($data['MaDeTaiNCKHGV'], $data['NoiDungBaoCao'], $data['NgayNop'], $data['FileBaoCao'])) {
+                echo json_encode(["message" => "Cập nhật báo cáo thành công."]);
             } else {
-                echo json_encode(["message" => "Không thể cập nhật đề tài NCKH."]);
+                echo json_encode(["message" => "Cập nhật thất bại hoặc MaDeTaiNCKHGV không tồn tại."]);
             }
-   
+        } else {
+            echo json_encode(["message" => "Thiếu thông tin cần thiết để cập nhật."]);
+        }
         break;
 
     case 'DELETE':
-        $data = json_decode(file_get_contents("php://input"));
-      
-            $detai->maDeTaiNCHKGV = $data->maDeTaiNCHKGV;
-
-            if ($detai->delete()) {
-                echo json_encode(["message" => "Đề tài NCKH đã được xóa."]);
+        // Xóa báo cáo theo MaDeTaiNCKHGV
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (isset($data['MaDeTaiNCKHGV'])) {
+            if ($baoCao->deleteReportByMaDeTai($data['MaDeTaiNCKHGV'])) {
+                echo json_encode(["message" => "Xóa báo cáo thành công."]);
             } else {
-                echo json_encode(["message" => "Không thể xóa đề tài NCKH."]);
+                echo json_encode(["message" => "Xóa thất bại hoặc MaDeTaiNCKHGV không tồn tại."]);
             }
-    
+        } else {
+            echo json_encode(["message" => "Thiếu MaDeTaiNCKHGV để xóa."]);
+        }
         break;
 
     default:
-        echo json_encode(["message" => "Hành động không được hỗ trợ: $action."]);
+        echo json_encode(["message" => "Action không hợp lệ."]);
         break;
 }
 ?>
