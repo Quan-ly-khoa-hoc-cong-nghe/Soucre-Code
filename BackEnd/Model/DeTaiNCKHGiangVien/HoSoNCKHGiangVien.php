@@ -1,112 +1,77 @@
 <?php
-require_once '/../../config/Database.php';
-
-class KhoaHoSo {
+class HoSoNCKHGV {
     private $conn;
-    private $tableKhoa = "Khoa";
-    private $tableHoSo = "HoSoNCKHGV";
+    private $table_name = "HoSoNCKHGV";
 
-    public function __construct() {
-        $database = new Database();
-        $this->conn = $database->getConn();
+    public $MaHoSo;
+    public $NgayNop;
+    public $FileHoSo;
+    public $TrangThai;
+
+    public function __construct($db) {
+        $this->conn = $db;
     }
 
-    // Đọc thông tin từ cả hai bảng
-    public function getAll() {
-        $query = "SELECT k.MaKhoa, k.TenKhoa, k.VanPhongKHoa, h.MaHoSo, h.NgayNop, h.FileHoSo, h.TrangThai
-                  FROM " . $this->tableKhoa . " k
-                   JOIN " . $this->tableHoSo . " h ON k.MaKhoa = h.MaKhoa";
+    // Lấy tất cả hồ sơ
+    public function read() {
+        $query = "SELECT * FROM " . $this->table_name;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt;
     }
 
-    // Thêm mới vào cả hai bảng
-    public function create($data) {
-        try {
-            $this->conn->beginTransaction();
-
-            // Thêm vào bảng Khoa
-            $queryKhoa = "INSERT INTO " . $this->tableKhoa . " SET MaKhoa=:MaKhoa, TenKhoa=:TenKhoa, VanPhongKHoa=:VanPhongKHoa";
-            $stmtKhoa = $this->conn->prepare($queryKhoa);
-            $stmtKhoa->execute([
-                'MaKhoa' => $data['MaKhoa'],
-                'TenKhoa' => $data['TenKhoa'],
-                'VanPhongKHoa' => $data['VanPhongKHoa']
-            ]);
-
-            // Thêm vào bảng HoSoNCKHGV
-            $queryHoSo = "INSERT INTO " . $this->tableHoSo . " SET MaHoSo=:MaHoSo, NgayNop=:NgayNop, FileHoSo=:FileHoSo, TrangThai=:TrangThai, MaKhoa=:MaKhoa";
-            $stmtHoSo = $this->conn->prepare($queryHoSo);
-            $stmtHoSo->execute([
-                'MaHoSo' => $data['MaHoSo'],
-                'NgayNop' => $data['NgayNop'],
-                'FileHoSo' => $data['FileHoSo'],
-                'TrangThai' => $data['TrangThai'],
-                'MaKhoa' => $data['MaKhoa']
-            ]);
-
-            $this->conn->commit();
-            return ["message" => "Thêm mới thành công"];
-        } catch (Exception $e) {
-            $this->conn->rollBack();
-            return ["error" => $e->getMessage()];
-        }
+    // Lấy một hồ sơ
+    public function readOne() {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE MaHoSo = ? LIMIT 0,1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->MaHoSo);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Cập nhật cả hai bảng
-    public function update($data) {
-        try {
-            $this->conn->beginTransaction();
+    // Tạo mới hồ sơ
+    public function create() {
+        $query = "INSERT INTO " . $this->table_name . " SET MaHoSo=:MaHoSo, NgayNop=:NgayNop, FileHoSo=:FileHoSo, TrangThai=:TrangThai";
+        $stmt = $this->conn->prepare($query);
 
-            // Cập nhật bảng Khoa
-            $queryKhoa = "UPDATE " . $this->tableKhoa . " SET TenKhoa=:TenKhoa, VanPhongKHoa=:VanPhongKHoa WHERE MaKhoa=:MaKhoa";
-            $stmtKhoa = $this->conn->prepare($queryKhoa);
-            $stmtKhoa->execute([
-                'MaKhoa' => $data['MaKhoa'],
-                'TenKhoa' => $data['TenKhoa'],
-                'VanPhongKHoa' => $data['VanPhongKHoa']
-            ]);
+        // Xử lý dữ liệu
+        $stmt->bindParam(":MaHoSo", $this->MaHoSo);
+        $stmt->bindParam(":NgayNop", $this->NgayNop);
+        $stmt->bindParam(":FileHoSo", $this->FileHoSo);
+        $stmt->bindParam(":TrangThai", $this->TrangThai);
 
-            // Cập nhật bảng HoSoNCKHGV
-            $queryHoSo = "UPDATE " . $this->tableHoSo . " SET NgayNop=:NgayNop, FileHoSo=:FileHoSo, TrangThai=:TrangThai WHERE MaHoSo=:MaHoSo";
-            $stmtHoSo = $this->conn->prepare($queryHoSo);
-            $stmtHoSo->execute([
-                'MaHoSo' => $data['MaHoSo'],
-                'NgayNop' => $data['NgayNop'],
-                'FileHoSo' => $data['FileHoSo'],
-                'TrangThai' => $data['TrangThai']
-            ]);
-
-            $this->conn->commit();
-            return ["message" => "Cập nhật thành công"];
-        } catch (Exception $e) {
-            $this->conn->rollBack();
-            return ["error" => $e->getMessage()];
+        if ($stmt->execute()) {
+            return true;
         }
+        return false;
     }
 
-    // Xóa thông tin từ cả hai bảng
-    public function delete($MaKhoa, $MaHoSo) {
-        try {
-            $this->conn->beginTransaction();
+    // Cập nhật hồ sơ
+    public function update() {
+        $query = "UPDATE " . $this->table_name . " SET NgayNop=:NgayNop, FileHoSo=:FileHoSo, TrangThai=:TrangThai WHERE MaHoSo=:MaHoSo";
+        $stmt = $this->conn->prepare($query);
 
-            // Xóa từ bảng HoSoNCKHGV
-            $queryHoSo = "DELETE FROM " . $this->tableHoSo . " WHERE MaHoSo=:MaHoSo";
-            $stmtHoSo = $this->conn->prepare($queryHoSo);
-            $stmtHoSo->execute(['MaHoSo' => $MaHoSo]);
+        $stmt->bindParam(":MaHoSo", $this->MaHoSo);
+        $stmt->bindParam(":NgayNop", $this->NgayNop);
+        $stmt->bindParam(":FileHoSo", $this->FileHoSo);
+        $stmt->bindParam(":TrangThai", $this->TrangThai);
 
-            // Xóa từ bảng Khoa
-            $queryKhoa = "DELETE FROM " . $this->tableKhoa . " WHERE MaKhoa=:MaKhoa";
-            $stmtKhoa = $this->conn->prepare($queryKhoa);
-            $stmtKhoa->execute(['MaKhoa' => $MaKhoa]);
-
-            $this->conn->commit();
-            return ["message" => "Xóa thành công"];
-        } catch (Exception $e) {
-            $this->conn->rollBack();
-            return ["error" => $e->getMessage()];
+        if ($stmt->execute()) {
+            return true;
         }
+        return false;
+    }
+
+    // Xóa hồ sơ
+    public function delete() {
+        $query = "DELETE FROM " . $this->table_name . " WHERE MaHoSo = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->MaHoSo);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
     }
 }
 ?>
