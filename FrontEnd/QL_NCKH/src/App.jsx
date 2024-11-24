@@ -13,6 +13,8 @@ import ScienceSeminar from './component/ScienceSeminar/ScienceSeminar';
 import StudentManager from './component/StudentTopicApproval/StudentManager';
 import Statistics from './pages/Statistics';
 import Product from './component/StudentTopicApproval/Product';
+import ApplicationApproval from './component/StudentTopicApproval/ApplicationApproval';
+import ApplicationApprovalAdmin from './component/StudentTopicApproval/ApplicationApproval_Admin';
 // Component bảo vệ route
 const PrivateRoute = ({ element }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -33,6 +35,8 @@ function App() {
         <Route path="/department" element={<PrivateRoute element={<Department />} />} />
         <Route path="/authcallback" element={<PrivateRoute element={<AuthCallback />} />} />
         <Route path="/admin/product-manager" element={<PrivateRoute element={<Product />} />} />
+        <Route path="/admin/application-approval" element={<PrivateRoute element={<ApplicationApproval />} />} />
+        <Route path="/admin/application-approval-admin" element={<PrivateRoute element={<ApplicationApprovalAdmin />} />} />
 
         <Route path="/scitech" element={<PrivateRoute element={<SciTech />} />} />
       </Routes>
