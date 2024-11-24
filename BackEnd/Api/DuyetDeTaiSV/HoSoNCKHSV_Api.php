@@ -1,6 +1,6 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET, PATCH, DELETE, OPTIONS");
+header("Access-Control-Allow-Methods: POST, GET, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -26,11 +26,13 @@ switch ($action) {
         break;
 
     case 'add':
-        if (!empty($data['NgayNop']) && !empty($data['TrangThai'])) {
+        if (!empty($data['MaHoSo']) && !empty($data['NgayNop']) && !empty($data['FileHoSo']) && !empty($data['TrangThai']) && !empty($data['MaKhoa'])) {
+            $hoSo->MaHoSo = $data['MaHoSo'];
             $hoSo->NgayNop = $data['NgayNop'];
             $hoSo->FileHoSo = $data['FileHoSo'];
             $hoSo->TrangThai = $data['TrangThai'];
             $hoSo->MaKhoa = $data['MaKhoa'];
+
             if ($hoSo->add()) {
                 echo json_encode(['message' => 'Thêm hồ sơ thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             } else {
@@ -45,7 +47,10 @@ switch ($action) {
         if (!empty($data['MaHoSo'])) {
             $hoSo->MaHoSo = $data['MaHoSo'];
             $hoSo->NgayNop = $data['NgayNop'];
+            $hoSo->FileHoSo = $data['FileHoSo'];
             $hoSo->TrangThai = $data['TrangThai'];
+            $hoSo->MaKhoa = $data['MaKhoa'];
+
             if ($hoSo->update()) {
                 echo json_encode(['message' => 'Cập nhật hồ sơ thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             } else {

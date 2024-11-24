@@ -1,88 +1,102 @@
 <?php
+use Google\Service\Drive;
+use Google\Service\Drive\DriveFile;
+require_once __DIR__ . '/../../config/GoogleDriveUploader.php';
 
-class HoSoNCKHSV
-{
-    private $db;
+class HoSoNCKHSV {
+    private $conn;
+    private $table_name = "HoSoNCKHSV";
 
-    public function __construct($pdo)
-    {
-        $this->db = $pdo;
+    public $MaHoSo;
+    public $NgayNop;
+    public $FileHoSo; // URL của file trên Google Drive
+    public $TrangThai;
+    public $MaKhoa;
+
+    public function __construct($db) {
+        $this->conn = $db;
     }
 
     // Lấy tất cả hồ sơ
-    public function getAllHoSo()
-    {
-        $stmt = $this->db->prepare("SELECT * FROM HoSoNCKHSV");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Lấy hồ sơ theo mã hồ sơ
-    public function getHoSoByMa($maHoSo)
-    {
-        $stmt = $this->db->prepare("SELECT * FROM HoSoNCKHSV WHERE MaHoSo = :maHoSo");
-        $stmt->bindParam(':maHoSo', $maHoSo);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    // Thêm hồ sơ mới
-    public function addHoSo($maHoSo, $ngayNop, $fileHoSo, $trangThai, $maKhoa)
-    {
-        // Kiểm tra nếu mã hồ sơ đã tồn tại
-        if ($this->checkMaHoSoExists($maHoSo)) {
-            return "Mã hồ sơ đã tồn tại.";
+    public function readAll() {
+        try {
+            $sql = "SELECT * FROM " . $this->table_name . " ORDER BY NgayNop DESC";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
         }
-
-        $stmt = $this->db->prepare("INSERT INTO HoSoNCKHSV (MaHoSo, NgayNop, FileHoSo, TrangThai, MaKhoa) 
-                                    VALUES (:maHoSo, :ngayNop, :fileHoSo, :trangThai, :maKhoa)");
-        $stmt->bindParam(':maHoSo', $maHoSo);
-        $stmt->bindParam(':ngayNop', $ngayNop);
-        $stmt->bindParam(':fileHoSo', $fileHoSo);
-        $stmt->bindParam(':trangThai', $trangThai);
-        $stmt->bindParam(':maKhoa', $maKhoa);
-        return $stmt->execute();
     }
 
-    // Kiểm tra mã hồ sơ có tồn tại không
-    public function checkMaHoSoExists($maHoSo)
-    {
-        $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM HoSoNCKHSV WHERE MaHoSo = :maHoSo");
-        $stmt->bindParam(':maHoSo', $maHoSo);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result['count'] > 0;
+    // Thêm mới hồ sơ
+    public function add($uploadedFile) {
+        try {
+            // Upload file lên Google Drive
+            $uploader = new GoogleDriveUploader();
+            $fileUrl = $uploader->uploadFile($uploadedFile);
+
+            if (!$fileUrl) {
+                return ["error" => "Không thể upload file lên Google Drive"];
+            }
+
+            // Lưu thông tin hồ sơ vào database
+            $sql = "INSERT INTO " . $this->table_name . " (MaHoSo, NgayNop, FileHoSo, TrangThai, MaKhoa) 
+                    VALUES (:maHoSo, :ngayNop, :fileHoSo, :trangThai, :maKhoa)";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':maHoSo', $this->MaHoSo);
+            $stmt->bindParam(':ngayNop', $this->NgayNop);
+            $stmt->bindParam(':fileHoSo', $fileUrl);
+            $stmt->bindParam(':trangThai', $this->TrangThai);
+            $stmt->bindParam(':maKhoa', $this->MaKhoa);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi thêm mới: " . $e->getMessage()];
+        }
     }
 
     // Cập nhật hồ sơ
-    public function updateHoSo($maHoSo, $ngayNop, $fileHoSo, $trangThai, $maKhoa)
-    {
-        // Kiểm tra nếu mã hồ sơ không tồn tại
-        if (!$this->checkMaHoSoExists($maHoSo)) {
-            return "Mã hồ sơ không tồn tại.";
-        }
+    public function update($uploadedFile = null) {
+        try {
+            // Nếu có file mới, upload lên Google Drive
+            $fileUrl = $this->FileHoSo;
+            if ($uploadedFile) {
+                $uploader = new GoogleDriveUploader();
+                $fileUrl = $uploader->uploadFile($uploadedFile);
 
-        $stmt = $this->db->prepare("UPDATE HoSoNCKHSV 
-                                    SET NgayNop = :ngayNop, FileHoSo = :fileHoSo, TrangThai = :trangThai, MaKhoa = :maKhoa 
-                                    WHERE MaHoSo = :maHoSo");
-        $stmt->bindParam(':maHoSo', $maHoSo);
-        $stmt->bindParam(':ngayNop', $ngayNop);
-        $stmt->bindParam(':fileHoSo', $fileHoSo);
-        $stmt->bindParam(':trangThai', $trangThai);
-        $stmt->bindParam(':maKhoa', $maKhoa);
-        return $stmt->execute();
+                if (!$fileUrl) {
+                    return ["error" => "Không thể upload file lên Google Drive"];
+                }
+            }
+
+            // Cập nhật thông tin hồ sơ trong database
+            $sql = "UPDATE " . $this->table_name . " 
+                    SET NgayNop = :ngayNop, FileHoSo = :fileHoSo, TrangThai = :trangThai, MaKhoa = :maKhoa 
+                    WHERE MaHoSo = :maHoSo";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':maHoSo', $this->MaHoSo);
+            $stmt->bindParam(':ngayNop', $this->NgayNop);
+            $stmt->bindParam(':fileHoSo', $fileUrl);
+            $stmt->bindParam(':trangThai', $this->TrangThai);
+            $stmt->bindParam(':maKhoa', $this->MaKhoa);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi cập nhật: " . $e->getMessage()];
+        }
     }
 
     // Xóa hồ sơ
-    public function deleteHoSo($maHoSo)
-    {
-        // Kiểm tra nếu mã hồ sơ không tồn tại
-        if (!$this->checkMaHoSoExists($maHoSo)) {
-            return "Mã hồ sơ không tồn tại.";
+    public function delete() {
+        try {
+            $sql = "DELETE FROM " . $this->table_name . " WHERE MaHoSo = :maHoSo";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':maHoSo', $this->MaHoSo);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi xóa: " . $e->getMessage()];
         }
-
-        $stmt = $this->db->prepare("DELETE FROM HoSoNCKHSV WHERE MaHoSo = :maHoSo");
-        $stmt->bindParam(':maHoSo', $maHoSo);
-        return $stmt->execute();
     }
 }
+?>

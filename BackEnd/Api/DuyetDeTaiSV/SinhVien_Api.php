@@ -36,6 +36,7 @@ switch ($action) {
                 $sinhVien->TenSinhVien = $data['TenSinhVien'];
                 $sinhVien->EmailSV = $data['EmailSV'];
                 $sinhVien->sdtSV = $data['sdtSV'];
+                $sinhVien->MaKhoa = $data['MaKhoa'];
         
                 // Gọi phương thức add để thêm sinh viên vào cơ sở dữ liệu
                 if ($sinhVien->add()) {
@@ -56,6 +57,7 @@ switch ($action) {
             $sinhVien->TenSinhVien = $data['TenSinhVien'];
             $sinhVien->EmailSV = $data['EmailSV'];
             $sinhVien->sdtSV = $data['sdtSV'];
+            $sinhVien->MaKhoa = $data['MaKhoa'];
             if ($sinhVien->update()) {
                 echo json_encode(['message' => 'Cập nhật sinh viên thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             } else {

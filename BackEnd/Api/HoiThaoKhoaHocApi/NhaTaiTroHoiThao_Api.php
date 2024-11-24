@@ -37,7 +37,7 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->TenNhaTaiTro, $data->DiaChi, $data->SoDienThoai, $data->Email, $data->MaHoiThao)) {
+        if (!isset($data->TenNhaTaiTro, $data->DiaChi, $data->SoDienThoai, $data->Email, $data->MaHoiThao,$data->SoTien,$data->LoaiTaiTro)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
@@ -48,6 +48,8 @@ switch ($method) {
         $nhataitro->SoDienThoai = $data->SoDienThoai;
         $nhataitro->Email = $data->Email;
         $nhataitro->MaHoiThao = $data->MaHoiThao;
+        $nhataitro->SoTien = $data->SoTien;
+        $nhataitro->LoaiTaiTro = $data->LoaiTro;
 
         if ($nhataitro->add()) {
             echo json_encode(["message" => "Nhà tài trợ được thêm thành công"]);
@@ -76,6 +78,8 @@ switch ($method) {
         $nhataitro->SoDienThoai = $data->SoDienThoai;
         $nhataitro->Email = $data->Email;
         $nhataitro->MaHoiThao = $data->MaHoiThao;
+        $nhataitro->SoTien = $data->SoTien;
+        $nhataitro->LoaiTaiTro = $data->LoaiTro;
 
         if ($nhataitro->update()) {
             echo json_encode(["message" => "Nhà tài trợ được cập nhật thành công"]);

@@ -3,24 +3,22 @@ class DeTaiNCKHSV {
     private $conn;
     private $table_name = "DeTaiNCKHSV";
 
-    // Các thuộc tính
-    public $maDeTaiSV;
-    public $tenDeTai;
-    public $moTa;
-    public $trangThai;
-    public $fileHopDong;
-    public $maHoSo;
-    public $maNhomNCKHSV;
+    public $MaDeTaiSV;
+    public $TenDeTai;
+    public $MoTa;
+    public $TrangThai;
+    public $FileHopDong;
+    public $MaHoSo;
+    public $MaNhomNCKHSV;
 
-    // Constructor
     public function __construct($db) {
         $this->conn = $db;
     }
 
-    // Phương thức lấy tất cả đề tài
+    // Lấy tất cả đề tài
     public function readAll() {
         try {
-            $sql = "SELECT * FROM " . $this->table_name . " ORDER BY tenDeTai ASC";
+            $sql = "SELECT * FROM " . $this->table_name . " ORDER BY TenDeTai ASC";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -28,99 +26,53 @@ class DeTaiNCKHSV {
             return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
         }
     }
-    public function updateGroup() {
-        // Câu lệnh SQL để cập nhật chỉ mã nhóm
-        $query = "UPDATE " . $this->table_name . " SET maNhomNCKHSV = :maNhomNCKHSV WHERE maDeTaiSV = :maDeTaiSV";
-    
-        // Chuẩn bị câu lệnh SQL
-        $stmt = $this->conn->prepare($query);
-    
-        // Liên kết các giá trị
-        $stmt->bindParam(':maDeTaiSV', $this->maDeTaiSV);  // Giữ nguyên mã đề tài
-        $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);  // Chỉ thay đổi mã nhóm
-    
-        // Thực thi câu lệnh SQL
-        if ($stmt->execute()) {
-            return true;
-        }
-    
-        return false;
-    }
-    
-    // Phương thức thêm đề tài
+
+    // Thêm đề tài mới
     public function add() {
         try {
-            $sql = "INSERT INTO " . $this->table_name . " (tenDeTai, moTa, trangThai, fileHopDong, maHoSo, maNhomNCKHSV) 
-                    VALUES (:ten, :moTa, :trangThai, :fileHopDong, :maHoSo, :maNhomNCKHSV)";
+            $sql = "INSERT INTO " . $this->table_name . " (MaDeTaiSV, TenDeTai, MoTa, TrangThai, FileHopDong, MaHoSo, MaNhomNCKHSV) 
+                    VALUES (:maDeTaiSV, :tenDeTai, :moTa, :trangThai, :fileHopDong, :maHoSo, :maNhomNCKHSV)";
             $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':ten', $this->tenDeTai);
-            $stmt->bindParam(':moTa', $this->moTa);
-            $stmt->bindParam(':trangThai', $this->trangThai);
-            $stmt->bindParam(':fileHopDong', $this->fileHopDong);
-            $stmt->bindParam(':maHoSo', $this->maHoSo);
-            $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);
+            $stmt->bindParam(':maDeTaiSV', $this->MaDeTaiSV);
+            $stmt->bindParam(':tenDeTai', $this->TenDeTai);
+            $stmt->bindParam(':moTa', $this->MoTa);
+            $stmt->bindParam(':trangThai', $this->TrangThai);
+            $stmt->bindParam(':fileHopDong', $this->FileHopDong);
+            $stmt->bindParam(':maHoSo', $this->MaHoSo);
+            $stmt->bindParam(':maNhomNCKHSV', $this->MaNhomNCKHSV);
             return $stmt->execute();
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
-public function readByMaDeTaiSV($maDeTaiSV) {
-    $query = "SELECT * FROM DeTaiNCKHSV WHERE maDeTaiSV = :maDeTaiSV";
-    $stmt = $this->conn->prepare($query);
-    $stmt->bindParam(':maDeTaiSV', $maDeTaiSV);
-    $stmt->execute();
 
-    if ($stmt->rowCount() > 0) {
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    } else {
-        return false; // Không tìm thấy dữ liệu
-    }
-}
-
-    // Phương thức cập nhật đề tài
+    // Cập nhật thông tin đề tài
     public function update() {
         try {
-            // Kiểm tra các giá trị có hợp lệ không
-            if (empty($this->maDeTaiSV) || empty($this->tenDeTai) || empty($this->moTa)) {
-                return ["error" => "Dữ liệu không đầy đủ"];
-            }
-    
             $sql = "UPDATE " . $this->table_name . " 
-                    SET tenDeTai = :ten, 
-                        moTa = :moTa, 
-                        trangThai = :trangThai, 
-                        fileHopDong = :fileHopDong, 
-                        maHoSo = :maHoSo, 
-                        maNhomNCKHSV = :maNhomNCKHSV 
-                    WHERE maDeTaiSV = :id";
+                    SET TenDeTai = :tenDeTai, MoTa = :moTa, TrangThai = :trangThai, 
+                        FileHopDong = :fileHopDong, MaHoSo = :maHoSo, MaNhomNCKHSV = :maNhomNCKHSV 
+                    WHERE MaDeTaiSV = :maDeTaiSV";
             $stmt = $this->conn->prepare($sql);
-    
-            // Gán giá trị từ thuộc tính
-            $stmt->bindParam(':id', $this->maDeTaiSV);
-            $stmt->bindParam(':ten', $this->tenDeTai);
-            $stmt->bindParam(':moTa', $this->moTa);
-            $stmt->bindParam(':trangThai', $this->trangThai);
-            $stmt->bindParam(':fileHopDong', $this->fileHopDong);
-            $stmt->bindParam(':maHoSo', $this->maHoSo);
-            $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);
-    
-            if ($stmt->execute()) {
-                return true; // Trả về true nếu thành công
-            } else {
-                return ["error" => "Không thể cập nhật đề tài"];
-            }
+            $stmt->bindParam(':maDeTaiSV', $this->MaDeTaiSV);
+            $stmt->bindParam(':tenDeTai', $this->TenDeTai);
+            $stmt->bindParam(':moTa', $this->MoTa);
+            $stmt->bindParam(':trangThai', $this->TrangThai);
+            $stmt->bindParam(':fileHopDong', $this->FileHopDong);
+            $stmt->bindParam(':maHoSo', $this->MaHoSo);
+            $stmt->bindParam(':maNhomNCKHSV', $this->MaNhomNCKHSV);
+            return $stmt->execute();
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
-    
 
-    // Phương thức xóa đề tài
+    // Xóa đề tài
     public function delete() {
         try {
-            $sql = "DELETE FROM " . $this->table_name . " WHERE maDeTaiSV = :id";
+            $sql = "DELETE FROM " . $this->table_name . " WHERE MaDeTaiSV = :maDeTaiSV";
             $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':id', $this->maDeTaiSV);
+            $stmt->bindParam(':maDeTaiSV', $this->MaDeTaiSV);
             return $stmt->execute();
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];

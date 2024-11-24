@@ -32,7 +32,7 @@ switch ($action) {
             $keHoach->KinhPhi = $data['KinhPhi'];
             $keHoach->FileKeHoach = $data['FileKeHoach'];
             $keHoach->MaDeTaiSV = $data['MaDeTaiSV'];
-            if ($keHoach->add()) {
+            if ($keHoach->add($data['FileKeHoach'])) {
                 echo json_encode(['message' => 'Thêm kế hoạch thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             } else {
                 echo json_encode(['message' => 'Không thể thêm kế hoạch'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
