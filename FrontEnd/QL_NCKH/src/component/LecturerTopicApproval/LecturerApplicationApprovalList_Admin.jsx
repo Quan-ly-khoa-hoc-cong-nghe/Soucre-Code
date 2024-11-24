@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaEye, FaCheck, FaTimes } from "react-icons/fa";
 import axios from "axios";
 
-const ApplicationApprovalListAdmin = () => {
+const LecturerApplicationApprovalListAdmin = () => {
   const [applications, setApplications] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,10 +16,10 @@ const ApplicationApprovalListAdmin = () => {
   const fetchApplications = () => {
     axios
       .get(
-        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/HoSoNCKHSV_Api.php?action=get"
+        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiGV/HoSoNCKHGV_Api.php?action=get"
       )
       .then((response) => {
-        setApplications(response.data.HoSoNCKHSV || []);
+        setApplications(response.data.HoSoNCKHGV || []);
       })
       .catch((error) => {
         console.error("Error fetching applications:", error);
@@ -49,7 +49,7 @@ const ApplicationApprovalListAdmin = () => {
 
     axios
       .put(
-        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/HoSoNCKHSV_Api.php?action=updateTrangThai",
+        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiGV/HoSoNCKHGV_Api.php?action=updateTrangThai",
         requestData
       )
       .then((response) => {
@@ -79,7 +79,7 @@ const ApplicationApprovalListAdmin = () => {
 
     axios
       .put(
-        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/HoSoNCKHSV_Api.php?action=updateTrangThai",
+        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiGV/HoSoNCKHGV_Api.php?action=updateTrangThai",
         requestData
       )
       .then((response) => {
@@ -98,6 +98,7 @@ const ApplicationApprovalListAdmin = () => {
         alert("Đã xảy ra lỗi khi gửi yêu cầu: " + error.message); // Thông báo lỗi khi gặp sự cố
       });
   };
+
   const openModal = (app) => {
     setSelectedApp(app);
     setIsModalOpen(true);
@@ -165,6 +166,7 @@ const ApplicationApprovalListAdmin = () => {
                           className="p-2 text-red-600 hover:bg-red-100 rounded-full"
                           title="Reject"
                           onClick={() => approveApplicationCancel(app)} // Gọi hàm approveApplication với hồ sơ app
+
                         >
                           <FaTimes className="w-5 h-5" />
                         </button>
@@ -241,4 +243,4 @@ const ApplicationApprovalListAdmin = () => {
   );
 };
 
-export default ApplicationApprovalListAdmin;
+export default LecturerApplicationApprovalListAdmin;
