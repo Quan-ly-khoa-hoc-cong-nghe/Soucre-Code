@@ -13,14 +13,28 @@ const LoginLayout = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('http://localhost/Soucre-Code/BackEnd/Api/DangNhap_Api.php?action=get', {
+      const response = await axios.post('http://localhost/Soucre-Code/BackEnd/Api/DangNhap_Api.php?action=login', {
         MaNguoiDung: username,
         MatKhau: password
       });
   
       console.log('Response from API:', response);  // Log response từ API
   
-      const user = response.data.data.find(u => u.MaNguoiDung === username && u.MatKhau === password);
+      if (response.data.status === 'success' && response.data.data) {
+        const user = response.data.data;
+    
+        localStorage.setItem('isAuthenticated', 'true'); // Lưu trạng thái đăng nhập
+        if (user.VaiTro === "Admin") {
+            navigate('/admin');
+        } else if (user.VaiTro === "User") {
+            navigate('/department');
+        } else if (user.VaiTro === "Manager") {
+            navigate('/scitech');
+        }
+    } else {
+        setError(response.data.message || 'Thông tin đăng nhập không đúng');
+    }
+    
   
       if (user) {
         localStorage.setItem('isAuthenticated', 'true'); // Lưu trạng thái đăng nhập
