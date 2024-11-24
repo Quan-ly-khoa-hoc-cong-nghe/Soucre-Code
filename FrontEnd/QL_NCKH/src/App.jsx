@@ -13,6 +13,10 @@ import ScienceSeminar from './component/ScienceSeminar/ScienceSeminar';
 import StudentManager from './component/StudentTopicApproval/StudentManager';
 import Statistics from './pages/Statistics';
 import Product from './component/StudentTopicApproval/Product';
+import ApplicationApproval from './component/StudentTopicApproval/ApplicationApproval';
+import ApplicationApprovalAdmin from './component/StudentTopicApproval/ApplicationApproval_Admin';
+import LecturerApplicationApprovalList from './component/LecturerTopicApproval/LecturerApplicationApprovalList';
+import LecturerApplicationApprovalListAdmin from './component/LecturerTopicApproval/LecturerApplicationApprovalList_Admin';
 // Component bảo vệ route
 const PrivateRoute = ({ element }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -31,8 +35,13 @@ function App() {
         <Route path="/admin/science-seminar" element={<PrivateRoute element={<ScienceSeminar />} />} />
         <Route path="/admin/edit-student" element={<PrivateRoute element={<StudentManager />} />} />
         <Route path="/department" element={<PrivateRoute element={<Department />} />} />
-        <Route path="/authcallback" element={<PrivateRoute element={<AuthCallback />} />} />
+        <Route path="/authcallback" element={<LecturerApplicationApprovalList element={<AuthCallback />} />} />
         <Route path="/admin/product-manager" element={<PrivateRoute element={<Product />} />} />
+        <Route path="/admin/application-approval" element={<PrivateRoute element={<ApplicationApproval />} />} />
+        <Route path="/admin/application-approval-admin" element={<PrivateRoute element={<ApplicationApprovalAdmin />} />} />
+        <Route path="/admin/lecturer-application-approval-admin" element={<PrivateRoute element={<LecturerApplicationApprovalListAdmin  />} />} />
+        <Route path="/admin/lecturer-application-approval-list-admin" element={<PrivateRoute element={<LecturerApplicationApprovalList />} />} />
+
 
         <Route path="/scitech" element={<PrivateRoute element={<SciTech />} />} />
       </Routes>

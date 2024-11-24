@@ -25,25 +25,29 @@ switch ($action) {
         echo json_encode(['SinhVienNCKHSV' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
 
-    case 'add':
-        if (!empty($data['MaNhomNCKHSV']) && !empty($data['MaSinhVien'])) {
-            $sinhVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
-            $sinhVienNCKHSV->MaSinhVien = $data['MaSinhVien'];
-            if ($sinhVienNCKHSV->add()) {
-                echo json_encode(['message' => 'Thêm sinh viên vào nhóm thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            } else {
-                echo json_encode(['message' => 'Không thể thêm sinh viên vào nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            }
+    case 'add': // Thêm sinh viên vào nhóm
+        if (empty($data['MaNhomNCKHSV']) || empty($data['MaSinhVien'])) {
+            errorResponse("Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, MaSinhVien.");
+        }
+
+        $sinhVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+        $sinhVienNCKHSV->MaSinhVien = $data['MaSinhVien'];
+
+        if ($sinhVienNCKHSV->add()) {
+            successResponse("Thêm sinh viên vào nhóm thành công.");
         } else {
-            echo json_encode(['message' => 'Dữ liệu không đầy đủ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            errorResponse("Không thể thêm sinh viên vào nhóm.");
         }
         break;
-        case 'autoUpdate':
-            $apiUrl = "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/NhomNCKHSV_Api.php?action=get";
-            $result = $sinhVienNCKHSV->autoUpdateFromAPI($apiUrl);
-            echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            break;        
-        
+
+
+
+    case 'autoUpdate':
+        $apiUrl = "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/NhomNCKHSV_Api.php?action=get";
+        $result = $sinhVienNCKHSV->autoUpdateFromAPI($apiUrl);
+        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        break;
+
     case 'update':
         if (!empty($data['MaNhomNCKHSV'])) {
             $sinhVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
@@ -57,28 +61,27 @@ switch ($action) {
             echo json_encode(['message' => 'Thiếu mã nhóm sinh viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
-        
 
-        case 'delete':
-            $data = json_decode(file_get_contents('php://input'), true);
-            $maSinhVien = $data['MaSinhVien'];
-            $maNhomNCKHSV = $data['MaNhomNCKHSV'];
-        
-            // Xóa sinh viên khỏi nhóm trong bảng SinhVienNCKHSV
-            $sql = "DELETE FROM SinhVienNCKHSV WHERE MaSinhVien = :maSinhVien AND MaNhomNCKHSV = :maNhomNCKHSV";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':maSinhVien', $maSinhVien);
-            $stmt->bindParam(':maNhomNCKHSV', $maNhomNCKHSV);
-            if ($stmt->execute()) {
-                echo json_encode(['message' => 'Xóa sinh viên khỏi nhóm thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            } else {
-                echo json_encode(['message' => 'Không thể xóa sinh viên khỏi nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            }
-            break;
-        
+
+    case 'delete':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $maSinhVien = $data['MaSinhVien'];
+        $maNhomNCKHSV = $data['MaNhomNCKHSV'];
+
+        // Xóa sinh viên khỏi nhóm trong bảng SinhVienNCKHSV
+        $sql = "DELETE FROM SinhVienNCKHSV WHERE MaSinhVien = :maSinhVien AND MaNhomNCKHSV = :maNhomNCKHSV";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':maSinhVien', $maSinhVien);
+        $stmt->bindParam(':maNhomNCKHSV', $maNhomNCKHSV);
+        if ($stmt->execute()) {
+            echo json_encode(['message' => 'Xóa sinh viên khỏi nhóm thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode(['message' => 'Không thể xóa sinh viên khỏi nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
+        break;
+
 
     default:
         echo json_encode(['message' => 'Action không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
 }
-?>
