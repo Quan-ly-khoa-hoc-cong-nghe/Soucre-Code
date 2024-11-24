@@ -57,15 +57,12 @@ class NhomNCKHSV {
     
     
     public function add() {
-        try {
-            $sql = "INSERT INTO " . $this->table_name . " (MaDeTaiSV) VALUES (:maDeTaiSV)";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':maDeTaiSV', $this->MaDeTaiSV);
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];
-        }
+        $query = "INSERT INTO NhomNCKHSV (MaDeTaiSV) VALUES (:MaDeTaiSV)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':MaDeTaiSV', $this->MaDeTaiSV);
+        return $stmt->execute();
     }
+    
     public function addNewGroup() {
         try {
             $sql = "INSERT INTO " . $this->table_name . " (MaNhomNCKHSV, MaDeTaiSV) VALUES (:maNhomNCKHSV, :maDeTaiSV)";

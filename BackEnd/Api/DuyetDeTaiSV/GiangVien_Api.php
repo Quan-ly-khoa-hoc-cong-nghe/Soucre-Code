@@ -73,6 +73,35 @@ switch ($action) {
         }
         break;
 
+        case 'getById':
+            if (isset($_GET['MaGV'])) { // Kiểm tra xem tham số MaGV có tồn tại không
+                $MaGV = $_GET['MaGV'];
+        
+                $sql = "SELECT gv.MaGV, gv.HoTenGV, gv.NgaySinhGV, gv.EmailGV, gv.DiaChiGV, gv.DiemNCKH, 
+                               gv.MaKhoa, k.TenKhoa
+                        FROM GiangVien gv
+                        LEFT JOIN Khoa k ON gv.MaKhoa = k.MaKhoa
+                        WHERE gv.MaGV = :MaGV";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':MaGV', $MaGV, PDO::PARAM_STR);
+        
+                try {
+                    $stmt->execute();
+                    $data = $stmt->fetch(PDO::FETCH_ASSOC); // Lấy dữ liệu giảng viên
+                    if ($data) {
+                        echo json_encode(["GiangVien" => $data], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                    } else {
+                        echo json_encode(["message" => "Không tìm thấy giảng viên"], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                    }
+                } catch (Exception $e) {
+                    echo json_encode(["message" => "Lỗi khi truy vấn: " . $e->getMessage()], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                }
+            } else {
+                echo json_encode(["message" => "Thiếu tham số MaGV"], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            }
+            break;
+        
+        
     default:
         echo json_encode(['message' => 'Action không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
