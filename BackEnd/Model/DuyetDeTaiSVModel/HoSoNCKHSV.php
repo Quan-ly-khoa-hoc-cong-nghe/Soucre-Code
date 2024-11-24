@@ -26,35 +26,61 @@ class HoSoNCKHSV {
 
     public function add() {
         try {
-            $sql = "INSERT INTO " . $this->table_name . " (NgayNop, FileHoSo, TrangThai, MaKhoa) 
-                    VALUES (:ngayNop, :fileHoSo, :trangThai, :maKhoa)";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':ngayNop', $this->NgayNop);
-            $stmt->bindParam(':fileHoSo', $this->FileHoSo);
-            $stmt->bindParam(':trangThai', $this->TrangThai);
-            $stmt->bindParam(':maKhoa', $this->MaKhoa);
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];
-        }
-    }
-
-    public function update() {
-        try {
-            $sql = "UPDATE " . $this->table_name . " 
-                    SET NgayNop = :ngayNop, FileHoSo = :fileHoSo, TrangThai = :trangThai, MaKhoa = :maKhoa 
-                    WHERE MaHoSo = :maHoSo";
+            $sql = "INSERT INTO " . $this->table_name . " (MaHoSo, NgayNop, FileHoSo, TrangThai, MaKhoa) 
+                    VALUES (:maHoSo, :ngayNop, :fileHoSo, :trangThai, :maKhoa)";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':maHoSo', $this->MaHoSo);
             $stmt->bindParam(':ngayNop', $this->NgayNop);
             $stmt->bindParam(':fileHoSo', $this->FileHoSo);
             $stmt->bindParam(':trangThai', $this->TrangThai);
             $stmt->bindParam(':maKhoa', $this->MaKhoa);
+    
+            if ($stmt->execute()) {
+                return true;
+            } else {
+                throw new PDOException("Không thể thêm dữ liệu vào cơ sở dữ liệu.");
+            }
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi: " . $e->getMessage()];
+        }
+    }
+    
+    public function updateTrangThai() {
+        try {
+            $sql = "UPDATE " . $this->table_name . " 
+                    SET TrangThai = :trangThai 
+                    WHERE MaHoSo = :maHoSo";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':trangThai', $this->TrangThai);
+            $stmt->bindParam(':maHoSo', $this->MaHoSo);
             return $stmt->execute();
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
+    
+
+    public function update() {
+        try {
+            $sql = "UPDATE " . $this->table_name . " 
+                    SET NgayNop = :ngayNop, 
+                        FileHoSo = :fileHoSo, 
+                        TrangThai = :trangThai, 
+                        MaKhoa = :maKhoa 
+                    WHERE MaHoSo = :maHoSo";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':ngayNop', $this->NgayNop);
+            $stmt->bindParam(':fileHoSo', $this->FileHoSo);
+            $stmt->bindParam(':trangThai', $this->TrangThai);
+            $stmt->bindParam(':maKhoa', $this->MaKhoa);
+            $stmt->bindParam(':maHoSo', $this->MaHoSo);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi: " . $e->getMessage()];
+        }
+    }
+    
+    
 
     public function delete() {
         try {

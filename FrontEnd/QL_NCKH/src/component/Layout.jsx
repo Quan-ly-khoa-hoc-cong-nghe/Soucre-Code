@@ -76,6 +76,18 @@ const Layout = ({ children }) => {
                                 <span className="font-semibold">Product Manager</span>
                             </Link>
                         </li>
+                        <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+                            <Link to="/admin/application-approval" className="flex items-center space-x-3">
+                                <FaComment />
+                                <span className="font-semibold">Application Approval</span>
+                            </Link>
+                        </li>
+                        <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+                            <Link to="/admin/application-approval-admin" className="flex items-center space-x-3">
+                                <FaComment />
+                                <span className="font-semibold">Duyệt hồ sơ thêm đề tài</span>
+                            </Link>
+                        </li>
                         <hr className="border-gray-400 my-4" />
 
                         <li className="flex items-center space-x-3 hover:bg-[#8AADE0] p-2 rounded hover:text-[#d95959]">
