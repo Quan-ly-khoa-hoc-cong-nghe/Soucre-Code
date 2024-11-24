@@ -1,7 +1,7 @@
 <?php
-class HoSoNCKHSV {
+class HoSoNCKHGV {
     private $conn;
-    private $table_name = "HoSoNCKHSV";
+    private $table_name = "HoSoNCKHGV";
 
     public $MaHoSo;
     public $NgayNop;

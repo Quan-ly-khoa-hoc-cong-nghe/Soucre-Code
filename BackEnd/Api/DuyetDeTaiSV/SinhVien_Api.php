@@ -66,21 +66,41 @@ switch ($action) {
         }
         break;
 
-        case 'delete':
-            $data = json_decode(file_get_contents('php://input'), true);
-            $maSinhVien = $data['MaSinhVien'];
+    case 'delete':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $maSinhVien = $data['MaSinhVien'];
+    
+        // Xóa sinh viên khỏi bảng SinhVien
+        $sql = "DELETE FROM SinhVien WHERE MaSinhVien = :maSinhVien";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':maSinhVien', $maSinhVien);
+        if ($stmt->execute()) {
+            echo json_encode(['message' => 'Xóa sinh viên thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode(['message' => 'Không thể xóa sinh viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
+        break;
+    
+        case 'getById':
+            if (isset($_GET['MaSinhVien'])) {
+                $MaSinhVien = $_GET['MaSinhVien'];
+                $sql = "SELECT * FROM SinhVien WHERE MaSinhVien = :MaSinhVien";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':MaSinhVien', $MaSinhVien, PDO::PARAM_STR);
+                $stmt->execute();
         
-            // Xóa sinh viên khỏi bảng SinhVien
-            $sql = "DELETE FROM SinhVien WHERE MaSinhVien = :maSinhVien";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':maSinhVien', $maSinhVien);
-            if ($stmt->execute()) {
-                echo json_encode(['message' => 'Xóa sinh viên thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                // Lấy kết quả truy vấn
+                $data = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($data) {
+                    echo json_encode(["SinhVien" => $data], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                } else {
+                    echo json_encode(["message" => "Không tìm thấy sinh viên"], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                }
             } else {
-                echo json_encode(['message' => 'Không thể xóa sinh viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                echo json_encode(["message" => "Thiếu tham số MaSinhVien"], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             }
-            break;
-        
+            break;        
+      
     default:
         echo json_encode(['message' => 'Action không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;

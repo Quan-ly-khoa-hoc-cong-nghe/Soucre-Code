@@ -1,15 +1,16 @@
 <?php
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, GET, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 require_once __DIR__ . '/../../config/Database.php';
-require_once __DIR__ . '/../../Model/DeTaiNCKHGiangVien/BaoCaoDinhKy.php';
+require_once __DIR__ . '/../../Model/DeTaiNCKHGiangVien/KeHoachNCKHGV.php';
 
 $database = new Database();
 $db = $database->getConn();
-$baoCao = new BaoCaoDinhKy($db);
+$keHoach = new KeHoachNCKHGV($db);
 
 // Lấy action từ query string
 $action = isset($_GET['action']) ? strtoupper(trim($_GET['action'])) : null;
@@ -22,19 +23,19 @@ if ($action === null) {
 // Xử lý các action
 switch ($action) {
     case 'GET':
-        // Lấy tất cả báo cáo
-        $result = $baoCao->getAllReports();
+        // Lấy tất cả kế hoạch
+        $result = $keHoach->getAllPlans();
         echo json_encode($result);
         break;
 
     case 'GET_BY_ID':
-        // Lấy báo cáo theo MaDeTaiNCKHGV
+        // Lấy kế hoạch theo MaDeTaiNCKHGV
         if (isset($_GET['maDeTai'])) {
-            $result = $baoCao->getReportByMaDeTai($_GET['maDeTai']);
+            $result = $keHoach->getPlanByMaDeTai($_GET['maDeTai']);
             if ($result) {
                 echo json_encode($result);
             } else {
-                echo json_encode(["message" => "Không tìm thấy báo cáo với mã đề tài này."]);
+                echo json_encode(["message" => "Không tìm thấy kế hoạch với mã đề tài này."]);
             }
         } else {
             echo json_encode(["message" => "Thiếu mã đề tài (maDeTai)."]);
@@ -42,25 +43,25 @@ switch ($action) {
         break;
 
     case 'POST':
-        // Thêm báo cáo mới
+        // Thêm kế hoạch mới
         $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['NoiDungBaoCao'], $data['NgayNop'], $data['FileBaoCao'], $data['MaDeTaiNCKHGV'])) {
-            if ($baoCao->addReport($data['NoiDungBaoCao'], $data['NgayNop'], $data['FileBaoCao'], $data['MaDeTaiNCKHGV'])) {
-                echo json_encode(["message" => "Thêm báo cáo thành công."]);
+        if (isset($data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'], $data['MaDeTaiNCKHGV'])) {
+            if ($keHoach->addPlan($data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'], $data['MaDeTaiNCKHGV'])) {
+                echo json_encode(["message" => "Thêm kế hoạch thành công."]);
             } else {
-                echo json_encode(["message" => "Thêm báo cáo thất bại."]);
+                echo json_encode(["message" => "Thêm kế hoạch thất bại."]);
             }
         } else {
-            echo json_encode(["message" => "Thiếu thông tin báo cáo để tạo."]);
+            echo json_encode(["message" => "Thiếu thông tin kế hoạch để tạo."]);
         }
         break;
 
     case 'PUT':
-        // Cập nhật báo cáo theo MaDeTaiNCKHGV
+        // Cập nhật kế hoạch theo MaDeTaiNCKHGV
         $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['MaDeTaiNCKHGV'], $data['NoiDungBaoCao'], $data['NgayNop'], $data['FileBaoCao'])) {
-            if ($baoCao->updateReportByMaDeTai($data['MaDeTaiNCKHGV'], $data['NoiDungBaoCao'], $data['NgayNop'], $data['FileBaoCao'])) {
-                echo json_encode(["message" => "Cập nhật báo cáo thành công."]);
+        if (isset($data['MaDeTaiNCKHGV'], $data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'])) {
+            if ($keHoach->updatePlanByMaDeTai($data['MaDeTaiNCKHGV'], $data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'])) {
+                echo json_encode(["message" => "Cập nhật kế hoạch thành công."]);
             } else {
                 echo json_encode(["message" => "Cập nhật thất bại hoặc MaDeTaiNCKHGV không tồn tại."]);
             }
@@ -70,11 +71,11 @@ switch ($action) {
         break;
 
     case 'DELETE':
-        // Xóa báo cáo theo MaDeTaiNCKHGV
+        // Xóa kế hoạch theo MaDeTaiNCKHGV
         $data = json_decode(file_get_contents("php://input"), true);
         if (isset($data['MaDeTaiNCKHGV'])) {
-            if ($baoCao->deleteReportByMaDeTai($data['MaDeTaiNCKHGV'])) {
-                echo json_encode(["message" => "Xóa báo cáo thành công."]);
+            if ($keHoach->deletePlanByMaDeTai($data['MaDeTaiNCKHGV'])) {
+                echo json_encode(["message" => "Xóa kế hoạch thành công."]);
             } else {
                 echo json_encode(["message" => "Xóa thất bại hoặc MaDeTaiNCKHGV không tồn tại."]);
             }

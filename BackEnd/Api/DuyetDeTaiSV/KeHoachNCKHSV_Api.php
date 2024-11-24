@@ -19,54 +19,70 @@ $keHoach = new KeHoachNCKHSV($conn);
 $data = json_decode(file_get_contents('php://input'), true);
 $action = $_GET['action'] ?? '';
 
+function uploadFile($file, $targetDir)
+{
+    $fileName = basename($file['name']); // Lấy tên file
+    $targetFilePath = $targetDir . $fileName; // Đường dẫn lưu file
+    if (move_uploaded_file($file['tmp_name'], $targetFilePath)) {
+        return $fileName; // Trả về tên file nếu upload thành công
+    }
+    return false; // Trả về false nếu upload thất bại
+}
+
 switch ($action) {
     case 'get':
         $result = $keHoach->readAll();
         echo json_encode(['KeHoachNCKHSV' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
 
-    case 'add':
-        if (!empty($data['NgayBatDau']) && !empty($data['NgayKetThuc'])) {
-            $keHoach->NgayBatDau = $data['NgayBatDau'];
-            $keHoach->NgayKetThuc = $data['NgayKetThuc'];
-            $keHoach->KinhPhi = $data['KinhPhi'];
-            $keHoach->FileKeHoach = $data['FileKeHoach'];
-            $keHoach->MaDeTaiSV = $data['MaDeTaiSV'];
-            if ($keHoach->add()) {
-                echo json_encode(['message' => 'Thêm kế hoạch thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            } else {
-                echo json_encode(['message' => 'Không thể thêm kế hoạch'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            }
+    case 'add': // Thêm kế hoạch
+        // Kiểm tra dữ liệu đầu vào
+        if (empty($data['NgayBatDau']) || empty($data['NgayKetThuc']) || empty($data['KinhPhi']) || empty($data['MaDeTaiSV']) || empty($data['FileKeHoach'])) {
+            echo json_encode(['success' => false, 'message' => 'Vui lòng cung cấp đầy đủ thông tin: NgayBatDau, NgayKetThuc, KinhPhi, MaDeTaiSV, FileKeHoach'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        // Gán dữ liệu vào model
+        $keHoach->NgayBatDau = $data['NgayBatDau'];
+        $keHoach->NgayKetThuc = $data['NgayKetThuc'];
+        $keHoach->KinhPhi = $data['KinhPhi'];
+        $keHoach->FileKeHoach = $data['FileKeHoach']; // Lưu tên file vào cơ sở dữ liệu
+        $keHoach->MaDeTaiSV = $data['MaDeTaiSV'];
+
+        // Thêm kế hoạch
+        if ($keHoach->add()) {
+            echo json_encode(['success' => true, 'message' => 'Thêm kế hoạch thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            echo json_encode(['message' => 'Dữ liệu không đầy đủ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            echo json_encode(['success' => false, 'message' => 'Không thể thêm kế hoạch'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
 
-        case 'update':
-            if (!empty($data['MaDeTaiSV'])) {
-                // Kiểm tra đầu vào
-                if (empty($data['NgayBatDau']) || empty($data['NgayKetThuc']) || !isset($data['KinhPhi'])) {
-                    echo json_encode(['message' => 'Dữ liệu không đầy đủ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                    exit;
-                }
-        
-                // Gán giá trị và thực thi
-                $keHoach->MaDeTaiSV = $data['MaDeTaiSV'];
-                $keHoach->NgayBatDau = $data['NgayBatDau'];
-                $keHoach->NgayKetThuc = $data['NgayKetThuc'];
-                $keHoach->KinhPhi = $data['KinhPhi'];
-                $keHoach->FileKeHoach = $data['FileKeHoach'];
-        
-                if ($keHoach->update()) {
-                    echo json_encode(['message' => ''], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                } else {
-                    echo json_encode(['message' => ''], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                }
-            } else {
-                echo json_encode(['message' => 'Thiếu mã đề tài'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+    case 'update': // Cập nhật kế hoạch
+        $targetDir = __DIR__ . "/../../LuuFile/"; // Đường dẫn lưu file
+
+        if (!empty($_FILES['FileKeHoach']['name'])) {
+            // Xử lý upload file kế hoạch
+            $fileKeHoachName = uploadFile($_FILES['FileKeHoach'], $targetDir);
+            if (!$fileKeHoachName) {
+                echo json_encode(['message' => 'Lỗi khi upload file kế hoạch'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                exit;
             }
-            break;
-        
+            $keHoach->FileKeHoach = $fileKeHoachName; // Lưu tên file vào cơ sở dữ liệu
+        }
+
+        $keHoach->MaDeTaiSV = $_POST['MaDeTaiSV'];
+        $keHoach->NgayBatDau = $_POST['NgayBatDau'];
+        $keHoach->NgayKetThuc = $_POST['NgayKetThuc'];
+        $keHoach->KinhPhi = $_POST['KinhPhi'];
+
+        if ($keHoach->update()) {
+            echo json_encode(['message' => 'Cập nhật kế hoạch thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode(['message' => 'Không thể cập nhật kế hoạch'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
+        break;
+
 
     case 'delete':
         if (!empty($data['MaDeTaiSV'])) {
@@ -85,4 +101,3 @@ switch ($action) {
         echo json_encode(['message' => 'Action không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
 }
-?>
