@@ -21,13 +21,18 @@ $action = $_GET['action'] ?? '';  // Lấy action từ query string
 
 function uploadFile($file, $targetDir)
 {
-    $fileName = basename($file['name']); // Lấy tên file
-    $targetFilePath = $targetDir . $fileName; // Đường dẫn lưu file
+    $fileName = basename($file['name']);
+    $targetFilePath = $targetDir . $fileName;
+
     if (move_uploaded_file($file['tmp_name'], $targetFilePath)) {
-        return $fileName; // Trả về tên file nếu upload thành công
+        error_log("Upload thành công: " . $targetFilePath); // Log thành công
+        return $fileName;
+    } else {
+        error_log("Upload thất bại: " . $file['name']); // Log thất bại
+        return false;
     }
-    return false; // Trả về false nếu upload thất bại
 }
+
 
 function callApi($api, $action, $data)
 {
@@ -63,6 +68,8 @@ switch ($action) {
         break;
 
     case 'add': // Thêm mới đề tài
+        error_log("Dữ liệu POST nhận được: " . print_r($_POST, true));
+        error_log("Dữ liệu FILES nhận được: " . print_r($_FILES, true));
         $targetDir = __DIR__ . "/../../LuuFile/";
 
         // Kiểm tra dữ liệu đầu vào
@@ -70,24 +77,39 @@ switch ($action) {
             errorResponse("Vui lòng cung cấp đầy đủ thông tin: MaDeTaiSV, TenDeTai, MoTa.");
         }
 
+        $missingFields = [];
+
+        if (empty($_POST['MaDeTaiSV'])) {
+            $missingFields[] = "MaDeTaiSV";
+        }
+        if (empty($_POST['TenDeTai'])) {
+            $missingFields[] = "TenDeTai";
+        }
+        if (empty($_POST['MoTa'])) {
+            $missingFields[] = "MoTa";
+        }
+        if (!empty($missingFields)) {
+            errorResponse("Vui lòng cung cấp đầy đủ thông tin: " . implode(", ", $missingFields) . ".");
+        }
+
         // Xử lý upload FileHopDong
-        if (!empty($_FILES['FileHopDong']['name'])) {
+        if (empty($_FILES['FileHopDong']['name'])) {
+            errorResponse("File hợp đồng là bắt buộc.");
+        } else {
             $fileHopDongName = uploadFile($_FILES['FileHopDong'], $targetDir);
             if (!$fileHopDongName) {
                 errorResponse("Lỗi khi upload file hợp đồng.");
             }
-        } else {
-            errorResponse("File hợp đồng là bắt buộc.");
         }
 
         // Xử lý upload FileKeHoach
-        if (!empty($_FILES['FileKeHoach']['name'])) {
+        if (empty($_FILES['FileKeHoach']['name'])) {
+            errorResponse("File kế hoạch là bắt buộc.");
+        } else {
             $fileKeHoachName = uploadFile($_FILES['FileKeHoach'], $targetDir);
             if (!$fileKeHoachName) {
                 errorResponse("Lỗi khi upload file kế hoạch.");
             }
-        } else {
-            errorResponse("File kế hoạch là bắt buộc.");
         }
 
         // Gán dữ liệu đề tài
@@ -98,68 +120,82 @@ switch ($action) {
         $deTai->fileHopDong = $fileHopDongName;
         $deTai->maHoSo = $_POST['MaHoSo'];
 
+        error_log("Dữ liệu đề tài trước khi thêm: " . print_r([
+            'maDeTaiSV' => $deTai->maDeTaiSV,
+            'tenDeTai' => $deTai->tenDeTai,
+            'moTa' => $deTai->moTa,
+            'trangThai' => $deTai->trangThai,
+            'fileHopDong' => $deTai->fileHopDong,
+            'maHoSo' => $deTai->maHoSo
+        ], true));
+
         if ($deTai->add()) {
-            // Gọi API thêm kế hoạch
-            $keHoachData = [
-                'NgayBatDau' => $_POST['NgayBatDau'],
-                'NgayKetThuc' => $_POST['NgayKetThuc'],
-                'KinhPhi' => $_POST['KinhPhi'],
-                'FileKeHoach' => $fileKeHoachName,
-                'MaDeTaiSV' => $_POST['MaDeTaiSV']
-            ];
-            $keHoachResponse = callApi('KeHoachNCKHSV_Api.php', 'add', $keHoachData);
-
-            if (!$keHoachResponse['success']) {
-                errorResponse("Lỗi khi thêm kế hoạch: " . $keHoachResponse['message']);
-            }
-
-            // Gọi API tạo nhóm
-            $nhomData = [
-                'MaNhomNCKHSV' => 1, // Hoặc logic tạo ID nhóm tự động
-                'MaDeTaiSV' => $_POST['MaDeTaiSV']
-            ];
-            $nhomResponse = callApi('NhomNCKHSV_Api.php', 'add', $nhomData);
-
-            if (!$nhomResponse['success']) {
-                errorResponse("Lỗi khi tạo nhóm nghiên cứu: " . $nhomResponse['message']);
-            }
-
-            $MaNhomNCKHSV = $nhomResponse['MaNhomNCKHSV'] ?? 1; // ID nhóm từ phản hồi API
-
-            // Gọi API thêm sinh viên vào nhóm
-            if (!empty($_POST['SinhViens'])) {
-                foreach ($_POST['SinhViens'] as $MaSinhVien) {
-                    $sinhVienData = [
-                        'MaNhomNCKHSV' => $MaNhomNCKHSV,
-                        'MaSinhVien' => $MaSinhVien
-                    ];
-                    $sinhVienResponse = callApi('SinhVienNCKHSV_Api.php', 'add', $sinhVienData);
-
-                    if (!$sinhVienResponse['success']) {
-                        errorResponse("Lỗi khi thêm sinh viên vào nhóm: " . $sinhVienResponse['message']);
-                    }
-                }
-            }
-
-            // Gọi API thêm giảng viên vào nhóm
-            if (!empty($_POST['GiangViens'])) {
-                foreach ($_POST['GiangViens'] as $MaGV) {
-                    $giangVienData = [
-                        'MaNhomNCKHSV' => $MaNhomNCKHSV,
-                        'MaGV' => $MaGV
-                    ];
-                    $giangVienResponse = callApi('GiangVienNCKHSV_Api.php', 'add', $giangVienData);
-
-                    if (!$giangVienResponse['success']) {
-                        errorResponse("Lỗi khi thêm giảng viên vào nhóm: " . $giangVienResponse['message']);
-                    }
-                }
-            }
-
-            successResponse("Thêm đề tài và các thông tin liên quan thành công.");
+            successResponse("Thêm đề tài thành công.");
         } else {
-            errorResponse("Không thể thêm đề tài. Vui lòng kiểm tra dữ liệu.");
+            errorResponse("Không thể thêm đề tài. Dữ liệu không hợp lệ hoặc có lỗi xảy ra trong quá trình xử lý.");
         }
+        // if ($deTai->add()) {
+        //     // Gọi API thêm kế hoạch
+        //     $keHoachData = [
+        //         'NgayBatDau' => $_POST['NgayBatDau'],
+        //         'NgayKetThuc' => $_POST['NgayKetThuc'],
+        //         'KinhPhi' => $_POST['KinhPhi'],
+        //         'FileKeHoach' => $fileKeHoachName,
+        //         'MaDeTaiSV' => $_POST['MaDeTaiSV']
+        //     ];
+        //     $keHoachResponse = callApi('KeHoachNCKHSV_Api.php', 'add', $keHoachData);
+
+        //     if (!$keHoachResponse['success']) {
+        //         errorResponse("Lỗi khi thêm kế hoạch: " . $keHoachResponse['message']);
+        //     }
+
+        //     // Gọi API tạo nhóm
+        //     $nhomData = [
+        //         'MaNhomNCKHSV' => 1, // Hoặc logic tạo ID nhóm tự động
+        //         'MaDeTaiSV' => $_POST['MaDeTaiSV']
+        //     ];
+        //     $nhomResponse = callApi('NhomNCKHSV_Api.php', 'add', $nhomData);
+
+        //     if (!$nhomResponse['success']) {
+        //         errorResponse("Lỗi khi tạo nhóm nghiên cứu: " . $nhomResponse['message']);
+        //     }
+
+        //     $MaNhomNCKHSV = $nhomResponse['MaNhomNCKHSV'] ?? 1; // ID nhóm từ phản hồi API
+
+        //     // Gọi API thêm sinh viên vào nhóm
+        //     if (!empty($_POST['SinhViens'])) {
+        //         foreach ($_POST['SinhViens'] as $MaSinhVien) {
+        //             $sinhVienData = [
+        //                 'MaNhomNCKHSV' => $MaNhomNCKHSV,
+        //                 'MaSinhVien' => $MaSinhVien
+        //             ];
+        //             $sinhVienResponse = callApi('SinhVienNCKHSV_Api.php', 'add', $sinhVienData);
+
+        //             if (!$sinhVienResponse['success']) {
+        //                 errorResponse("Lỗi khi thêm sinh viên vào nhóm: " . $sinhVienResponse['message']);
+        //             }
+        //         }
+        //     }
+
+        //     // Gọi API thêm giảng viên vào nhóm
+        //     if (!empty($_POST['GiangViens'])) {
+        //         foreach ($_POST['GiangViens'] as $MaGV) {
+        //             $giangVienData = [
+        //                 'MaNhomNCKHSV' => $MaNhomNCKHSV,
+        //                 'MaGV' => $MaGV
+        //             ];
+        //             $giangVienResponse = callApi('GiangVienNCKHSV_Api.php', 'add', $giangVienData);
+
+        //             if (!$giangVienResponse['success']) {
+        //                 errorResponse("Lỗi khi thêm giảng viên vào nhóm: " . $giangVienResponse['message']);
+        //             }
+        //         }
+        //     }
+
+        //     successResponse("Thêm đề tài và các thông tin liên quan thành công.");
+        // } else {
+        //     errorResponse("Không thể thêm đề tài. Vui lòng kiểm tra dữ liệu.");
+        // }
         break;
 
     case 'updateGroup': // Chỉnh sửa mã nhóm và mã đề tài

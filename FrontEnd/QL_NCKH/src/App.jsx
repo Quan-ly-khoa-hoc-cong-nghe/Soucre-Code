@@ -17,6 +17,7 @@ import ApplicationApproval from './component/StudentTopicApproval/ApplicationApp
 import ApplicationApprovalAdmin from './component/StudentTopicApproval/ApplicationApproval_Admin';
 import LecturerApplicationApprovalList from './component/LecturerTopicApproval/LecturerApplicationApprovalList';
 import LecturerApplicationApprovalListAdmin from './component/LecturerTopicApproval/LecturerApplicationApprovalList_Admin';
+
 // Component bảo vệ route
 const PrivateRoute = ({ element }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -28,22 +29,25 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        
+        {/* Các route có Layout */}
         <Route path="/admin" element={<PrivateRoute element={<Statistics />} />} />
         <Route path="/admin/lecturer-topic-approval" element={<PrivateRoute element={<LecturerTopicApproval />} />} />
         <Route path="/admin/student-topic-approval" element={<PrivateRoute element={<StudentTopicApproval />} />} />
         <Route path="/admin/article-review" element={<PrivateRoute element={<ArticleReview />} />} />
         <Route path="/admin/science-seminar" element={<PrivateRoute element={<ScienceSeminar />} />} />
         <Route path="/admin/edit-student" element={<PrivateRoute element={<StudentManager />} />} />
-        <Route path="/department" element={<PrivateRoute element={<Department />} />} />
-        <Route path="/authcallback" element={<LecturerApplicationApprovalList element={<AuthCallback />} />} />
         <Route path="/admin/product-manager" element={<PrivateRoute element={<Product />} />} />
         <Route path="/admin/application-approval" element={<PrivateRoute element={<ApplicationApproval />} />} />
         <Route path="/admin/application-approval-admin" element={<PrivateRoute element={<ApplicationApprovalAdmin />} />} />
-        <Route path="/admin/lecturer-application-approval-admin" element={<PrivateRoute element={<LecturerApplicationApprovalListAdmin  />} />} />
+        <Route path="/admin/lecturer-application-approval-admin" element={<PrivateRoute element={<LecturerApplicationApprovalListAdmin />} />} />
         <Route path="/admin/lecturer-application-approval-list-admin" element={<PrivateRoute element={<LecturerApplicationApprovalList />} />} />
 
+        {/* Các route không cần Layout */}
+        <Route path="/department" element={<Department />} />
+        <Route path="/scitech" element={<SciTech />} />
 
-        <Route path="/scitech" element={<PrivateRoute element={<SciTech />} />} />
+        <Route path="/authcallback" element={<LecturerApplicationApprovalList element={<AuthCallback />} />} />
       </Routes>
     </Router>
   );
