@@ -1,16 +1,19 @@
 <?php
-class NhomNCKHSV {
+class NhomNCKHSV
+{
     private $conn;
     private $table_name = "NhomNCKHSV";
 
     public $MaNhomNCKHSV;
     public $MaDeTaiSV;
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->conn = $db;
     }
 
-    public function readAll() {
+    public function readAll()
+    {
         try {
             $sql = "SELECT * FROM " . $this->table_name . " ORDER BY MaNhomNCKHSV ASC";
             $stmt = $this->conn->prepare($sql);
@@ -20,7 +23,8 @@ class NhomNCKHSV {
             return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
         }
     }
-    public function autoUpdateGroups($deTaiData) {
+    public function autoUpdateGroups($deTaiData)
+    {
         try {
             foreach ($deTaiData as $deTai) {
                 // Kiểm tra xem MaNhomNCKHSV đã tồn tại trong bảng chưa
@@ -29,7 +33,7 @@ class NhomNCKHSV {
                 $stmtCheck->bindParam(':maNhomNCKHSV', $deTai['MaNhomNCKHSV']);
                 $stmtCheck->execute();
                 $exists = $stmtCheck->fetchColumn();
-    
+
                 if ($exists) {
                     // Nếu mã nhóm đã tồn tại, cập nhật MaDeTaiSV
                     $sqlUpdate = "UPDATE " . $this->table_name . " 
@@ -54,16 +58,41 @@ class NhomNCKHSV {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
-    
-    
-    public function add() {
-        $query = "INSERT INTO NhomNCKHSV (MaDeTaiSV) VALUES (:MaDeTaiSV)";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':MaDeTaiSV', $this->MaDeTaiSV);
-        return $stmt->execute();
+
+
+    public function add()
+    {
+        try {
+            // Log dữ liệu trước khi thực hiện thêm để kiểm tra
+            error_log("Dữ liệu chuẩn bị thêm: MaNhomNCKHSV = {$this->MaNhomNCKHSV}, MaDeTaiSV = {$this->MaDeTaiSV}");
+
+            // Câu lệnh SQL
+            $query = "INSERT INTO NhomNCKHSV (MaNhomNCKHSV, MaDeTaiSV) VALUES (:MaNhomNCKHSV, :MaDeTaiSV)";
+            $stmt = $this->conn->prepare($query);
+
+            // Gán giá trị cho tham số
+            $stmt->bindParam(':MaNhomNCKHSV', $this->MaNhomNCKHSV, PDO::PARAM_STR);
+            $stmt->bindParam(':MaDeTaiSV', $this->MaDeTaiSV, PDO::PARAM_STR);
+
+            // Thực thi câu lệnh và kiểm tra kết quả
+            if ($stmt->execute()) {
+                error_log("Thêm nhóm nghiên cứu thành công: MaNhomNCKHSV = {$this->MaNhomNCKHSV}, MaDeTaiSV = {$this->MaDeTaiSV}");
+                return true;
+            } else {
+                $errorInfo = $stmt->errorInfo(); // Lấy thông tin lỗi
+                error_log("Lỗi khi thêm nhóm nghiên cứu: " . implode(" | ", $errorInfo));
+                return false;
+            }
+        } catch (PDOException $e) {
+            // Log lỗi ngoại lệ nếu xảy ra
+            error_log("PDOException khi thêm nhóm nghiên cứu: " . $e->getMessage());
+            return false;
+        }
     }
-    
-    public function addNewGroup() {
+
+
+    public function addNewGroup()
+    {
         try {
             $sql = "INSERT INTO " . $this->table_name . " (MaNhomNCKHSV, MaDeTaiSV) VALUES (:maNhomNCKHSV, :maDeTaiSV)";
             $stmt = $this->conn->prepare($sql);
@@ -74,9 +103,10 @@ class NhomNCKHSV {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
-    
 
-    public function update() {
+
+    public function update()
+    {
         try {
             $sql = "UPDATE " . $this->table_name . " SET MaDeTaiSV = :maDeTaiSV WHERE MaNhomNCKHSV = :maNhomNCKHSV";
             $stmt = $this->conn->prepare($sql);
@@ -88,7 +118,8 @@ class NhomNCKHSV {
         }
     }
 
-    public function delete() {
+    public function delete()
+    {
         try {
             $sql = "DELETE FROM " . $this->table_name . " WHERE MaNhomNCKHSV = :maNhomNCKHSV";
             $stmt = $this->conn->prepare($sql);
@@ -99,4 +130,3 @@ class NhomNCKHSV {
         }
     }
 }
-?>
