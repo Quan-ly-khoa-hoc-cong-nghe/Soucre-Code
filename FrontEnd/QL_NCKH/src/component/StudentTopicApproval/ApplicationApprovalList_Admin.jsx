@@ -24,18 +24,23 @@ const ApplicationApprovalListAdmin = () => {
   const [ngayKetThuc, setNgayKetThuc] = useState("");
   const [kinhPhi, setKinhPhi] = useState("");
 
-
-
-
-
-
-
   useEffect(() => {
     fetchApplications();
     fetchDepartments();
   }, []);
+
   const handleFileUpload = (event, fieldName) => {
-    const file = event.target.files[0]; // Lấy file được chọn
+    const file = event.target.files[0];
+    const allowedTypes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ]; // Các loại file cho phép
+
+    if (!allowedTypes.includes(file.type)) {
+      alert("Chỉ chấp nhận các tệp PDF hoặc DOCX.");
+      return;
+    }
+
     setFiles((prevFiles) => ({
       ...prevFiles,
       [fieldName]: file,
@@ -86,6 +91,12 @@ const ApplicationApprovalListAdmin = () => {
       });
   };
   const addStudent = (studentId) => {
+    // Kiểm tra trùng lặp
+    if (students.some((student) => student.MaSinhVien === studentId)) {
+      alert("Sinh viên đã có trong danh sách!");
+      return;
+    }
+
     axios
       .get(
         `http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SinhVien_Api.php?action=getById&MaSinhVien=${studentId}`
@@ -95,7 +106,7 @@ const ApplicationApprovalListAdmin = () => {
           setStudents((prevStudents) => [
             ...prevStudents,
             response.data.SinhVien,
-          ]); // Thêm sinh viên vào danh sách
+          ]);
         } else {
           alert("Không tìm thấy thông tin sinh viên!");
         }
@@ -126,6 +137,12 @@ const ApplicationApprovalListAdmin = () => {
       });
   };
   const addLecturer = (lecturerId) => {
+    // Kiểm tra trùng lặp
+    if (lecturers.some((lecturer) => lecturer.MaGV === lecturerId)) {
+      alert("Giảng viên đã có trong danh sách!");
+      return;
+    }
+
     axios
       .get(
         `http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/GiangVien_Api.php?action=getById&MaGV=${lecturerId}`
@@ -135,7 +152,7 @@ const ApplicationApprovalListAdmin = () => {
           setLecturers((prevLecturers) => [
             ...prevLecturers,
             response.data.GiangVien,
-          ]); // Thêm giảng viên vào danh sách
+          ]);
         } else {
           alert("Không tìm thấy thông tin giảng viên!");
         }
@@ -236,26 +253,29 @@ const ApplicationApprovalListAdmin = () => {
     setStudents([]);
     setLecturers([]);
   };
-  
-
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Kiểm tra ngày
+    if (new Date(ngayKetThuc) < new Date(ngayBatDau)) {
+      alert("Ngày kết thúc không thể trước ngày bắt đầu!");
+      return;
+    }
     setLoading(true);
-    // if (
-    //   !maDeTai ||
-    //   !tenDeTai ||
-    //   !moTa ||
-    //   !ngayBatDau ||
-    //   !ngayKetThuc ||
-    //   !kinhPhi ||
-    //   !files.FileHopDong ||
-    //   !files.FileKeHoach
-    // ) {
-    //   alert("Vui lòng nhập đầy đủ thông tin và tải lên các tệp cần thiết!");
-    //   return;
-    // }
+    if (
+      !maDeTai ||
+      !tenDeTai ||
+      !moTa ||
+      !ngayBatDau ||
+      !ngayKetThuc ||
+      !kinhPhi ||
+      !files.FileHopDong ||
+      !files.FileKeHoach
+    ) {
+      alert("Vui lòng nhập đầy đủ thông tin và tải lên các tệp cần thiết!");
+      return;
+    }
 
     if (!selectedApp?.MaHoSo) {
       alert("Không tìm thấy MaHoSo! Vui lòng chọn hồ sơ.");
@@ -438,7 +458,7 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={maDeTai}
-  onChange={(e) => setMaDeTai(e.target.value)}
+                      onChange={(e) => setMaDeTai(e.target.value)}
                     />
                   </div>
                   <div>
@@ -451,7 +471,7 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={tenDeTai}
-  onChange={(e) => setTenDeTai(e.target.value)}
+                      onChange={(e) => setTenDeTai(e.target.value)}
                     />
                   </div>
                   <div>
@@ -463,7 +483,7 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={moTa}
-  onChange={(e) => setMoTa(e.target.value)}
+                      onChange={(e) => setMoTa(e.target.value)}
                     />
                   </div>
                   <div>
@@ -497,7 +517,7 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={ngayBatDau}
-  onChange={(e) => setNgayBatDau(e.target.value)}
+                      onChange={(e) => setNgayBatDau(e.target.value)}
                     />
                   </div>
                   <div>
@@ -510,7 +530,7 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={ngayKetThuc}
-  onChange={(e) => setNgayKetThuc(e.target.value)}
+                      onChange={(e) => setNgayKetThuc(e.target.value)}
                     />
                   </div>
                   <div>
@@ -523,7 +543,7 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={kinhPhi}
-  onChange={(e) => setKinhPhi(e.target.value)}
+                      onChange={(e) => setKinhPhi(e.target.value)}
                     />
                   </div>
                   <div>

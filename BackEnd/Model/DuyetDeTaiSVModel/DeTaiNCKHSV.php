@@ -54,36 +54,34 @@ class DeTaiNCKHSV
     }
 
     // Phương thức thêm đề tài
-    public function add()
-    {
-        try {
-            $sql = "INSERT INTO " . $this->table_name . " 
-                    (maDeTaiSV, tenDeTai, moTa, trangThai, fileHopDong, maHoSo, maNhomNCKHSV) 
-                    VALUES (:maDeTaiSV, :ten, :moTa, :trangThai, :fileHopDong, :maHoSo, :maNhomNCKHSV)";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':maDeTaiSV', $this->maDeTaiSV);
-            $stmt->bindParam(':ten', $this->tenDeTai);
-            $stmt->bindParam(':moTa', $this->moTa);
-            $stmt->bindParam(':trangThai', $this->trangThai);
-            $stmt->bindParam(':fileHopDong', $this->fileHopDong);
-            $stmt->bindParam(':maHoSo', $this->maHoSo);
-            $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);
+        public function add()
+        {
+            try {
+                $sql = "INSERT INTO " . $this->table_name . " 
+                        (maDeTaiSV, tenDeTai, moTa, trangThai, fileHopDong, maHoSo, maNhomNCKHSV) 
+                        VALUES (:maDeTaiSV, :ten, :moTa, :trangThai, :fileHopDong, :maHoSo, :maNhomNCKHSV)";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->bindParam(':maDeTaiSV', $this->maDeTaiSV);
+                $stmt->bindParam(':ten', $this->tenDeTai);
+                $stmt->bindParam(':moTa', $this->moTa);
+                $stmt->bindParam(':trangThai', $this->trangThai);
+                $stmt->bindParam(':fileHopDong', $this->fileHopDong);
+                $stmt->bindParam(':maHoSo', $this->maHoSo);
+                $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);
 
-            if ($stmt->execute()) {
-                error_log("Thêm đề tài thành công");
-                return true;
-            } else {
-                $errorInfo = $stmt->errorInfo();
-                error_log("SQL Error: " . implode(" - ", $errorInfo));
+                if ($stmt->execute()) {
+                    error_log("Thêm đề tài thành công");
+                    return true;
+                } else {
+                    $errorInfo = $stmt->errorInfo();
+                    error_log("SQL Error: " . implode(" - ", $errorInfo));
+                    return false;
+                }
+            } catch (PDOException $e) {
+                error_log("Lỗi thêm đề tài: " . $e->getMessage());
                 return false;
             }
-
-        } catch (PDOException $e) {
-            error_log("Lỗi thêm đề tài: " . $e->getMessage());
-            return false;
         }
-    }
-
 
 
     public function readByMaDeTaiSV($maDeTaiSV)

@@ -46,8 +46,16 @@ switch ($action) {
         $nhomNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
         $nhomNCKHSV->MaDeTaiSV = $data['MaDeTaiSV'];
 
-        if ($nhom->add()) {
-            successResponse("Tạo nhóm nghiên cứu thành công.", ['MaNhomNCKHSV' => $nhom->MaNhomNCKHSV]);
+        error_log("Dữ liệu nhận từ DeTaiNCKHSV_Api: " . print_r($data, true));
+
+        if (empty($nhomNCKHSV->MaNhomNCKHSV) || empty($nhomNCKHSV->MaDeTaiSV)) {
+            errorResponse("Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, MaDeTaiSV.");
+        }
+
+        error_log("Trước khi gọi add(): MaNhomNCKHSV = {$nhomNCKHSV->MaNhomNCKHSV}, MaDeTaiSV = {$nhomNCKHSV->MaDeTaiSV}");
+
+        if ($nhomNCKHSV->add()) {
+            successResponse("Tạo nhóm nghiên cứu thành công.", ['MaNhomNCKHSV' => $nhomNCKHSV->MaNhomNCKHSV]);
         } else {
             errorResponse("Không thể tạo nhóm nghiên cứu.");
         }
