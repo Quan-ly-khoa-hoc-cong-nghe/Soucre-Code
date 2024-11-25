@@ -4,13 +4,13 @@ class DeTaiNCKHSV
     private $conn;
     private $table_name = "DeTaiNCKHSV";
 
-    public $MaDeTaiSV;
-    public $TenDeTai;
-    public $MoTa;
-    public $TrangThai;
-    public $FileHopDong;
-    public $MaHoSo;
-    public $MaNhomNCKHSV;
+    public $maDeTaiSV;
+    public $tenDeTai;
+    public $moTa;
+    public $trangThai;
+    public $fileHopDong;
+    public $maHoSo;
+    public $maNhomNCKHSV;
 
 
     // Constructor
@@ -145,7 +145,7 @@ class DeTaiNCKHSV
         try {
             $sql = "DELETE FROM " . $this->table_name . " WHERE MaDeTaiSV = :maDeTaiSV";
             $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':maDeTaiSV', $this->MaDeTaiSV);
+            $stmt->bindParam(':maDeTaiSV', $this->maDeTaiSV);
             return $stmt->execute();
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];

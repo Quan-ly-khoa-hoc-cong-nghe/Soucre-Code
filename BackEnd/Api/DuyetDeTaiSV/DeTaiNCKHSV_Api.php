@@ -204,13 +204,13 @@ switch ($action) {
 
     case 'update':
         if (!empty($data['MaDeTaiSV'])) {
-            $deTai->MaDeTaiSV = $data['MaDeTaiSV'];
-            $deTai->TenDeTai = $data['TenDeTai'];
-            $deTai->MoTa = $data['MoTa'];
-            $deTai->TrangThai = $data['TrangThai'];
-            $deTai->FileHopDong = $data['FileHopDong'];
-            $deTai->MaHoSo = $data['MaHoSo'];
-            $deTai->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+            $deTai->maDeTaiSV = $data['MaDeTaiSV'];
+            $deTai->tenDeTai = $data['TenDeTai'];
+            $deTai->moTa = $data['MoTa'];
+            $deTai->trangThai = $data['TrangThai'];
+            $deTai->fileHopDong = $data['FileHopDong'];
+            $deTai->maHoSo = $data['MaHoSo'];
+            $deTai->maNhomNCKHSV = $data['MaNhomNCKHSV'];
 
             if ($deTai->update()) {
                 echo json_encode(['message' => 'Cập nhật đề tài thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
@@ -224,7 +224,7 @@ switch ($action) {
 
     case 'delete':
         if (!empty($data['MaDeTaiSV'])) {
-            $deTai->MaDeTaiSV = $data['MaDeTaiSV'];
+            $deTai->maDeTaiSV = $data['MaDeTaiSV'];
             if ($deTai->delete()) {
                 echo json_encode(['message' => 'Xóa đề tài thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             } else {
