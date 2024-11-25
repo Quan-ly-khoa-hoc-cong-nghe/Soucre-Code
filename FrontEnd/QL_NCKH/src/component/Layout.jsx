@@ -20,6 +20,10 @@ import LogoHUIT from "../assets/logohuitt.png";
 
 const Layout = ({ children }) => {
   const [sidebarToggle, setSidebarToggle] = useState(false);
+  const [userInfo, setUserInfo] = useState({ name: "", role: "" });
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
   const sidebarRef = useRef();
 
   const handleClickOutside = (event) => {
@@ -29,11 +33,27 @@ const Layout = ({ children }) => {
   };
 
   useEffect(() => {
+    // Khi component mount, lấy thông tin người dùng từ localStorage
+    const storedUserName = localStorage.getItem("userName");
+    const storedUserRole = localStorage.getItem("userRole");
+
+    if (storedUserName && storedUserRole) {
+      setUserInfo({ name: storedUserName, role: storedUserRole });
+    }
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  const handleLogout = () => {
+    // Xóa thông tin người dùng từ localStorage
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userRole");
+
+    // Điều hướng đến trang login (nếu sử dụng React Router)
+    window.location.href = "/"; // Hoặc dùng navigate trong react-router-dom
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100">
@@ -130,7 +150,9 @@ const Layout = ({ children }) => {
                 className="flex items-center space-x-3"
               >
                 <FaComment />
-                <span className="font-semibold">Duyệt hồ sơ thêm đề tài role KHCN</span>
+                <span className="font-semibold">
+                  Duyệt hồ sơ thêm đề tài role KHCN
+                </span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -153,12 +175,7 @@ const Layout = ({ children }) => {
             </li>
             <hr className="border-gray-400 my-4" />
 
-            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] p-2 rounded hover:text-[#d95959]">
-              <Link to="/logout" className="flex items-center space-x-3 mt">
-                <FaSignOutAlt />
-                <span className="font-semibold">Logout</span>
-              </Link>
-            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] p-2 rounded hover:text-[#d95959]"></li>
           </ul>
         </div>
       </div>
@@ -185,12 +202,40 @@ const Layout = ({ children }) => {
 
             <div className="flex gap-4 h-full">
               <div className="text-right">
-                <p className="text-sm font-semibold">Name</p>
-                <p className="text-xs font-semibold">Role</p>
+                <p className="text-sm font-semibold">{userInfo.name}</p>
+                <p className="text-xs font-semibold">{userInfo.role}</p>
               </div>
-              <div className="relative h-full p-1.5 border border-[#e2e8f0] rounded-full bg-[#eff4fb] group">
+              <div
+                className="relative h-full p-1.5 border border-[#e2e8f0] rounded-full bg-[#eff4fb] group"
+                onClick={() => setIsLogoutModalOpen(true)}
+              >
                 <CiUser className="text-xl text-gray-600 h-full flex w-full" />
               </div>
+
+              {/* Modal */}
+              {isLogoutModalOpen && (
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-30">
+                  <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                    <h2 className="text-lg font-semibold mb-4">
+                      Are you sure you want to logout?
+                    </h2>
+                    <div className="flex justify-end space-x-4">
+                      <button
+                        onClick={() => setIsLogoutModalOpen(false)}
+                        className="px-4 py-2 bg-gray-300 rounded-lg"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
