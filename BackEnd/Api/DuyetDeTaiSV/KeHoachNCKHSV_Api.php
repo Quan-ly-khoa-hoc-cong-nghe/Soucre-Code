@@ -35,6 +35,7 @@ switch ($action) {
         echo json_encode(['KeHoachNCKHSV' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
 
+
     case 'add': // Thêm kế hoạch
         // Kiểm tra dữ liệu đầu vào
         if (empty($data['NgayBatDau']) || empty($data['NgayKetThuc']) || empty($data['KinhPhi']) || empty($data['MaDeTaiSV']) || empty($data['FileKeHoach'])) {
@@ -52,6 +53,7 @@ switch ($action) {
         // Thêm kế hoạch
         if ($keHoach->add()) {
             echo json_encode(['success' => true, 'message' => 'Thêm kế hoạch thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
         } else {
             echo json_encode(['success' => false, 'message' => 'Không thể thêm kế hoạch'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }

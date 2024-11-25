@@ -1,91 +1,120 @@
 <?php
-
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST, GET, PUT, DELETE");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
+header("Content-Type: application/json");
 require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../../Model/DeTaiNCKHSinhVien/GiangVienNCKHSV.php';
 
 $database = new Database();
 $db = $database->getConn();
-$giangVien = new GiangVienNCKHSV($db);
+$giangVienNCKHSV = new GiangVienNCKHSV($db);
 
-// Lấy action từ query string
-$action = isset($_GET['action']) ? strtoupper(trim($_GET['action'])) : null;
+// Lấy phương thức HTTP và tham số `action`
+$method = $_SERVER['REQUEST_METHOD'];
+$action = isset($_GET['action']) ? $_GET['action'] : null;
 
-if ($action === null) {
-    echo json_encode(["message" => "Tham số 'action' không được cung cấp."]);
+if (!$action) {
+    echo json_encode(["message" => "Yêu cầu không hợp lệ: thiếu tham số action"]);
+    http_response_code(400);
     exit;
 }
 
-// Xử lý các action
-switch ($action) {
+switch ($method) {
     case 'GET':
-        // Lấy tất cả bản ghi
-        $result = $giangVien->getAllRecords();
-        echo json_encode($result);
-        break;
-
-    case 'GET_BY_MANHOM':
-        // Lấy giảng viên theo mã nhóm
-        if (isset($_GET['maNhom'])) {
-            $result = $giangVien->getByMaNhom($_GET['maNhom']);
-            if ($result) {
-                echo json_encode($result);
-            } else {
-                echo json_encode(["message" => "Không tìm thấy giảng viên trong nhóm này."]);
+        if ($action === "get") {
+            $result = $giangVienNCKHSV->readAll();
+            echo json_encode($result);
+        } elseif ($action === "getOne") {
+            $maNhom = isset($_GET['MaNhomNCKHSV']) ? $_GET['MaNhomNCKHSV'] : null;
+            if (!$maNhom) {
+                echo json_encode(["message" => "Thiếu mã nhóm nghiên cứu khoa học sinh viên"]);
+                http_response_code(400);
+                exit;
             }
+            $giangVienNCKHSV->MaNhomNCKHSV = $maNhom;
+            $data = $giangVienNCKHSV->readOne();
+            echo json_encode($data);
         } else {
-            echo json_encode(["message" => "Thiếu mã nhóm (maNhom)."]);
+            echo json_encode(["message" => "Action không hợp lệ"]);
+            http_response_code(400);
         }
         break;
 
     case 'POST':
-        // Thêm bản ghi mới
+        if ($action !== "post") {
+            echo json_encode(["message" => "Action không hợp lệ cho phương thức POST"]);
+            http_response_code(400);
+            exit;
+        }
+
         $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['MaNhomNCKHSV'], $data['MaGV'])) {
-            if ($giangVien->addRecord($data['MaNhomNCKHSV'], $data['MaGV'])) {
-                echo json_encode(["message" => "Thêm giảng viên vào nhóm thành công."]);
-            } else {
-                echo json_encode(["message" => "Thêm giảng viên thất bại."]);
-            }
+        if (!isset($data['MaNhomNCKHSV'], $data['MaGV'])) {
+            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            http_response_code(400);
+            exit;
+        }
+
+        $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+        $giangVienNCKHSV->MaGV = $data['MaGV'];
+
+        if ($giangVienNCKHSV->add()) {
+            echo json_encode(["message" => "Dữ liệu được thêm thành công"]);
         } else {
-            echo json_encode(["message" => "Thiếu thông tin để thêm giảng viên."]);
+            echo json_encode(["message" => "Thêm dữ liệu thất bại"]);
+            http_response_code(500);
         }
         break;
 
     case 'PUT':
-        // Cập nhật giảng viên
+        if ($action !== "put") {
+            echo json_encode(["message" => "Action không hợp lệ cho phương thức PUT"]);
+            http_response_code(400);
+            exit;
+        }
+
         $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['MaNhomNCKHSV'], $data['MaGV'], $data['NewMaGV'])) {
-            if ($giangVien->updateRecord($data['MaNhomNCKHSV'], $data['MaGV'], $data['NewMaGV'])) {
-                echo json_encode(["message" => "Cập nhật giảng viên thành công."]);
-            } else {
-                echo json_encode(["message" => "Cập nhật thất bại hoặc bản ghi không tồn tại."]);
-            }
+        if (!isset($data['MaNhomNCKHSV'], $data['MaGV'])) {
+            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            http_response_code(400);
+            exit;
+        }
+
+        $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+        $giangVienNCKHSV->MaGV = $data['MaGV'];
+
+        if ($giangVienNCKHSV->update()) {
+            echo json_encode(["message" => "Dữ liệu được cập nhật thành công"]);
         } else {
-            echo json_encode(["message" => "Thiếu thông tin cần thiết để cập nhật."]);
+            echo json_encode(["message" => "Cập nhật dữ liệu thất bại"]);
+            http_response_code(500);
         }
         break;
 
     case 'DELETE':
-        // Xóa giảng viên khỏi nhóm
+        if ($action !== "delete") {
+            echo json_encode(["message" => "Action không hợp lệ cho phương thức DELETE"]);
+            http_response_code(400);
+            exit;
+        }
+
         $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['MaNhomNCKHSV'], $data['MaGV'])) {
-            if ($giangVien->deleteRecord($data['MaNhomNCKHSV'], $data['MaGV'])) {
-                echo json_encode(["message" => "Xóa giảng viên thành công."]);
-            } else {
-                echo json_encode(["message" => "Xóa thất bại hoặc bản ghi không tồn tại."]);
-            }
+        if (!isset($data['MaNhomNCKHSV'])) {
+            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            http_response_code(400);
+            exit;
+        }
+
+        $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+
+        if ($giangVienNCKHSV->delete()) {
+            echo json_encode(["message" => "Dữ liệu được xóa thành công"]);
         } else {
-            echo json_encode(["message" => "Thiếu thông tin để xóa giảng viên."]);
+            echo json_encode(["message" => "Xóa dữ liệu thất bại"]);
+            http_response_code(500);
         }
         break;
 
     default:
-        echo json_encode(["message" => "Action không hợp lệ."]);
+        echo json_encode(["message" => "Phương thức không được hỗ trợ"]);
+        http_response_code(405);
         break;
 }
 ?>

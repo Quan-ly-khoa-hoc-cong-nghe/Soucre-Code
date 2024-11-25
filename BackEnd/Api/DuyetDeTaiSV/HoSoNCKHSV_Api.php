@@ -1,6 +1,8 @@
 <?php
 header("Access-Control-Allow-Origin: *");
+
 header("Access-Control-Allow-Methods: POST, GET,PUT, PATCH, DELETE, OPTIONS");
+
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -25,6 +27,7 @@ switch ($action) {
         echo json_encode(['HoSoNCKHSV' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
 
+
         case 'add':
             if (!empty($data['MaHoSo']) && !empty($data['NgayNop']) && !empty($data['FileHoSo']) && !empty($data['TrangThai']) && !empty($data['MaKhoa'])) {
                 $hoSo->MaHoSo = $data['MaHoSo'];
@@ -37,6 +40,7 @@ switch ($action) {
                 } else {
                     echo json_encode(['message' => 'Không thể thêm hồ sơ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                 }
+
             } else {
                 echo json_encode(['message' => 'Dữ liệu không đầy đủ hoặc không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             }
@@ -62,6 +66,7 @@ switch ($action) {
             
             
 
+
         case 'update':
             if (!empty($data['MaHoSo'])) {
                 $hoSo->MaHoSo = $data['MaHoSo'];
@@ -74,6 +79,7 @@ switch ($action) {
                 } else {
                     echo json_encode(['message' => 'Không thể cập nhật hồ sơ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                 }
+
             } else {
                 echo json_encode(['message' => 'Thiếu mã hồ sơ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             }

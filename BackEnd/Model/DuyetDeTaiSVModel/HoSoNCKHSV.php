@@ -13,9 +13,10 @@ class HoSoNCKHSV {
         $this->conn = $db;
     }
 
+    // Lấy tất cả hồ sơ
     public function readAll() {
         try {
-            $sql = "SELECT * FROM " . $this->table_name . " ORDER BY NgayNop DESC";
+            $sql = "SELECT * FROM " . $this->table_name . " ORDER BY NgayNop ASC";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -24,10 +25,12 @@ class HoSoNCKHSV {
         }
     }
 
+    // Thêm hồ sơ mới
     public function add() {
         try {
             $sql = "INSERT INTO " . $this->table_name . " (MaHoSo, NgayNop, FileHoSo, TrangThai, MaKhoa) 
                     VALUES (:maHoSo, :ngayNop, :fileHoSo, :trangThai, :maKhoa)";
+
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':maHoSo', $this->MaHoSo);
             $stmt->bindParam(':ngayNop', $this->NgayNop);
@@ -82,6 +85,7 @@ class HoSoNCKHSV {
     
     
 
+    // Xóa hồ sơ
     public function delete() {
         try {
             $sql = "DELETE FROM " . $this->table_name . " WHERE MaHoSo = :maHoSo";

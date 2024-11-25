@@ -7,6 +7,7 @@ class SinhVien {
     public $TenSinhVien;
     public $EmailSV;
     public $sdtSV;
+    public $MaKhoa;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -38,6 +39,7 @@ class SinhVien {
             $stmt->bindParam(':tenSinhVien', $this->TenSinhVien);
             $stmt->bindParam(':emailSV', $this->EmailSV);
             $stmt->bindParam(':sdtSV', $this->sdtSV);
+            $stmt->bindParam('MaKhoa', $this->MaKhoa);
     
             return $stmt->execute();  // Trả về true nếu thêm thành công, false nếu không thành công
         } catch (PDOException $e) {
@@ -55,6 +57,7 @@ class SinhVien {
             $stmt->bindParam(':tenSinhVien', $this->TenSinhVien);
             $stmt->bindParam(':emailSV', $this->EmailSV);
             $stmt->bindParam(':sdtSV', $this->sdtSV);
+            $stmt->bindParam('MaKhoa', $this->MaKhoa);
             return $stmt->execute();
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];

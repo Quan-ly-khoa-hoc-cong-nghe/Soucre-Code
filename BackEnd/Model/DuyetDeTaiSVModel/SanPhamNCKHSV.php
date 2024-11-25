@@ -7,16 +7,15 @@ class SanPhamNCKHSV {
     public $NgayHoanThanh;
     public $KetQua;
     public $MaDeTaiSV;
-    public $FileSanPham; // Thêm thuộc tính mới
 
     public function __construct($db) {
         $this->conn = $db;
     }
 
-    // Đọc tất cả sản phẩm
+    // Lấy tất cả sản phẩm
     public function readAll() {
         try {
-            $sql = "SELECT * FROM " . $this->table_name . " ORDER BY NgayHoanThanh DESC";
+            $sql = "SELECT * FROM " . $this->table_name . " ORDER BY TenSanPham ASC";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -28,39 +27,41 @@ class SanPhamNCKHSV {
     // Thêm sản phẩm mới
     public function add() {
         try {
-            $sql = "INSERT INTO " . $this->table_name . " (TenSanPham, NgayHoanThanh, KetQua, MaDeTaiSV, FileSanPham) 
-                    VALUES (:tenSanPham, :ngayHoanThanh, :ketQua, :maDeTaiSV, :fileSanPham)";
+            if (empty($this->TenSanPham) || empty($this->NgayHoanThanh) || empty($this->KetQua) || empty($this->MaDeTaiSV)) {
+                return false;
+            }
+
+            $sql = "INSERT INTO " . $this->table_name . " (TenSanPham, NgayHoanThanh, KetQua, MaDeTaiSV) 
+                    VALUES (:tenSanPham, :ngayHoanThanh, :ketQua, :maDeTaiSV)";
             $stmt = $this->conn->prepare($sql);
+
             $stmt->bindParam(':tenSanPham', $this->TenSanPham);
             $stmt->bindParam(':ngayHoanThanh', $this->NgayHoanThanh);
             $stmt->bindParam(':ketQua', $this->KetQua);
             $stmt->bindParam(':maDeTaiSV', $this->MaDeTaiSV);
-            $stmt->bindParam(':fileSanPham', $this->FileSanPham);
+
             return $stmt->execute();
         } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];
+            return ["error" => "Lỗi thêm sản phẩm: " . $e->getMessage()];
         }
     }
 
     // Cập nhật sản phẩm
     public function update() {
         try {
-            $fileSanPham = !empty($this->FileSanPham) ? $this->FileSanPham : null;
-    
-            $sql = "UPDATE " . $this->table_name . "
-                    SET TenSanPham = :tenSanPham, NgayHoanThanh = :ngayHoanThanh, KetQua = :ketQua, FileSanPham = :fileSanPham
+            $sql = "UPDATE " . $this->table_name . " 
+                    SET TenSanPham = :tenSanPham, NgayHoanThanh = :ngayHoanThanh, KetQua = :ketQua 
                     WHERE MaDeTaiSV = :maDeTaiSV";
             $stmt = $this->conn->prepare($sql);
-    
+
             $stmt->bindParam(':tenSanPham', $this->TenSanPham);
             $stmt->bindParam(':ngayHoanThanh', $this->NgayHoanThanh);
             $stmt->bindParam(':ketQua', $this->KetQua);
-            $stmt->bindParam(':fileSanPham', $fileSanPham);  // Lưu đường dẫn file vào CSDL
             $stmt->bindParam(':maDeTaiSV', $this->MaDeTaiSV);
-    
-            return $stmt->execute();  // Chạy câu lệnh SQL
+
+            return $stmt->execute();
         } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];  // Bắt lỗi và trả về thông báo lỗi
+            return ["error" => "Lỗi cập nhật sản phẩm: " . $e->getMessage()];
         }
     }
 
@@ -72,7 +73,7 @@ class SanPhamNCKHSV {
             $stmt->bindParam(':maDeTaiSV', $this->MaDeTaiSV);
             return $stmt->execute();
         } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];
+            return ["error" => "Lỗi xóa sản phẩm: " . $e->getMessage()];
         }
     }
 }
