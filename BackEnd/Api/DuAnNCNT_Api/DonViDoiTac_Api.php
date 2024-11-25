@@ -1,13 +1,12 @@
 <?php
 header("Content-Type: application/json");
-require_once __DIR__. '/../../config/Database.php';
-require_once __DIR__ . '/../../Model/DuAnNCNTModel/DonViDoiTac.php';
+require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../Model/DonViDoiTacModel/DonViDoiTac.php';
 
 $database = new Database();
 $db = $database->getConn();
-$doitac = new DonViDoiTac($db);
+$doiTac = new DonViDoiTac($db);
 
-// Lấy phương thức HTTP và tham số `action`
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 
@@ -20,19 +19,18 @@ if (!$action) {
 switch ($method) {
     case 'GET':
         if ($action === "get") {
-            $stmt = $doitac->getAll();
+            $stmt = $doiTac->getAll();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($result);
         } elseif ($action === "getOne") {
-            $maDoiTac = isset($_GET['ma_doi_tac']) ? $_GET['ma_doi_tac'] : null;
-            if (!$maDoiTac) {
+            $MaDoiTac = isset($_GET['MaDoiTac']) ? $_GET['MaDoiTac'] : null;
+            if (!$MaDoiTac) {
                 echo json_encode(["message" => "Thiếu mã đối tác"]);
                 http_response_code(400);
                 exit;
             }
-            $doitac->ma_doi_tac = $maDoiTac;
-            $stmt = $doitac->getOne();
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            $doiTac->MaDoiTac = $MaDoiTac;
+            $data = $doiTac->getOne();
             echo json_encode($data);
         } else {
             echo json_encode(["message" => "Action không hợp lệ"]);
@@ -48,20 +46,20 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_doi_tac, $data->ten_doi_tac, $data->sdt_doi_tac, $data->email_doi_tac, $data->dia_chi_doi_tac)) {
+        if (!isset($data->MaDoiTac, $data->TenDoiTac, $data->SdtDoiTac, $data->EmailDoiTac, $data->DiaChiDoiTac)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $doitac->ma_doi_tac = $data->ma_doi_tac;
-        $doitac->ten_doi_tac = $data->ten_doi_tac;
-        $doitac->sdt_doi_tac = $data->sdt_doi_tac;
-        $doitac->email_doi_tac = $data->email_doi_tac;
-        $doitac->dia_chi_doi_tac = $data->dia_chi_doi_tac;
+        $doiTac->MaDoiTac = $data->MaDoiTac;
+        $doiTac->TenDoiTac = $data->TenDoiTac;
+        $doiTac->SdtDoiTac = $data->SdtDoiTac;
+        $doiTac->EmailDoiTac = $data->EmailDoiTac;
+        $doiTac->DiaChiDoiTac = $data->DiaChiDoiTac;
 
-        if ($doitac->add()) {
-            echo json_encode(["message" => "Đối tác được thêm thành công"]);
+        if ($doiTac->add()) {
+            echo json_encode(["message" => "Thêm đối tác thành công"]);
         } else {
             echo json_encode(["message" => "Thêm đối tác thất bại"]);
             http_response_code(500);
@@ -69,27 +67,27 @@ switch ($method) {
         break;
 
     case 'PUT':
-        if ($action !== "put") {
+        if ($action !== "update") {
             echo json_encode(["message" => "Action không hợp lệ cho phương thức PUT"]);
             http_response_code(400);
             exit;
         }
 
-        $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_doi_tac, $data->ten_doi_tac, $data->sdt_doi_tac, $data->email_doi_tac, $data->dia_chi_doi_tac)) {
+        parse_str(file_get_contents("php://input"), $_PUT);
+        if (!isset($_PUT['MaDoiTac'], $_PUT['TenDoiTac'], $_PUT['SdtDoiTac'], $_PUT['EmailDoiTac'], $_PUT['DiaChiDoiTac'])) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $doitac->ma_doi_tac = $data->ma_doi_tac;
-        $doitac->ten_doi_tac = $data->ten_doi_tac;
-        $doitac->sdt_doi_tac = $data->sdt_doi_tac;
-        $doitac->email_doi_tac = $data->email_doi_tac;
-        $doitac->dia_chi_doi_tac = $data->dia_chi_doi_tac;
+        $doiTac->MaDoiTac = $_PUT['MaDoiTac'];
+        $doiTac->TenDoiTac = $_PUT['TenDoiTac'];
+        $doiTac->SdtDoiTac = $_PUT['SdtDoiTac'];
+        $doiTac->EmailDoiTac = $_PUT['EmailDoiTac'];
+        $doiTac->DiaChiDoiTac = $_PUT['DiaChiDoiTac'];
 
-        if ($doitac->update()) {
-            echo json_encode(["message" => "Đối tác được cập nhật thành công"]);
+        if ($doiTac->update()) {
+            echo json_encode(["message" => "Cập nhật đối tác thành công"]);
         } else {
             echo json_encode(["message" => "Cập nhật đối tác thất bại"]);
             http_response_code(500);
@@ -104,16 +102,16 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_doi_tac)) {
+        if (!isset($data->MaDoiTac)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $doitac->ma_doi_tac = $data->ma_doi_tac;
+        $doiTac->MaDoiTac = $data->MaDoiTac;
 
-        if ($doitac->delete()) {
-            echo json_encode(["message" => "Đối tác được xóa thành công"]);
+        if ($doiTac->delete()) {
+            echo json_encode(["message" => "Xóa đối tác thành công"]);
         } else {
             echo json_encode(["message" => "Xóa đối tác thất bại"]);
             http_response_code(500);

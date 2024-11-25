@@ -3,18 +3,9 @@ header("Content-Type: application/json");
 require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../../Model/DeTaiCapCoSoModel/HoSoDTCS.php';
 
-// Kết nối database
 $database = new Database();
 $db = $database->getConn();
-
-// Access Token và Refresh Token từ OAuth Playground
-$accessToken = 'YOUR_ACCESS_TOKEN';
-$refreshToken = 'YOUR_REFRESH_TOKEN';
-$clientId = 'YOUR_CLIENT_ID';
-$clientSecret = 'YOUR_CLIENT_SECRET';
-
-// Khởi tạo class HoSoDTCS
-$hoso = new HoSoDTCS($db, $accessToken, $refreshToken, $clientId, $clientSecret);
+$hoSoDTCS = new HoSoDTCS($db);
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET['action']) ? $_GET['action'] : null;
@@ -25,50 +16,111 @@ if (!$action) {
     exit;
 }
 
-try {
-    switch ($method) {
-        case 'GET':
-            if ($action === "get") {
-                $stmt = $hoso->getAll();
-                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                echo json_encode(["data" => $result]);
-            } elseif ($action === "getOne") {
-                $hoso->ma_ho_so = $_GET['ma_ho_so'] ?? null;
-                echo json_encode(["data" => $hoso->getOne()]);
+switch ($method) {
+    case 'GET':
+        if ($action === "get") {
+            $stmt = $hoSoDTCS->getAll();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($result);
+        } elseif ($action === "getOne") {
+            $MaHoSo = isset($_GET['MaHoSo']) ? $_GET['MaHoSo'] : null;
+            if (!$MaHoSo) {
+                echo json_encode(["message" => "Thiếu mã hồ sơ"]);
+                http_response_code(400);
+                exit;
             }
-            break;
+            $hoSoDTCS->MaHoSo = $MaHoSo;
+            $data = $hoSoDTCS->getOne();
+            echo json_encode($data);
+        } else {
+            echo json_encode(["message" => "Action không hợp lệ"]);
+            http_response_code(400);
+        }
+        break;
 
-        case 'POST':
-            if ($action === "add") {
-                $filePath = $_FILES['file']['tmp_name'];
-                $fileName = $_FILES['file']['name'];
+    case 'POST':
+        if ($action !== "post") {
+            echo json_encode(["message" => "Action không hợp lệ cho phương thức POST"]);
+            http_response_code(400);
+            exit;
+        }
 
-                $hoso->ma_ho_so = $_POST['ma_ho_so'];
-                $hoso->ngay_nop = $_POST['ngay_nop'];
-                $hoso->trang_thai = $_POST['trang_thai'];
-                $hoso->ma_khoa = $_POST['ma_khoa'];
+        $data = json_decode(file_get_contents("php://input"));
+        if (!isset($data->MaHoSo, $data->NgayNop, $data->FileHoSo, $data->TrangThai, $data->MaKhoa)) {
+            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            http_response_code(400);
+            exit;
+        }
 
-                echo json_encode([
-                    "success" => $hoso->add($filePath, $fileName)
-                ]);
-            }
-            break;
+        $hoSoDTCS->MaHoSo = $data->MaHoSo;
+        $hoSoDTCS->NgayNop = $data->NgayNop;
+        $hoSoDTCS->FileHoSo = $data->FileHoSo;
+        $hoSoDTCS->TrangThai = $data->TrangThai;
+        $hoSoDTCS->MaKhoa = $data->MaKhoa;
 
-        case 'DELETE':
-            if ($action === "delete") {
-                $hoso->ma_ho_so = $_GET['ma_ho_so'];
-                echo json_encode([
-                    "success" => $hoso->delete()
-                ]);
-            }
-            break;
+        if ($hoSoDTCS->add()) {
+            echo json_encode(["message" => "Thêm hồ sơ đào tạo cơ sở thành công"]);
+        } else {
+            echo json_encode(["message" => "Thêm hồ sơ đào tạo cơ sở thất bại"]);
+            http_response_code(500);
+        }
+        break;
 
-        default:
-            http_response_code(405);
-            echo json_encode(["message" => "Phương thức không được hỗ trợ."]);
-    }
-} catch (Exception $e) {
-    echo json_encode(["error" => $e->getMessage()]);
-    http_response_code(500);
+    case 'PUT':
+        if ($action !== "update") {
+            echo json_encode(["message" => "Action không hợp lệ cho phương thức PUT"]);
+            http_response_code(400);
+            exit;
+        }
+
+        parse_str(file_get_contents("php://input"), $_PUT);
+        if (!isset($_PUT['MaHoSo'], $_PUT['NgayNop'], $_PUT['FileHoSo'], $_PUT['TrangThai'], $_PUT['MaKhoa'])) {
+            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            http_response_code(400);
+            exit;
+        }
+
+        $hoSoDTCS->MaHoSo = $_PUT['MaHoSo'];
+        $hoSoDTCS->NgayNop = $_PUT['NgayNop'];
+        $hoSoDTCS->FileHoSo = $_PUT['FileHoSo'];
+        $hoSoDTCS->TrangThai = $_PUT['TrangThai'];
+        $hoSoDTCS->MaKhoa = $_PUT['MaKhoa'];
+
+        if ($hoSoDTCS->update()) {
+            echo json_encode(["message" => "Cập nhật hồ sơ đào tạo cơ sở thành công"]);
+        } else {
+            echo json_encode(["message" => "Cập nhật hồ sơ đào tạo cơ sở thất bại"]);
+            http_response_code(500);
+        }
+        break;
+
+    case 'DELETE':
+        if ($action !== "delete") {
+            echo json_encode(["message" => "Action không hợp lệ cho phương thức DELETE"]);
+            http_response_code(400);
+            exit;
+        }
+
+        $data = json_decode(file_get_contents("php://input"));
+        if (!isset($data->MaHoSo)) {
+            echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            http_response_code(400);
+            exit;
+        }
+
+        $hoSoDTCS->MaHoSo = $data->MaHoSo;
+
+        if ($hoSoDTCS->delete()) {
+            echo json_encode(["message" => "Xóa hồ sơ đào tạo cơ sở thành công"]);
+        } else {
+            echo json_encode(["message" => "Xóa hồ sơ đào tạo cơ sở thất bại"]);
+            http_response_code(500);
+        }
+        break;
+
+    default:
+        echo json_encode(["message" => "Phương thức không được hỗ trợ"]);
+        http_response_code(405);
+        break;
 }
 ?>

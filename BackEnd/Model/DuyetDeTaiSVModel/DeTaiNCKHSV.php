@@ -4,7 +4,6 @@ class DeTaiNCKHSV
     private $conn;
     private $table_name = "DeTaiNCKHSV";
 
-    // Các thuộc tính
     public $maDeTaiSV;
     public $tenDeTai;
     public $moTa;
@@ -12,6 +11,7 @@ class DeTaiNCKHSV
     public $fileHopDong;
     public $maHoSo;
     public $maNhomNCKHSV;
+
 
     // Constructor
     public function __construct($db)
@@ -22,8 +22,9 @@ class DeTaiNCKHSV
     // Phương thức lấy tất cả đề tài
     public function readAll()
     {
+
         try {
-            $sql = "SELECT * FROM " . $this->table_name . " ORDER BY tenDeTai ASC";
+            $sql = "SELECT * FROM " . $this->table_name . " ORDER BY TenDeTai ASC";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -31,6 +32,7 @@ class DeTaiNCKHSV
             return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
         }
     }
+
     public function updateGroup()
     {
         // Câu lệnh SQL để cập nhật chỉ mã nhóm
@@ -75,11 +77,13 @@ class DeTaiNCKHSV
                 error_log("SQL Error: " . implode(" - ", $errorInfo));
                 return false;
             }
+
         } catch (PDOException $e) {
             error_log("Lỗi thêm đề tài: " . $e->getMessage());
             return false;
         }
     }
+
 
 
     public function readByMaDeTaiSV($maDeTaiSV)
@@ -106,14 +110,11 @@ class DeTaiNCKHSV
             }
 
             $sql = "UPDATE " . $this->table_name . " 
-                    SET tenDeTai = :ten, 
-                        moTa = :moTa, 
-                        trangThai = :trangThai, 
-                        fileHopDong = :fileHopDong, 
-                        maHoSo = :maHoSo, 
-                        maNhomNCKHSV = :maNhomNCKHSV 
-                    WHERE maDeTaiSV = :id";
+                    SET TenDeTai = :tenDeTai, MoTa = :moTa, TrangThai = :trangThai, 
+                        FileHopDong = :fileHopDong, MaHoSo = :maHoSo, MaNhomNCKHSV = :maNhomNCKHSV 
+                    WHERE MaDeTaiSV = :maDeTaiSV";
             $stmt = $this->conn->prepare($sql);
+
 
             // Gán giá trị từ thuộc tính
             $stmt->bindParam(':id', $this->maDeTaiSV);
@@ -129,19 +130,22 @@ class DeTaiNCKHSV
             } else {
                 return ["error" => "Không thể cập nhật đề tài"];
             }
+
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
 
 
+
     // Phương thức xóa đề tài
     public function delete()
     {
+
         try {
-            $sql = "DELETE FROM " . $this->table_name . " WHERE maDeTaiSV = :id";
+            $sql = "DELETE FROM " . $this->table_name . " WHERE MaDeTaiSV = :maDeTaiSV";
             $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':id', $this->maDeTaiSV);
+            $stmt->bindParam(':maDeTaiSV', $this->maDeTaiSV);
             return $stmt->execute();
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];
