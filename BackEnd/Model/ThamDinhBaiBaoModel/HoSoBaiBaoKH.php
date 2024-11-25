@@ -5,7 +5,6 @@ class HoSoBaiBaoKH {
 
     public $MaHoSo;
     public $TrangThai;
-    public $MaNguoiDung;
     public $NgayNop;
     public $MaTacGia;
     public $MaKhoa;
@@ -22,7 +21,6 @@ class HoSoBaiBaoKH {
         // Ràng buộc dữ liệu
         $stmt->bindParam(":MaHoSo", $this->MaHoSo);
         $stmt->bindParam(":TrangThai", $this->TrangThai);
-        $stmt->bindParam(":MaNguoiDung", $this->MaNguoiDung);
         $stmt->bindParam(":NgayNop", $this->NgayNop);
         $stmt->bindParam(":MaTacGia", $this->MaTacGia);
         $stmt->bindParam(":MaKhoa", $this->MaKhoa);
@@ -45,7 +43,6 @@ class HoSoBaiBaoKH {
 
         $stmt->bindParam(":MaHoSo", $this->MaHoSo);
         $stmt->bindParam(":TrangThai", $this->TrangThai);
-        $stmt->bindParam(":MaNguoiDung", $this->MaNguoiDung);
         $stmt->bindParam(":NgayNop", $this->NgayNop);
         $stmt->bindParam(":MaTacGia", $this->MaTacGia);
         $stmt->bindParam(":MaKhoa", $this->MaKhoa);
