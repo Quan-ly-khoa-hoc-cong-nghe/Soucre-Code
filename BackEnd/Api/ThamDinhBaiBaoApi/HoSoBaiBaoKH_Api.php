@@ -46,7 +46,6 @@ switch ($method) {
 
         $hosobaibao->MaHoSo = $data->MaHoSo;
         $hosobaibao->TrangThai = $data->TrangThai;
-        $hosobaibao->MaNguoiDung = $data->MaNguoiDung;
         $hosobaibao->NgayNop = $data->NgayNop;
         $hosobaibao->MaTacGia = $data->MaTacGia;
         $hosobaibao->MaKhoa = $data->MaKhoa;
@@ -75,7 +74,6 @@ switch ($method) {
 
         $hosobaibao->MaHoSo = $data->MaHoSo;
         $hosobaibao->TrangThai = $data->TrangThai;
-        $hosobaibao->MaNguoiDung = $data->MaNguoiDung;
         $hosobaibao->NgayNop = $data->NgayNop;
         $hosobaibao->MaTacGia = $data->MaTacGia;
         $hosobaibao->MaKhoa = $data->MaKhoa;
