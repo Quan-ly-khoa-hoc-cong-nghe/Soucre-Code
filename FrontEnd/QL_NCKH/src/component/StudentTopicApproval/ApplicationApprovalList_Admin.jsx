@@ -215,7 +215,8 @@ const ApplicationApprovalListAdmin = () => {
     setIsModalOpen(false);
     setSelectedApp(null);
   };
-  const handleAddTopicClick = () => {
+  const handleAddTopicClick = (app) => {
+    setSelectedApp(app); // Lưu hồ sơ được chọn
     setShowAddTopicModal(true);
   };
   const closeAddTopicModal = () => {
@@ -242,17 +243,23 @@ const ApplicationApprovalListAdmin = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
-    if (
-      !maDeTai ||
-      !tenDeTai ||
-      !moTa ||
-      !ngayBatDau ||
-      !ngayKetThuc ||
-      !kinhPhi ||
-      !files.FileHopDong ||
-      !files.FileKeHoach
-    ) {
-      alert("Vui lòng nhập đầy đủ thông tin và tải lên các tệp cần thiết!");
+    // if (
+    //   !maDeTai ||
+    //   !tenDeTai ||
+    //   !moTa ||
+    //   !ngayBatDau ||
+    //   !ngayKetThuc ||
+    //   !kinhPhi ||
+    //   !files.FileHopDong ||
+    //   !files.FileKeHoach
+    // ) {
+    //   alert("Vui lòng nhập đầy đủ thông tin và tải lên các tệp cần thiết!");
+    //   return;
+    // }
+
+    if (!selectedApp?.MaHoSo) {
+      alert("Không tìm thấy MaHoSo! Vui lòng chọn hồ sơ.");
+      setLoading(false);
       return;
     }
 
@@ -383,7 +390,7 @@ const ApplicationApprovalListAdmin = () => {
                       app.TrangThai !== "Hủy" && (
                         <button
                           className="text-green-600 hover:underline text-sm font-medium"
-                          onClick={handleAddTopicClick}
+                          onClick={() => handleAddTopicClick(app)}
                         >
                           Thêm đề tài
                         </button>

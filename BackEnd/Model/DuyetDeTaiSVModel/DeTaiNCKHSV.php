@@ -1,5 +1,6 @@
 <?php
-class DeTaiNCKHSV {
+class DeTaiNCKHSV
+{
     private $conn;
     private $table_name = "DeTaiNCKHSV";
 
@@ -11,12 +12,17 @@ class DeTaiNCKHSV {
     public $MaHoSo;
     public $MaNhomNCKHSV;
 
-    public function __construct($db) {
+
+    // Constructor
+    public function __construct($db)
+    {
         $this->conn = $db;
     }
 
-    // Lấy tất cả đề tài
-    public function readAll() {
+    // Phương thức lấy tất cả đề tài
+    public function readAll()
+    {
+
         try {
             $sql = "SELECT * FROM " . $this->table_name . " ORDER BY TenDeTai ASC";
             $stmt = $this->conn->prepare($sql);
@@ -27,48 +33,115 @@ class DeTaiNCKHSV {
         }
     }
 
-    // Thêm đề tài mới
-    public function add() {
+    public function updateGroup()
+    {
+        // Câu lệnh SQL để cập nhật chỉ mã nhóm
+        $query = "UPDATE " . $this->table_name . " SET maNhomNCKHSV = :maNhomNCKHSV WHERE maDeTaiSV = :maDeTaiSV";
+
+        // Chuẩn bị câu lệnh SQL
+        $stmt = $this->conn->prepare($query);
+
+        // Liên kết các giá trị
+        $stmt->bindParam(':maDeTaiSV', $this->maDeTaiSV);  // Giữ nguyên mã đề tài
+        $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);  // Chỉ thay đổi mã nhóm
+
+        // Thực thi câu lệnh SQL
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Phương thức thêm đề tài
+    public function add()
+    {
         try {
-            $sql = "INSERT INTO " . $this->table_name . " (MaDeTaiSV, TenDeTai, MoTa, TrangThai, FileHopDong, MaHoSo, MaNhomNCKHSV) 
-                    VALUES (:maDeTaiSV, :tenDeTai, :moTa, :trangThai, :fileHopDong, :maHoSo, :maNhomNCKHSV)";
+            $sql = "INSERT INTO " . $this->table_name . " 
+                    (maDeTaiSV, tenDeTai, moTa, trangThai, fileHopDong, maHoSo, maNhomNCKHSV) 
+                    VALUES (:maDeTaiSV, :ten, :moTa, :trangThai, :fileHopDong, :maHoSo, :maNhomNCKHSV)";
             $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':maDeTaiSV', $this->MaDeTaiSV);
-            $stmt->bindParam(':tenDeTai', $this->TenDeTai);
-            $stmt->bindParam(':moTa', $this->MoTa);
-            $stmt->bindParam(':trangThai', $this->TrangThai);
-            $stmt->bindParam(':fileHopDong', $this->FileHopDong);
-            $stmt->bindParam(':maHoSo', $this->MaHoSo);
-            $stmt->bindParam(':maNhomNCKHSV', $this->MaNhomNCKHSV);
-            return $stmt->execute();
+            $stmt->bindParam(':maDeTaiSV', $this->maDeTaiSV);
+            $stmt->bindParam(':ten', $this->tenDeTai);
+            $stmt->bindParam(':moTa', $this->moTa);
+            $stmt->bindParam(':trangThai', $this->trangThai);
+            $stmt->bindParam(':fileHopDong', $this->fileHopDong);
+            $stmt->bindParam(':maHoSo', $this->maHoSo);
+            $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);
+
+            if ($stmt->execute()) {
+                error_log("Thêm đề tài thành công");
+                return true;
+            } else {
+                $errorInfo = $stmt->errorInfo();
+                error_log("SQL Error: " . implode(" - ", $errorInfo));
+                return false;
+            }
+
         } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];
+            error_log("Lỗi thêm đề tài: " . $e->getMessage());
+            return false;
         }
     }
 
-    // Cập nhật thông tin đề tài
-    public function update() {
+
+
+    public function readByMaDeTaiSV($maDeTaiSV)
+    {
+        $query = "SELECT * FROM DeTaiNCKHSV WHERE maDeTaiSV = :maDeTaiSV";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':maDeTaiSV', $maDeTaiSV);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } else {
+            return false; // Không tìm thấy dữ liệu
+        }
+    }
+
+    // Phương thức cập nhật đề tài
+    public function update()
+    {
         try {
+            // Kiểm tra các giá trị có hợp lệ không
+            if (empty($this->maDeTaiSV) || empty($this->tenDeTai) || empty($this->moTa)) {
+                return ["error" => "Dữ liệu không đầy đủ"];
+            }
+
             $sql = "UPDATE " . $this->table_name . " 
                     SET TenDeTai = :tenDeTai, MoTa = :moTa, TrangThai = :trangThai, 
                         FileHopDong = :fileHopDong, MaHoSo = :maHoSo, MaNhomNCKHSV = :maNhomNCKHSV 
                     WHERE MaDeTaiSV = :maDeTaiSV";
             $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':maDeTaiSV', $this->MaDeTaiSV);
-            $stmt->bindParam(':tenDeTai', $this->TenDeTai);
-            $stmt->bindParam(':moTa', $this->MoTa);
-            $stmt->bindParam(':trangThai', $this->TrangThai);
-            $stmt->bindParam(':fileHopDong', $this->FileHopDong);
-            $stmt->bindParam(':maHoSo', $this->MaHoSo);
-            $stmt->bindParam(':maNhomNCKHSV', $this->MaNhomNCKHSV);
-            return $stmt->execute();
+
+
+            // Gán giá trị từ thuộc tính
+            $stmt->bindParam(':id', $this->maDeTaiSV);
+            $stmt->bindParam(':ten', $this->tenDeTai);
+            $stmt->bindParam(':moTa', $this->moTa);
+            $stmt->bindParam(':trangThai', $this->trangThai);
+            $stmt->bindParam(':fileHopDong', $this->fileHopDong);
+            $stmt->bindParam(':maHoSo', $this->maHoSo);
+            $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);
+
+            if ($stmt->execute()) {
+                return true; // Trả về true nếu thành công
+            } else {
+                return ["error" => "Không thể cập nhật đề tài"];
+            }
+
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
 
-    // Xóa đề tài
-    public function delete() {
+
+
+    // Phương thức xóa đề tài
+    public function delete()
+    {
+
         try {
             $sql = "DELETE FROM " . $this->table_name . " WHERE MaDeTaiSV = :maDeTaiSV";
             $stmt = $this->conn->prepare($sql);
@@ -79,4 +152,3 @@ class DeTaiNCKHSV {
         }
     }
 }
-?>
