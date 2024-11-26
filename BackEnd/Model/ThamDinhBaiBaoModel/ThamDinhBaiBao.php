@@ -8,14 +8,37 @@ class ThamDinhBaiBao {
     public $DanhGiaBaiBao;
     public $KetQua;
     public $NhanXet;
+    public $MaBaiBao;  // Thêm trường MaBaiBao
 
     public function __construct($db) {
         $this->conn = $db;
     }
 
+    // Tạo mã thẩm định tự động
+    private function generateMaThamDinh() {
+        // Đếm số dòng hiện tại trong bảng
+        $query = "SELECT COUNT(*) FROM " . $this->table_name;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
+        
+        // Tạo mã thẩm định mới theo định dạng TDBBKH + (count + 1)
+        return "TDBBKH" . ($count + 1);
+    }
+
     // Thêm thông tin thẩm định bài báo
     public function add() {
-        $query = "INSERT INTO " . $this->table_name . " SET MaThamDinh=:MaThamDinh, NgayThamDinh=:NgayThamDinh, DanhGiaBaiBao=:DanhGiaBaiBao, KetQua=:KetQua, NhanXet=:NhanXet";
+        // Kiểm tra tính hợp lệ của dữ liệu
+        if (empty($this->NgayThamDinh) || empty($this->DanhGiaBaiBao) || empty($this->KetQua) || empty($this->NhanXet) || empty($this->MaBaiBao)) {
+            echo json_encode(["message" => "Dữ liệu không hợp lệ"]);
+            http_response_code(400);
+            return false;
+        }
+
+        // Tạo mã thẩm định tự động
+        $this->MaThamDinh = $this->generateMaThamDinh();
+
+        $query = "INSERT INTO " . $this->table_name . " SET MaThamDinh=:MaThamDinh, NgayThamDinh=:NgayThamDinh, DanhGiaBaiBao=:DanhGiaBaiBao, KetQua=:KetQua, NhanXet=:NhanXet, MaBaiBao=:MaBaiBao";
         $stmt = $this->conn->prepare($query);
 
         // Ràng buộc dữ liệu
@@ -24,6 +47,7 @@ class ThamDinhBaiBao {
         $stmt->bindParam(":DanhGiaBaiBao", $this->DanhGiaBaiBao);
         $stmt->bindParam(":KetQua", $this->KetQua);
         $stmt->bindParam(":NhanXet", $this->NhanXet);
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
 
         return $stmt->execute();
     }
@@ -38,7 +62,7 @@ class ThamDinhBaiBao {
 
     // Cập nhật thông tin thẩm định bài báo
     public function update() {
-        $query = "UPDATE " . $this->table_name . " SET NgayThamDinh=:NgayThamDinh, DanhGiaBaiBao=:DanhGiaBaiBao, KetQua=:KetQua, NhanXet=:NhanXet WHERE MaThamDinh=:MaThamDinh";
+        $query = "UPDATE " . $this->table_name . " SET NgayThamDinh=:NgayThamDinh, DanhGiaBaiBao=:DanhGiaBaiBao, KetQua=:KetQua, NhanXet=:NhanXet, MaBaiBao=:MaBaiBao WHERE MaThamDinh=:MaThamDinh";
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":MaThamDinh", $this->MaThamDinh);
@@ -46,6 +70,7 @@ class ThamDinhBaiBao {
         $stmt->bindParam(":DanhGiaBaiBao", $this->DanhGiaBaiBao);
         $stmt->bindParam(":KetQua", $this->KetQua);
         $stmt->bindParam(":NhanXet", $this->NhanXet);
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
 
         return $stmt->execute();
     }

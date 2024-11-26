@@ -23,6 +23,7 @@ class SinhVienNCKHSV {
 
     public function add() {
         try {
+            // Thêm dữ liệu cho MaNhomNCKHSV và MaSinhVien
             $sql = "INSERT INTO " . $this->table_name . " (MaNhomNCKHSV, MaSinhVien) VALUES (:maNhomNCKHSV, :maSinhVien)";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':maNhomNCKHSV', $this->MaNhomNCKHSV);
@@ -35,6 +36,7 @@ class SinhVienNCKHSV {
 
     public function update() {
         try {
+            // Cập nhật thông tin MaSinhVien theo MaNhomNCKHSV
             $sql = "UPDATE " . $this->table_name . " SET MaSinhVien = :maSinhVien WHERE MaNhomNCKHSV = :maNhomNCKHSV";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':maSinhVien', $this->MaSinhVien);
@@ -44,6 +46,7 @@ class SinhVienNCKHSV {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
+
     public function autoUpdateFromAPI($apiUrl) {
         try {
             // Lấy dữ liệu từ API
@@ -77,9 +80,10 @@ class SinhVienNCKHSV {
             return ['error' => 'Lỗi: ' . $e->getMessage()];
         }
     }
-    
+
     public function delete() {
         try {
+            // Xóa thông tin theo MaNhomNCKHSV
             $sql = "DELETE FROM " . $this->table_name . " WHERE MaNhomNCKHSV = :maNhomNCKHSV";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':maNhomNCKHSV', $this->MaNhomNCKHSV);

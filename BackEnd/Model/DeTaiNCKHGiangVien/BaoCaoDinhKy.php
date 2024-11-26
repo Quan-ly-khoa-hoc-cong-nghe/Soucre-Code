@@ -20,6 +20,10 @@ class BaoCaoDinhKy
     // Lấy báo cáo theo mã đề tài
     public function getReportByMaDeTai($maDeTai)
     {
+        if (empty($maDeTai)) {
+            return false; // Nếu mã đề tài rỗng, không thực hiện truy vấn
+        }
+
         $stmt = $this->db->prepare("SELECT * FROM BaoCaoDinhKy WHERE MaDeTaiNCKHGV = :maDeTai");
         $stmt->bindParam(':maDeTai', $maDeTai);
         $stmt->execute();
@@ -29,20 +33,44 @@ class BaoCaoDinhKy
     // Thêm báo cáo mới
     public function addReport($noiDung, $ngayNop, $fileBaoCao, $maDeTai)
     {
+        // Kiểm tra dữ liệu đầu vào
+        if (empty($noiDung) || empty($ngayNop) || empty($fileBaoCao) || empty($maDeTai)) {
+            return false; // Nếu dữ liệu không hợp lệ, không thực hiện thêm
+        }
+
         $stmt = $this->db->prepare("INSERT INTO BaoCaoDinhKy (NoiDungBaoCao, NgayNop, FileBaoBao, MaDeTaiNCKHGV) 
                                     VALUES (:noiDung, :ngayNop, :fileBaoCao, :maDeTai)");
         $stmt->bindParam(':noiDung', $noiDung);
         $stmt->bindParam(':ngayNop', $ngayNop);
         $stmt->bindParam(':fileBaoCao', $fileBaoCao);
         $stmt->bindParam(':maDeTai', $maDeTai);
-        return $stmt->execute();
+
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
     }
 
     // Kiểm tra mã đề tài có tồn tại không
     public function checkMaDeTaiExists($maDeTai)
     {
+        if (empty($maDeTai)) {
+            return false; // Nếu mã đề tài rỗng, trả về false
+        }
+
         $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM BaoCaoDinhKy WHERE MaDeTaiNCKHGV = :maDeTai");
         $stmt->bindParam(':maDeTai', $maDeTai);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['count'] > 0;
+    }
+
+    // Kiểm tra mã báo cáo có tồn tại không
+    public function checkMaBaoCaoExists($maBaoCao)
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM BaoCaoDinhKy WHERE MaBaoCaoDinhKy = :maBaoCao");
+        $stmt->bindParam(':maBaoCao', $maBaoCao);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result['count'] > 0;
@@ -51,7 +79,13 @@ class BaoCaoDinhKy
     // Cập nhật báo cáo theo mã đề tài
     public function updateReportByMaDeTai($maDeTai, $noiDung, $ngayNop, $fileBaoCao)
     {
+        // Kiểm tra tồn tại mã đề tài
         if (!$this->checkMaDeTaiExists($maDeTai)) {
+            return false;
+        }
+
+        // Kiểm tra dữ liệu đầu vào
+        if (empty($noiDung) || empty($ngayNop) || empty($fileBaoCao)) {
             return false;
         }
 
@@ -64,18 +98,30 @@ class BaoCaoDinhKy
         $stmt->bindParam(':ngayNop', $ngayNop);
         $stmt->bindParam(':fileBaoCao', $fileBaoCao);
         $stmt->bindParam(':maDeTai', $maDeTai);
-        return $stmt->execute();
+
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
     }
 
     // Xóa báo cáo theo mã đề tài
     public function deleteReportByMaDeTai($maDeTai)
     {
+        // Kiểm tra tồn tại mã đề tài
         if (!$this->checkMaDeTaiExists($maDeTai)) {
             return false;
         }
 
         $stmt = $this->db->prepare("DELETE FROM BaoCaoDinhKy WHERE MaDeTaiNCKHGV = :maDeTai");
         $stmt->bindParam(':maDeTai', $maDeTai);
-        return $stmt->execute();
+
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
     }
 }
+?>

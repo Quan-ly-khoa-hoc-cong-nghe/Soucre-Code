@@ -3,7 +3,7 @@ class TacGiaSinhVien {
     private $conn;
     private $table_name = "TacGiaSinhVien";
 
-    public $MaTacGia;
+    public $MaBaiBao;
     public $MaSinhVien;
     public $VaiTro;
 
@@ -13,11 +13,11 @@ class TacGiaSinhVien {
 
     // Thêm tác giả sinh viên
     public function add() {
-        $query = "INSERT INTO " . $this->table_name . " SET MaTacGia=:MaTacGia, MaSinhVien=:MaSinhVien, VaiTro=:VaiTro";
+        $query = "INSERT INTO " . $this->table_name . " SET MaBaiBao=:MaBaiBao, MaSinhVien=:MaSinhVien, VaiTro=:VaiTro";
         $stmt = $this->conn->prepare($query);
 
         // Ràng buộc dữ liệu
-        $stmt->bindParam(":MaTacGia", $this->MaTacGia);
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
         $stmt->bindParam(":MaSinhVien", $this->MaSinhVien);
         $stmt->bindParam(":VaiTro", $this->VaiTro);
 
@@ -34,10 +34,10 @@ class TacGiaSinhVien {
 
     // Cập nhật vai trò của tác giả sinh viên
     public function update() {
-        $query = "UPDATE " . $this->table_name . " SET VaiTro=:VaiTro WHERE MaTacGia=:MaTacGia AND MaSinhVien=:MaSinhVien";
+        $query = "UPDATE " . $this->table_name . " SET VaiTro=:VaiTro WHERE MaBaiBao=:MaBaiBao AND MaSinhVien=:MaSinhVien";
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(":MaTacGia", $this->MaTacGia);
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
         $stmt->bindParam(":MaSinhVien", $this->MaSinhVien);
         $stmt->bindParam(":VaiTro", $this->VaiTro);
 
@@ -46,10 +46,10 @@ class TacGiaSinhVien {
 
     // Xóa tác giả sinh viên
     public function delete() {
-        $query = "DELETE FROM " . $this->table_name . " WHERE MaTacGia=:MaTacGia AND MaSinhVien=:MaSinhVien";
+        $query = "DELETE FROM " . $this->table_name . " WHERE MaBaiBao=:MaBaiBao AND MaSinhVien=:MaSinhVien";
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(":MaTacGia", $this->MaTacGia);
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
         $stmt->bindParam(":MaSinhVien", $this->MaSinhVien);
 
         return $stmt->execute();
