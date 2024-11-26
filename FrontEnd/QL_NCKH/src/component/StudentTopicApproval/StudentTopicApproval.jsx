@@ -109,7 +109,7 @@ const StudentTopicApproval = () => {
           </nav>
         </div>
 
-        {/* Nút Thêm Đề Tài */}
+        {/* Nút Thêm Đề Tài
         <div className="mb-4 flex justify-end">
           <button
             onClick={handleAddTopicClick}
@@ -117,7 +117,7 @@ const StudentTopicApproval = () => {
           >
             Thêm Đề Tài
           </button>
-        </div>
+        </div> */}
 
         {/* Topic List */}
         <TopicList />

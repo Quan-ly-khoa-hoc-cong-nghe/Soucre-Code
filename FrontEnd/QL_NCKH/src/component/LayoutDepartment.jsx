@@ -60,7 +60,7 @@ const LayoutDepartment = ({ children }) => {
           sidebarToggle ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 transition-all duration-300`}
       >
-        <div className="flex p-4 text-center text-2xl font-bold justify-between items-center ">
+        <div className="flex p-4 text-center text-2xl font-bold justify-between items-center">
           <img src={LogoHUIT} alt="Admin Dashboard Logo" className="h-10" />
           <div
             className="text-gray-500 block border border-gray-500 lg:hidden p-2 rounded-lg"
@@ -70,18 +70,16 @@ const LayoutDepartment = ({ children }) => {
           </div>
         </div>
         <div className="py-10 px-5">
-          <ul className="space-y-6">
+          <ul className="space-y-6 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link to="/" className="flex items-center space-x-3">
                 <FaChartBar />
-                <span className="font-semibold">
-                  Dashboard LayoutDepartment
-                </span>
+                <span className="font-semibold">Dashboard Khoa </span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
-                to="/article-review"
+                to="/department/article-review"
                 className="flex items-center space-x-3"
               >
                 <FaBook />
@@ -90,7 +88,7 @@ const LayoutDepartment = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
-                to="lecturer-topic-approval"
+                to="/department/lecturer-topic-approval"
                 className="flex items-center space-x-3"
               >
                 <FaClipboardList />
@@ -99,7 +97,7 @@ const LayoutDepartment = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
-                to="/student-topic-approval"
+                to="/department/student-topic-approval"
                 className="flex items-center space-x-3"
               >
                 <FaClipboardList />
@@ -108,7 +106,7 @@ const LayoutDepartment = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
-                to="/science-seminar"
+                to="/department/science-seminar"
                 className="flex items-center space-x-3"
               >
                 <FaGift />
@@ -117,27 +115,63 @@ const LayoutDepartment = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
-                to="/content-uploaded"
+                to="/department/edit-student"
                 className="flex items-center space-x-3"
               >
                 <FaUpload />
-                <span className="font-semibold">ádsa sad</span>
+                <span className="font-semibold">Edir Student</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-              <Link to="/cmt-manage" className="flex items-center space-x-3">
+              <Link
+                to="/department/product-manager"
+                className="flex items-center space-x-3"
+              >
                 <FaComment />
-                <span className="font-semibold">ádsa</span>
+                <span className="font-semibold">Product Manager</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/department/application-approval"
+                className="flex items-center space-x-3"
+              >
+                <FaComment />
+                <span className="font-semibold">Duyệt hồ sơ SV Role khoa</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/department/application-approval-admin"
+                className="flex items-center space-x-3"
+              >
+                <FaComment />
+                <span className="font-semibold">
+                  Duyệt hồ sơ thêm đề tài role KHCN
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/department/lecturer-application-approval-admin"
+                className="flex items-center space-x-3"
+              >
+                <FaComment />
+                <span className="font-semibold">Duyệt hồ sơ GV role khoa</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/department/lecturer-application-approval-list-admin"
+                className="flex items-center space-x-3"
+              >
+                <FaComment />
+                <span className="font-semibold">Duyệt hồ sơ GV role KHCN</span>
               </Link>
             </li>
             <hr className="border-gray-400 my-4" />
 
-            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] p-2 rounded hover:text-[#d95959]">
-              <Link to="/logout" className="flex items-center space-x-3 mt">
-                <FaSignOutAlt />
-                <span className="font-semibold">Logout</span>
-              </Link>
-            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] p-2 rounded hover:text-[#d95959]"></li>
           </ul>
         </div>
       </div>
