@@ -30,8 +30,24 @@ class DeTaiCapSo {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Tạo mã MaDTCS tự động theo định dạng DTCS + (count + 1)
+    private function generateMaDTCS() {
+        // Đếm số dòng hiện tại trong bảng
+        $query = "SELECT COUNT(*) FROM " . $this->table;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
+        
+        // Tạo mã đề tài mới theo định dạng DTCS + (count + 1)
+        return "DTCS" . ($count + 1);
+    }
+
     // Thêm đề tài cấp sở
     public function add() {
+        // Tạo mã MaDTCS tự động
+        $this->MaDTCS = $this->generateMaDTCS();
+
+        // Thực hiện thêm mới đề tài
         $query = "INSERT INTO " . $this->table . " (MaDTCS, TenDeTai, NgayBatDau, NgayKetThuc, FileHopDong, TrangThai, MaHoSo) 
                   VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);

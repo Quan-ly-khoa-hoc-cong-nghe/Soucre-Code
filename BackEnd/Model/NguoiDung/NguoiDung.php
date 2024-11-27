@@ -34,16 +34,12 @@ class NguoiDung {
     public function add() {
         // Kiểm tra mã nhân viên hợp lệ
         if (!$this->isNhanVienExist()) {
-            echo json_encode(["message" => "Mã nhân viên không tồn tại"]);
-            http_response_code(400);
-            return false;
+            return $this->sendErrorResponse("Mã nhân viên không tồn tại");
         }
 
         // Kiểm tra người dùng đã tồn tại chưa
         if ($this->isUserExist()) {
-            echo json_encode(["message" => "Người dùng đã tồn tại"]);
-            http_response_code(400);
-            return false;
+            return $this->sendErrorResponse("Người dùng đã tồn tại");
         }
 
         $query = "INSERT INTO " . $this->table . " (MaNguoiDung, VaiTro, MatKhau, MaNhanVien) 
@@ -53,7 +49,7 @@ class NguoiDung {
         // Ràng buộc tham số
         $stmt->bindParam(":MaNguoiDung", $this->MaNguoiDung);
         $stmt->bindParam(":VaiTro", $this->VaiTro);
-        $stmt->bindParam(":MatKhau", $this->MatKhau); // Mật khẩu nên mã hóa
+        $stmt->bindParam(":MatKhau", $this->MatKhau);  // Không mã hóa mật khẩu
         $stmt->bindParam(":MaNhanVien", $this->MaNhanVien);
 
         if ($stmt->execute()) {
@@ -66,16 +62,12 @@ class NguoiDung {
     public function update() {
         // Kiểm tra mã nhân viên hợp lệ
         if (!$this->isNhanVienExist()) {
-            echo json_encode(["message" => "Mã nhân viên không tồn tại"]);
-            http_response_code(400);
-            return false;
+            return $this->sendErrorResponse("Mã nhân viên không tồn tại");
         }
 
         // Kiểm tra người dùng có tồn tại để cập nhật
         if (!$this->isUserExist()) {
-            echo json_encode(["message" => "Người dùng không tồn tại"]);
-            http_response_code(400);
-            return false;
+            return $this->sendErrorResponse("Người dùng không tồn tại");
         }
 
         $query = "UPDATE " . $this->table . " 
@@ -86,7 +78,7 @@ class NguoiDung {
         // Ràng buộc tham số
         $stmt->bindParam(":MaNguoiDung", $this->MaNguoiDung);
         $stmt->bindParam(":VaiTro", $this->VaiTro);
-        $stmt->bindParam(":MatKhau", $this->MatKhau);
+        $stmt->bindParam(":MatKhau", $this->MatKhau);  // Không mã hóa mật khẩu
         $stmt->bindParam(":MaNhanVien", $this->MaNhanVien);
 
         if ($stmt->execute()) {
@@ -99,9 +91,7 @@ class NguoiDung {
     public function delete() {
         // Kiểm tra người dùng có tồn tại để xóa
         if (!$this->isUserExist()) {
-            echo json_encode(["message" => "Người dùng không tồn tại"]);
-            http_response_code(400);
-            return false;
+            return $this->sendErrorResponse("Người dùng không tồn tại");
         }
 
         $query = "DELETE FROM " . $this->table . " WHERE MaNguoiDung = :MaNguoiDung";
@@ -133,6 +123,13 @@ class NguoiDung {
         $stmt->bindParam(":MaNguoiDung", $this->MaNguoiDung);
         $stmt->execute();
         return $stmt;
+    }
+
+    // Gửi thông báo lỗi dưới dạng JSON
+    private function sendErrorResponse($message) {
+        echo json_encode(["message" => $message]);
+        http_response_code(400);
+        return false;
     }
 }
 ?>

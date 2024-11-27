@@ -29,12 +29,20 @@ class LoaiHinhNCKH
     // Thêm loại hình NCKH mới
     public function addLoaiHinh($maLoaiHinh, $tenLoaiHinh, $diemSo)
     {
+        // Kiểm tra mã loại hình đã tồn tại chưa
+        if ($this->checkMaLoaiHinhExists($maLoaiHinh)) {
+            return false;  // Nếu mã loại hình đã tồn tại, không thêm mới
+        }
+
         $stmt = $this->db->prepare("INSERT INTO LoaiHinhNCKH (MaLoaiHinhNCKH, TenLoaiHinh, DiemSo) 
                                     VALUES (:maLoaiHinh, :tenLoaiHinh, :diemSo)");
         $stmt->bindParam(':maLoaiHinh', $maLoaiHinh);
         $stmt->bindParam(':tenLoaiHinh', $tenLoaiHinh);
         $stmt->bindParam(':diemSo', $diemSo);
-        return $stmt->execute();
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
     }
 
     // Kiểm tra mã loại hình có tồn tại không
@@ -50,8 +58,9 @@ class LoaiHinhNCKH
     // Cập nhật loại hình NCKH
     public function updateLoaiHinh($maLoaiHinh, $tenLoaiHinh, $diemSo)
     {
+        // Kiểm tra sự tồn tại của loại hình trước khi cập nhật
         if (!$this->checkMaLoaiHinhExists($maLoaiHinh)) {
-            return false;
+            return false;  // Không có mã loại hình để cập nhật
         }
 
         $stmt = $this->db->prepare("
@@ -62,18 +71,26 @@ class LoaiHinhNCKH
         $stmt->bindParam(':maLoaiHinh', $maLoaiHinh);
         $stmt->bindParam(':tenLoaiHinh', $tenLoaiHinh);
         $stmt->bindParam(':diemSo', $diemSo);
-        return $stmt->execute();
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
     }
 
     // Xóa loại hình NCKH
     public function deleteLoaiHinh($maLoaiHinh)
     {
+        // Kiểm tra sự tồn tại của loại hình trước khi xóa
         if (!$this->checkMaLoaiHinhExists($maLoaiHinh)) {
-            return false;
+            return false;  // Không có mã loại hình để xóa
         }
 
         $stmt = $this->db->prepare("DELETE FROM LoaiHinhNCKH WHERE MaLoaiHinhNCKH = :maLoaiHinh");
         $stmt->bindParam(':maLoaiHinh', $maLoaiHinh);
-        return $stmt->execute();
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
     }
 }
+?>

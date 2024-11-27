@@ -1,5 +1,5 @@
 <?php
-class GiangVienCKHGV {
+class GiangVienNCKHGV {
     private $conn;
     private $table_name = "GiangVienCKHGV";
 

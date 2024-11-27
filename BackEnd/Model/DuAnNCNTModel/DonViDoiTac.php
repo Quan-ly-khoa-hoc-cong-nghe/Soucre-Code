@@ -30,11 +30,10 @@ class DonViDoiTac {
 
     // Thêm đối tác mới
     public function add() {
-        $query = "INSERT INTO " . $this->table . " (MaDoiTac, TenDoiTac, SdtDoiTac, EmailDoiTac, DiaChiDoiTac) 
-                  VALUES (?, ?, ?, ?, ?)";
+        $query = "INSERT INTO " . $this->table . " (TenDoiTac, SdtDoiTac, EmailDoiTac, DiaChiDoiTac) 
+          VALUES (?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(1, $this->MaDoiTac);
         $stmt->bindParam(2, $this->TenDoiTac);
         $stmt->bindParam(3, $this->SdtDoiTac);
         $stmt->bindParam(4, $this->EmailDoiTac);

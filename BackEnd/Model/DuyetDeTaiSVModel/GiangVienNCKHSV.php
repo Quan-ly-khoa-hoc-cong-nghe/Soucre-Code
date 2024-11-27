@@ -23,6 +23,7 @@ class GiangVienNCKHSV {
 
     public function add() {
         try {
+            // Không cần MaNhomNCKHSV vì nó là khóa phụ
             $sql = "INSERT INTO " . $this->table_name . " (MaNhomNCKHSV, MaGV) VALUES (:maNhomNCKHSV, :maGV)";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':maNhomNCKHSV', $this->MaNhomNCKHSV);
