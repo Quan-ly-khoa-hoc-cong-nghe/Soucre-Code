@@ -21,8 +21,7 @@ if ($action === null) {
 
 switch ($action) {
     case 'GET':
-        $stmt = $nhom->read();
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $data = $nhom->read();
         echo json_encode($data);
         break;
 
