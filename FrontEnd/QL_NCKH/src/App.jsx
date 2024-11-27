@@ -19,6 +19,8 @@ import LecturerApplicationApprovalList from './component/LecturerTopicApproval/L
 import LecturerApplicationApprovalListAdmin from './component/LecturerTopicApproval/LecturerApplicationApprovalList_Admin';
 import LayoutDepartment from './component/LayoutDepartment';
 import LayoutSciTech from './component/LayoutSciTech';
+import ScienceSeminardepartments from './component/ScienceSeminar/ScienceSeminardepartments';
+import ScienceSeminarSciTech from './component/ScienceSeminar/ScienceSeminarSciTech';
 
 // Component bảo vệ route
 const PrivateRoute = ({ element, layout: LayoutComponent }) => {
@@ -44,6 +46,8 @@ function App() {
         <Route path="/admin/application-approval-admin" element={<PrivateRoute element={<ApplicationApprovalAdmin />} layout={Layout} />} />
         <Route path="/admin/lecturer-application-approval-admin" element={<PrivateRoute element={<LecturerApplicationApprovalListAdmin />} layout={Layout} />} />
         <Route path="/admin/lecturer-application-approval-list-admin" element={<PrivateRoute element={<LecturerApplicationApprovalList />} layout={Layout} />} />
+        <Route path="/admin/science-seminar-departments" element={<PrivateRoute element={<ScienceSeminardepartments/>} layout={Layout} />} />
+        <Route path="/admin/science-seminar-sciTech" element={<PrivateRoute element={<ScienceSeminarSciTech />} layout={Layout} />} />
 
         {/* Các route cho LayoutDepartment */}
         <Route path="/department" element={<PrivateRoute element={<Statistics />} layout={LayoutDepartment} />} />

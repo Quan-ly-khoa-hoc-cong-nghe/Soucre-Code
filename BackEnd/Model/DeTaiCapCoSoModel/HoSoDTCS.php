@@ -28,8 +28,23 @@ class HoSoDTCS {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Tạo mã hồ sơ tự động (HSDTCS + số tự tăng)
+    public function generateMaHoSo() {
+        // Truy vấn để lấy giá trị max của MaHoSo hiện tại
+        $query = "SELECT MAX(CAST(SUBSTRING(MaHoSo, 7) AS UNSIGNED)) AS max_id FROM " . $this->table;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Tạo mã mới từ số tự tăng
+        $newId = (int)($result['max_id'] ?? 0) + 1;
+        $this->MaHoSo = "HSDTCS" . str_pad($newId, 5, "0", STR_PAD_LEFT);  // Format như HSDTCS00001
+    }
+
     // Thêm hồ sơ đào tạo cơ sở
     public function add() {
+        $this->generateMaHoSo();  // Gọi hàm tạo mã tự động trước khi thêm
+
         $query = "INSERT INTO " . $this->table . " (MaHoSo, NgayNop, FileHoSo, TrangThai, MaKhoa) 
                   VALUES (?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
