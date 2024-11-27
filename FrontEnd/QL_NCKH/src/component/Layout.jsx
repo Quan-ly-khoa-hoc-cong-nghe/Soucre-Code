@@ -173,6 +173,25 @@ const Layout = ({ children }) => {
                 <span className="font-semibold">Duyệt hồ sơ GV role khoa </span>
               </Link>
             </li>
+
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/admin/science-seminar-departments"
+                className="flex items-center space-x-3"
+              >
+                <FaComment />
+                <span className="font-semibold">Duyệt hồ sơ hội thảo role khoa</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/admin/science-seminar-sciTech"
+                className="flex items-center space-x-3"
+              >
+                <FaComment />
+                <span className="font-semibold">Duyệt hồ sơ và thêm hội thảo</span>
+              </Link>
+            </li>
             <hr className="border-gray-400 my-4" />
 
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] p-2 rounded hover:text-[#d95959]"></li>
