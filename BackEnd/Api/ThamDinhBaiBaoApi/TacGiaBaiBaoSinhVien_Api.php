@@ -38,13 +38,13 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaTacGia, $data->MaSinhVien, $data->VaiTro)) {
+        if (!isset($data->MaBaiBao, $data->MaSinhVien, $data->VaiTro)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $tacgia->MaTacGia = $data->MaTacGia;
+        $tacgia->MaBaiBao = $data->MaBaiBao;
         $tacgia->MaSinhVien = $data->MaSinhVien;
         $tacgia->VaiTro = $data->VaiTro;
 
@@ -64,13 +64,13 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaTacGia, $data->MaSinhVien, $data->VaiTro)) {
+        if (!isset($data->MaBaiBao, $data->MaSinhVien, $data->VaiTro)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $tacgia->MaTacGia = $data->MaTacGia;
+        $tacgia->MaBaiBao = $data->MaBaiBao;
         $tacgia->MaSinhVien = $data->MaSinhVien;
         $tacgia->VaiTro = $data->VaiTro;
 
@@ -90,13 +90,13 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaTacGia, $data->MaSinhVien)) {
+        if (!isset($data->MaBaiBao, $data->MaSinhVien)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $tacgia->MaTacGia = $data->MaTacGia;
+        $tacgia->MaBaiBao = $data->MaBaiBao;
         $tacgia->MaSinhVien = $data->MaSinhVien;
 
         if ($tacgia->delete()) {
