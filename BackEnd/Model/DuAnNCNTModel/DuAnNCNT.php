@@ -16,6 +16,21 @@ class DuAnNCNT {
         $this->conn = $db;
     }
 
+    // Lấy số tự động tăng cuối cùng trong MaDuAn
+    private function generateMaDuAn() {
+        // Truy vấn để lấy MaDuAn lớn nhất
+        $query = "SELECT MAX(CAST(SUBSTRING(MaDuAn, 6) AS UNSIGNED)) AS last_id FROM " . $this->table;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Nếu không có bản ghi nào, bắt đầu từ 1
+        $last_id = isset($result['last_id']) ? $result['last_id'] : 0;
+
+        // Tạo MaDuAn mới có dạng NCNT+X
+        return 'NCNT' . str_pad($last_id + 1, 3, '0', STR_PAD_LEFT);
+    }
+
     // Lấy tất cả dự án
     public function getAll() {
         $query = "SELECT * FROM " . $this->table;
@@ -33,6 +48,9 @@ class DuAnNCNT {
 
     // Thêm dự án
     public function add() {
+        // Tạo MaDuAn mới
+        $this->MaDuAn = $this->generateMaDuAn();
+
         $query = "INSERT INTO " . $this->table . " (MaDuAn, TenDuAn, NgayBatDau, NgayKetThuc, FileHopDong, TrangThai, MaHoSo, MaDatHang) 
                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
@@ -77,4 +95,3 @@ class DuAnNCNT {
         return $stmt->execute();
     }
 }
-?>

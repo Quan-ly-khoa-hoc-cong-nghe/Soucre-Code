@@ -1,9 +1,9 @@
 <?php
-
 class KeHoachHoiThao {
     private $conn;
     private $table = "KeHoachHoiThao";
 
+    public $ma_ke_hoach_hoi_thao;  // Đổi tên cho phù hợp với bảng CSDL
     public $ngay_bat_dau;
     public $ngay_ket_thuc;
     public $kinh_phi;
@@ -24,9 +24,9 @@ class KeHoachHoiThao {
 
     // Lấy thông tin một kế hoạch theo mã
     public function getOne() {
-        $query = "SELECT * FROM " . $this->table . " WHERE MaHoiThao = ?";
+        $query = "SELECT * FROM " . $this->table . " WHERE MaKeHoachHoiThao = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ma_hoi_thao);
+        $stmt->bindParam(1, $this->ma_ke_hoach_hoi_thao);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -55,14 +55,14 @@ class KeHoachHoiThao {
         try {
             $query = "UPDATE " . $this->table . " 
                       SET NgayBatDau = :ngayBatDau, NgayKetThuc = :ngayKetThuc, KinhPhi = :kinhPhi, FileKeHoach = :fileKeHoach 
-                      WHERE MaHoiThao = :maHoiThao";
+                      WHERE MaKeHoachHoiThao = :maKeHoachHoiThao";
             $stmt = $this->conn->prepare($query);
 
             $stmt->bindParam(':ngayBatDau', $this->ngay_bat_dau);
             $stmt->bindParam(':ngayKetThuc', $this->ngay_ket_thuc);
             $stmt->bindParam(':kinhPhi', $this->kinh_phi);
             $stmt->bindParam(':fileKeHoach', $this->file_ke_hoach);
-            $stmt->bindParam(':maHoiThao', $this->ma_hoi_thao);
+            $stmt->bindParam(':maKeHoachHoiThao', $this->ma_ke_hoach_hoi_thao);
 
             return $stmt->execute();
         } catch (Exception $e) {
@@ -73,9 +73,9 @@ class KeHoachHoiThao {
     // Xóa kế hoạch
     public function delete() {
         try {
-            $query = "DELETE FROM " . $this->table . " WHERE MaHoiThao = ?";
+            $query = "DELETE FROM " . $this->table . " WHERE MaKeHoachHoiThao = ?";
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(1, $this->ma_hoi_thao);
+            $stmt->bindParam(1, $this->ma_ke_hoach_hoi_thao);
 
             return $stmt->execute();
         } catch (Exception $e) {
@@ -83,4 +83,3 @@ class KeHoachHoiThao {
         }
     }
 }
-?>

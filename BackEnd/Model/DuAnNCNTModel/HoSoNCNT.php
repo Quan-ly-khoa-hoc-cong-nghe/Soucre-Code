@@ -14,23 +14,24 @@ class HoSoNCNT {
         $this->conn = $db;
     }
 
-    // Lấy tất cả hồ sơ
-    public function getAll() {
-        $query = "SELECT * FROM " . $this->table;
-        return $this->conn->query($query);
-    }
-
-    // Lấy một hồ sơ
-    public function getOne() {
-        $query = "SELECT * FROM " . $this->table . " WHERE MaHoSo = ?";
+    // Lấy giá trị MaHoSo mới
+    private function generateMaHoSo() {
+        // Lấy phần số tự động từ các bản ghi có sẵn trong bảng
+        $query = "SELECT MAX(CAST(SUBSTRING(MaHoSo, 7) AS UNSIGNED)) AS max_id FROM " . $this->table;
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->MaHoSo);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Tạo MaHoSo mới
+        $newId = (int)$result['max_id'] + 1;
+        return 'HSNCNT' . $newId;
     }
 
     // Thêm hồ sơ mới
     public function add() {
+        // Tạo MaHoSo mới
+        $this->MaHoSo = $this->generateMaHoSo();
+
         $query = "INSERT INTO " . $this->table . " (MaHoSo, NgayNop, FileHoSo, TrangThai, MaDatHang, MaKhoa) 
                   VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
@@ -71,4 +72,3 @@ class HoSoNCNT {
         return $stmt->execute();
     }
 }
-?>

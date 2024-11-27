@@ -13,6 +13,18 @@ class HoSoNCKHSV {
         $this->conn = $db;
     }
 
+    // Hàm sinh mã hồ sơ tự động
+    private function generateMaHoSo() {
+        // Đếm số dòng hiện tại trong bảng
+        $query = "SELECT COUNT(*) FROM " . $this->table_name;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
+        
+        // Tạo mã hồ sơ theo định dạng HSNCSV + (count + 1)
+        return "HSNCSV" . ($count + 1);
+    }
+
     // Lấy tất cả hồ sơ
     public function readAll() {
         try {
@@ -28,9 +40,11 @@ class HoSoNCKHSV {
     // Thêm hồ sơ mới
     public function add() {
         try {
+            // Tạo mã hồ sơ tự động
+            $this->MaHoSo = $this->generateMaHoSo();
+
             $sql = "INSERT INTO " . $this->table_name . " (MaHoSo, NgayNop, FileHoSo, TrangThai, MaKhoa) 
                     VALUES (:maHoSo, :ngayNop, :fileHoSo, :trangThai, :maKhoa)";
-
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':maHoSo', $this->MaHoSo);
             $stmt->bindParam(':ngayNop', $this->NgayNop);
@@ -61,7 +75,6 @@ class HoSoNCKHSV {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
-    
 
     public function update() {
         try {
@@ -82,8 +95,6 @@ class HoSoNCKHSV {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
-    
-    
 
     // Xóa hồ sơ
     public function delete() {

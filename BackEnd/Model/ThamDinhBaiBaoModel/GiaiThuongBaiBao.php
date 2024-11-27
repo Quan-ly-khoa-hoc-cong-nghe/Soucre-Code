@@ -3,6 +3,7 @@ class GiaiThuongBaiBao {
     private $conn;
     private $table_name = "GiaiThuongBaiBao";
 
+    public $MaGiaiThuong;
     public $NgayKhenThuong;
     public $SoTienThuong;
     public $MaBaiBao;

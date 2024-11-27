@@ -3,10 +3,12 @@ class SanPhamDTCS {
     private $conn;
     private $table = "SanPhamDTCS";
 
-    public $ten_san_pham;
-    public $ngay_hoan_thanh;
-    public $ket_qua;
-    public $ma_dtcs;
+    public $MaSanPhamDTCS;  // Cập nhật tên khóa chính
+    public $TenSanPham;      // Cập nhật tên thuộc tính
+    public $NgayHoanThanh;   // Cập nhật tên thuộc tính
+    public $KetQua;          // Cập nhật tên thuộc tính
+    public $FileSanPham;     // Thêm trường FileSanPham
+    public $MaDTCS;          // Khóa ngoại
 
     public function __construct($db) {
         $this->conn = $db;
@@ -20,42 +22,49 @@ class SanPhamDTCS {
 
     // Lấy thông tin một sản phẩm
     public function getOne() {
-        $query = "SELECT * FROM " . $this->table . " WHERE ten_san_pham = ? AND ma_dtcs = ?";
+        $query = "SELECT * FROM " . $this->table . " WHERE TenSanPham = ? AND MaDTCS = ?";  // Cập nhật tên trường
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ten_san_pham);
-        $stmt->bindParam(2, $this->ma_dtcs);
+        $stmt->bindParam(1, $this->TenSanPham);  // Cập nhật tên thuộc tính
+        $stmt->bindParam(2, $this->MaDTCS);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     // Thêm sản phẩm
     public function add() {
-        $query = "INSERT INTO " . $this->table . " SET ten_san_pham=?, ngay_hoan_thanh=?, ket_qua=?, ma_dtcs=?";
+        $query = "INSERT INTO " . $this->table . " (TenSanPham, NgayHoanThanh, KetQua, FileSanPham, MaDTCS) 
+                  VALUES (?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ten_san_pham);
-        $stmt->bindParam(2, $this->ngay_hoan_thanh);
-        $stmt->bindParam(3, $this->ket_qua);
-        $stmt->bindParam(4, $this->ma_dtcs);
+        $stmt->bindParam(1, $this->TenSanPham);  // Cập nhật tên thuộc tính
+        $stmt->bindParam(2, $this->NgayHoanThanh);  // Cập nhật tên thuộc tính
+        $stmt->bindParam(3, $this->KetQua);  // Cập nhật tên thuộc tính
+        $stmt->bindParam(4, $this->FileSanPham);  // Thêm tham số FileSanPham
+        $stmt->bindParam(5, $this->MaDTCS);  // Khóa ngoại
+
         return $stmt->execute();
     }
 
     // Cập nhật sản phẩm
     public function update() {
-        $query = "UPDATE " . $this->table . " SET ngay_hoan_thanh=?, ket_qua=? WHERE ten_san_pham=? AND ma_dtcs=?";
+        $query = "UPDATE " . $this->table . " SET NgayHoanThanh = ?, KetQua = ?, FileSanPham = ? WHERE TenSanPham = ? AND MaDTCS = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ngay_hoan_thanh);
-        $stmt->bindParam(2, $this->ket_qua);
-        $stmt->bindParam(3, $this->ten_san_pham);
-        $stmt->bindParam(4, $this->ma_dtcs);
+
+        $stmt->bindParam(1, $this->NgayHoanThanh);  // Cập nhật tên thuộc tính
+        $stmt->bindParam(2, $this->KetQua);  // Cập nhật tên thuộc tính
+        $stmt->bindParam(3, $this->FileSanPham);  // Thêm tham số FileSanPham
+        $stmt->bindParam(4, $this->TenSanPham);  // Cập nhật tên thuộc tính
+        $stmt->bindParam(5, $this->MaDTCS);  // Khóa ngoại
+
         return $stmt->execute();
     }
 
     // Xóa sản phẩm
     public function delete() {
-        $query = "DELETE FROM " . $this->table . " WHERE ten_san_pham = ? AND ma_dtcs = ?";
+        $query = "DELETE FROM " . $this->table . " WHERE TenSanPham = ? AND MaDTCS = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ten_san_pham);
-        $stmt->bindParam(2, $this->ma_dtcs);
+        $stmt->bindParam(1, $this->TenSanPham);  // Cập nhật tên thuộc tính
+        $stmt->bindParam(2, $this->MaDTCS);  // Khóa ngoại
+
         return $stmt->execute();
     }
 }

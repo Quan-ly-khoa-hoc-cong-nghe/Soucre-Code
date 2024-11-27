@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../Model/DeTaiNCKHGiangVien/DeTaiNCKHGiangVien.php';
 
 $database = new Database();
 $db = $database->getConn();
-$giangvien = new GiangVienCKHGV($db);
+$giangvien = new GiangVienNCKHGV($db);
 
 // Lấy action từ query string
 $action = isset($_GET['action']) ? strtoupper(trim($_GET['action'])) : null;

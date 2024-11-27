@@ -3,8 +3,8 @@ class NhomNCNT {
     private $conn;
     private $table = "NhomNCNT";
 
-    public $ma_ho_so;
-    public $ma_gv;
+    public $MaDuAn;
+    public $MaGV;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -18,39 +18,39 @@ class NhomNCNT {
 
     // Lấy thông tin một thành viên nhóm
     public function getOne() {
-        $query = "SELECT * FROM " . $this->table . " WHERE ma_ho_so = ? AND ma_gv = ?";
+        $query = "SELECT * FROM " . $this->table . " WHERE MaDuAn = ? AND MaGV = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ma_ho_so);
-        $stmt->bindParam(2, $this->ma_gv);
+        $stmt->bindParam(1, $this->MaDuAn);
+        $stmt->bindParam(2, $this->MaGV);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     // Thêm thành viên vào nhóm
     public function add() {
-        $query = "INSERT INTO " . $this->table . " SET ma_ho_so=?, ma_gv=?";
+        $query = "INSERT INTO " . $this->table . " (MaDuAn, MaGV) VALUES (?, ?)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ma_ho_so);
-        $stmt->bindParam(2, $this->ma_gv);
+        $stmt->bindParam(1, $this->MaDuAn);
+        $stmt->bindParam(2, $this->MaGV);
         return $stmt->execute();
     }
 
     // Cập nhật mã giảng viên trong nhóm
-    public function update($ma_gv_moi) {
-        $query = "UPDATE " . $this->table . " SET ma_gv=? WHERE ma_ho_so=? AND ma_gv=?";
+    public function update($MaGVMoi) {
+        $query = "UPDATE " . $this->table . " SET MaGV=? WHERE MaDuAn=? AND MaGV=?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $ma_gv_moi);
-        $stmt->bindParam(2, $this->ma_ho_so);
-        $stmt->bindParam(3, $this->ma_gv);
+        $stmt->bindParam(1, $MaGVMoi);
+        $stmt->bindParam(2, $this->MaDuAn);
+        $stmt->bindParam(3, $this->MaGV);
         return $stmt->execute();
     }
 
     // Xóa thành viên khỏi nhóm
     public function delete() {
-        $query = "DELETE FROM " . $this->table . " WHERE ma_ho_so = ? AND ma_gv = ?";
+        $query = "DELETE FROM " . $this->table . " WHERE MaDuAn = ? AND MaGV = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->ma_ho_so);
-        $stmt->bindParam(2, $this->ma_gv);
+        $stmt->bindParam(1, $this->MaDuAn);
+        $stmt->bindParam(2, $this->MaGV);
         return $stmt->execute();
     }
 }

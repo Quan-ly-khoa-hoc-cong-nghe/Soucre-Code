@@ -29,6 +29,11 @@ class KeHoachNCKHGV
     // Thêm kế hoạch mới
     public function addPlan($ngayBatDau, $ngayKetThuc, $kinhPhi, $fileKeHoach, $maDeTai)
     {
+        // Kiểm tra mã đề tài đã tồn tại chưa
+        if (!$this->checkMaDeTaiExists($maDeTai)) {
+            return false;  // Nếu mã đề tài không tồn tại, không thêm kế hoạch mới
+        }
+
         $stmt = $this->db->prepare("INSERT INTO KeHoachNCKHGV (NgayBatDau, NgayKetThuc, KinhPhi, FileKeHoach, MaDeTaiNCKHGV) 
                                     VALUES (:ngayBatDau, :ngayKetThuc, :kinhPhi, :fileKeHoach, :maDeTai)");
         $stmt->bindParam(':ngayBatDau', $ngayBatDau);
@@ -52,8 +57,9 @@ class KeHoachNCKHGV
     // Cập nhật kế hoạch theo mã đề tài
     public function updatePlanByMaDeTai($maDeTai, $ngayBatDau, $ngayKetThuc, $kinhPhi, $fileKeHoach)
     {
+        // Kiểm tra mã đề tài trước khi cập nhật
         if (!$this->checkMaDeTaiExists($maDeTai)) {
-            return false;
+            return false;  // Không có mã đề tài để cập nhật
         }
 
         $stmt = $this->db->prepare("
@@ -72,8 +78,9 @@ class KeHoachNCKHGV
     // Xóa kế hoạch theo mã đề tài
     public function deletePlanByMaDeTai($maDeTai)
     {
+        // Kiểm tra mã đề tài trước khi xóa
         if (!$this->checkMaDeTaiExists($maDeTai)) {
-            return false;
+            return false;  // Không có mã đề tài để xóa
         }
 
         $stmt = $this->db->prepare("DELETE FROM KeHoachNCKHGV WHERE MaDeTaiNCKHGV = :maDeTai");
@@ -81,3 +88,4 @@ class KeHoachNCKHGV
         return $stmt->execute();
     }
 }
+?>
