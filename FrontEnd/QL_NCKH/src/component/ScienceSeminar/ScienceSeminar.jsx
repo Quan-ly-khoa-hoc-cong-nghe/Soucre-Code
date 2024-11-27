@@ -74,26 +74,6 @@ const ScienceSeminar = () => {
                     </nav>
                 </div>
 
-                <div className="mb-6 flex justify-between items-center">
-                    <div className="flex items-center space-x-4">
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            className="px-4 py-2 border rounded-lg"
-                        />
-                        <button className="px-4 py-2 border rounded-lg">Filters</button>
-                    </div>
-                    <button
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center space-x-2"
-                        onClick={() => setShowForm(true)}
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span>New Seminar</span>
-                    </button>
-                </div>
-
                 {/* Modal for Event Details */}
                 {showForm && (
                     <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50">
