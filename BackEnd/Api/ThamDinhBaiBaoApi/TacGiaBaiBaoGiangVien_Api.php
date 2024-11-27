@@ -44,7 +44,7 @@ switch ($method) {
             exit;
         }
 
-        $tacgia->MaTacGia = $data->MaTacGia;
+        $tacgia->MaBaiBao = $data->MaBaiBao;
         $tacgia->MaGV = $data->MaGV;
         $tacgia->VaiTro = $data->VaiTro;
 
@@ -64,13 +64,13 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaTacGia, $data->MaGV, $data->VaiTro)) {
+        if (!isset($data->MaBaiBao, $data->MaGV, $data->VaiTro)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $tacgia->MaTacGia = $data->MaTacGia;
+        $tacgia->MaBaiBao = $data->MaBaiBao;
         $tacgia->MaGV = $data->MaGV;
         $tacgia->VaiTro = $data->VaiTro;
 
@@ -90,13 +90,13 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaTacGia, $data->MaGV)) {
+        if (!isset($data->MaBaiBao, $data->MaGV)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $tacgia->MaTacGia = $data->MaTacGia;
+        $tacgia->MaBaiBao = $data->MaBaiBao;
         $tacgia->MaGV = $data->MaGV;
 
         if ($tacgia->delete()) {

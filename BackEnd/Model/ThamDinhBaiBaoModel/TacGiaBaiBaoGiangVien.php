@@ -3,7 +3,7 @@ class TacGiaGiangVien {
     private $conn;
     private $table_name = "TacGiaGiangVien";
 
-    public $MaTacGia;
+    public $MaBaiBao;
     public $MaGV;
     public $VaiTro;
 
@@ -13,11 +13,11 @@ class TacGiaGiangVien {
 
     // Thêm tác giả giảng viên
     public function add() {
-        $query = "INSERT INTO " . $this->table_name . " SET MaTacGia=:MaTacGia, MaGV=:MaGV, VaiTro=:VaiTro";
+        $query = "INSERT INTO " . $this->table_name . " SET MaBaiBao=:MaBaiBao, MaGV=:MaGV, VaiTro=:VaiTro";
         $stmt = $this->conn->prepare($query);
 
         // Ràng buộc dữ liệu
-        $stmt->bindParam(":MaTacGia", $this->MaTacGia);
+        $stmt->bindParam(":MaTacGia", $this->MaBaiBao);
         $stmt->bindParam(":MaGV", $this->MaGV);
         $stmt->bindParam(":VaiTro", $this->VaiTro);
 
@@ -34,10 +34,10 @@ class TacGiaGiangVien {
 
     // Cập nhật vai trò của tác giả giảng viên
     public function update() {
-        $query = "UPDATE " . $this->table_name . " SET VaiTro=:VaiTro WHERE MaTacGia=:MaTacGia AND MaGV=:MaGV";
+        $query = "UPDATE " . $this->table_name . " SET VaiTro=:VaiTro WHERE MaTacGia=:MaBaiBao AND MaGV=:MaGV";
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(":MaTacGia", $this->MaTacGia);
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
         $stmt->bindParam(":MaGV", $this->MaGV);
         $stmt->bindParam(":VaiTro", $this->VaiTro);
 
@@ -46,10 +46,10 @@ class TacGiaGiangVien {
 
     // Xóa tác giả giảng viên
     public function delete() {
-        $query = "DELETE FROM " . $this->table_name . " WHERE MaTacGia=:MaTacGia AND MaGV=:MaGV";
+        $query = "DELETE FROM " . $this->table_name . " WHERE MaBaiBao=:MaBaiBao AND MaGV=:MaGV";
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(":MaTacGia", $this->MaTacGia);
+        $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
         $stmt->bindParam(":MaGV", $this->MaGV);
 
         return $stmt->execute();
