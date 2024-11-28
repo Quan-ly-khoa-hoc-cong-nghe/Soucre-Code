@@ -17,7 +17,6 @@ const ApplicationApprovalListAdmin = () => {
     FileKeHoach: null,
   });
   const [loading, setLoading] = useState(false);
-  const [maDeTai, setMaDeTai] = useState("");
   const [tenDeTai, setTenDeTai] = useState("");
   const [moTa, setMoTa] = useState("");
   const [ngayBatDau, setNgayBatDau] = useState("");
@@ -243,7 +242,6 @@ const ApplicationApprovalListAdmin = () => {
     resetForm();
   };
   const resetForm = () => {
-    setMaDeTai("");
     setTenDeTai("");
     setMoTa("");
     setNgayBatDau("");
@@ -262,21 +260,10 @@ const ApplicationApprovalListAdmin = () => {
       alert("Ngày kết thúc không thể trước ngày bắt đầu!");
       return;
     }
-    setLoading(true);
-    if (
-      !maDeTai ||
-      !tenDeTai ||
-      !moTa ||
-      !ngayBatDau ||
-      !ngayKetThuc ||
-      !kinhPhi ||
-      !files.FileHopDong ||
-      !files.FileKeHoach
-    ) {
-      alert("Vui lòng nhập đầy đủ thông tin và tải lên các tệp cần thiết!");
-      return;
-    }
 
+    setLoading(true);
+
+    // Kiểm tra thông tin bắt buộc
     if (!selectedApp?.MaHoSo) {
       alert("Không tìm thấy MaHoSo! Vui lòng chọn hồ sơ.");
       setLoading(false);
@@ -284,7 +271,6 @@ const ApplicationApprovalListAdmin = () => {
     }
 
     const formData = new FormData();
-    formData.append("MaDeTaiSV", maDeTai);
     formData.append("TenDeTai", tenDeTai);
     formData.append("MoTa", moTa);
     formData.append("NgayBatDau", ngayBatDau);
@@ -305,7 +291,6 @@ const ApplicationApprovalListAdmin = () => {
     });
 
     console.log("Đang gửi dữ liệu:", {
-      maDeTai,
       tenDeTai,
       moTa,
       ngayBatDau,
@@ -448,19 +433,6 @@ const ApplicationApprovalListAdmin = () => {
               <div className="border-b-2 border-gray-400 pb-4">
                 <h3 className="text-xl font-semibold mb-2">Thông Tin Đề Tài</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Mã Đề Tài
-                    </label>
-                    <input
-                      type="text"
-                      name="MaDeTai"
-                      className="w-full px-4 py-2 border rounded-lg"
-                      required
-                      value={maDeTai}
-                      onChange={(e) => setMaDeTai(e.target.value)}
-                    />
-                  </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       Tên Đề Tài
@@ -704,35 +676,35 @@ const ApplicationApprovalListAdmin = () => {
       )}
       {/* Modal */}
       {/* {isModalOpen && selectedApp && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
-            <h2 className="text-xl font-semibold mb-4">Thêm Đề Tài</h2>
-            <p>
-              <strong>Application ID:</strong> {selectedApp.MaHoSo}
-            </p>
-            <p>
-              <strong>Submission Date:</strong> {selectedApp.NgayNop}
-            </p>
-            <div className="mt-4">
-              <textarea
-                className="w-full h-32 p-2 border border-gray-300 rounded-lg"
-                placeholder="Enter topic details here..."
-              ></textarea>
-            </div>
-            <div className="mt-4 flex justify-end space-x-2">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md"
-              >
-                Close
-              </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
-                Save Topic
-              </button>
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
+              <h2 className="text-xl font-semibold mb-4">Thêm Đề Tài</h2>
+              <p>
+                <strong>Application ID:</strong> {selectedApp.MaHoSo}
+              </p>
+              <p>
+                <strong>Submission Date:</strong> {selectedApp.NgayNop}
+              </p>
+              <div className="mt-4">
+                <textarea
+                  className="w-full h-32 p-2 border border-gray-300 rounded-lg"
+                  placeholder="Enter topic details here..."
+                ></textarea>
+              </div>
+              <div className="mt-4 flex justify-end space-x-2">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md"
+                >
+                  Close
+                </button>
+                <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
+                  Save Topic
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )} */}
+        )} */}
     </div>
   );
 };

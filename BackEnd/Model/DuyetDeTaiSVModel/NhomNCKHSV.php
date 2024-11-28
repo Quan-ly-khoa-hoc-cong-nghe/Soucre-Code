@@ -28,7 +28,7 @@ class NhomNCKHSV
     // Kiểm tra sự tồn tại của MaDeTaiSV trong bảng DeTaiSV
     private function isDeTaiSVExist()
     {
-        $query = "SELECT MaDeTaiSV FROM DeTaiSV WHERE MaDeTaiSV = :maDeTaiSV";
+        $query = "SELECT MaDeTaiSV FROM DeTaiNCKHSV WHERE MaDeTaiSV = :maDeTaiSV";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":maDeTaiSV", $this->MaDeTaiSV);
         $stmt->execute();
@@ -47,11 +47,12 @@ class NhomNCKHSV
             // Câu lệnh SQL không cần truyền MaNhomNCKHSV vì nó sẽ tự tăng
             $query = "INSERT INTO " . $this->table_name . " (MaDeTaiSV) VALUES (:MaDeTaiSV)";
             $stmt = $this->conn->prepare($query);
-
             $stmt->bindParam(':MaDeTaiSV', $this->MaDeTaiSV, PDO::PARAM_STR);
 
             if ($stmt->execute()) {
-                return true;
+                // Lấy MaNhomNCKHSV tự động sinh ra từ lastInsertId()
+                $this->MaNhomNCKHSV = $this->conn->lastInsertId();
+                return $this->MaNhomNCKHSV;  // Trả về giá trị MaNhomNCKHSV
             } else {
                 $errorInfo = $stmt->errorInfo();
                 return ["error" => "Lỗi khi thêm nhóm nghiên cứu: " . implode(" | ", $errorInfo)];
@@ -132,4 +133,3 @@ class NhomNCKHSV
         }
     }
 }
-?>

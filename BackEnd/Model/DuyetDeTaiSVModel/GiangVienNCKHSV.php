@@ -1,7 +1,7 @@
 <?php
 class GiangVienNCKHSV {
     private $conn;
-    private $table_name = "GiangVienNCKHSV";
+    private $table_name = "giangviennckhsv";
 
     public $MaNhomNCKHSV;
     public $MaGV;

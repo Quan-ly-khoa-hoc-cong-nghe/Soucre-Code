@@ -27,46 +27,49 @@ switch ($action) {
 
     case 'add': // Thêm giảng viên vào nhóm
         if (empty($data['MaNhomNCKHSV']) || empty($data['MaGV'])) {
-            errorResponse("Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, MaGV.");
+            echo json_encode(["message" => "Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, MaGV."], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
         }
 
         $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
         $giangVienNCKHSV->MaGV = $data['MaGV'];
 
         if ($giangVienNCKHSV->add()) {
-            successResponse("Thêm giảng viên vào nhóm thành công.");
+            echo json_encode(["message" => "Thêm giảng viên vào nhóm thành công."], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            errorResponse("Không thể thêm giảng viên vào nhóm.");
+            echo json_encode(["message" => "Không thể thêm giảng viên vào nhóm."], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
 
-
-
     case 'update':
-        if (!empty($data['MaNhomNCKHSV'])) {
-            $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
-            $giangVienNCKHSV->MaGV = $data['MaGV'];
-            if ($giangVienNCKHSV->update()) {
-                echo json_encode(['message' => 'Cập nhật giảng viên vào nhóm thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            } else {
-                echo json_encode(['message' => 'Không thể cập nhật giảng viên vào nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            }
+        if (empty($data['MaNhomNCKHSV']) || empty($data['MaGV'])) {
+            echo json_encode(['message' => 'Thiếu mã nhóm giảng viên hoặc mã giảng viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
+        }
+
+        $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+        $giangVienNCKHSV->MaGV = $data['MaGV'];
+
+        if ($giangVienNCKHSV->update()) {
+            echo json_encode(['message' => 'Cập nhật giảng viên vào nhóm thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            echo json_encode(['message' => 'Thiếu mã nhóm giảng viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            echo json_encode(['message' => 'Không thể cập nhật giảng viên vào nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
 
     case 'delete':
-        if (!empty($data['MaNhomNCKHSV'])) {
-            $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
-            $giangVienNCKHSV->MaGV = $data['MaGV'];
-            if ($giangVienNCKHSV->delete()) {
-                echo json_encode(['message' => 'Xóa giảng viên khỏi nhóm thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            } else {
-                echo json_encode(['message' => 'Không thể xóa giảng viên khỏi nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            }
+        if (empty($data['MaNhomNCKHSV']) || empty($data['MaGV'])) {
+            echo json_encode(['message' => 'Thiếu mã nhóm hoặc mã giảng viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
+        }
+
+        $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+        $giangVienNCKHSV->MaGV = $data['MaGV'];
+
+        if ($giangVienNCKHSV->delete()) {
+            echo json_encode(['message' => 'Xóa giảng viên khỏi nhóm thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            echo json_encode(['message' => 'Dữ liệu không đầy đủ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            echo json_encode(['message' => 'Không thể xóa giảng viên khỏi nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
 

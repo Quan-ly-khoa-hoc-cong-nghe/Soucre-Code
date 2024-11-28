@@ -27,20 +27,19 @@ switch ($action) {
 
     case 'add': // Thêm sinh viên vào nhóm
         if (empty($data['MaNhomNCKHSV']) || empty($data['MaSinhVien'])) {
-            errorResponse("Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, MaSinhVien.");
+            echo json_encode(["message" => "Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, MaSinhVien."], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
         }
 
         $sinhVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
         $sinhVienNCKHSV->MaSinhVien = $data['MaSinhVien'];
 
         if ($sinhVienNCKHSV->add()) {
-            successResponse("Thêm sinh viên vào nhóm thành công.");
+            echo json_encode(["message" => "Thêm sinh viên vào nhóm thành công."], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            errorResponse("Không thể thêm sinh viên vào nhóm.");
+            echo json_encode(["message" => "Không thể thêm sinh viên vào nhóm."], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
-
-
 
     case 'autoUpdate':
         $apiUrl = "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/NhomNCKHSV_Api.php?action=get";
@@ -49,26 +48,29 @@ switch ($action) {
         break;
 
     case 'update':
-        if (!empty($data['MaNhomNCKHSV'])) {
-            $sinhVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
-            $sinhVienNCKHSV->MaSinhVien = $data['MaSinhVien'];
-            if ($sinhVienNCKHSV->update()) {
-                echo json_encode(['message' => 'Cập nhật sinh viên vào nhóm thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            } else {
-                echo json_encode(['message' => 'Không thể cập nhật sinh viên vào nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            }
+        if (empty($data['MaNhomNCKHSV']) || empty($data['MaSinhVien'])) {
+            echo json_encode(['message' => 'Thiếu mã nhóm sinh viên hoặc mã sinh viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
+        }
+        $sinhVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+        $sinhVienNCKHSV->MaSinhVien = $data['MaSinhVien'];
+
+        if ($sinhVienNCKHSV->update()) {
+            echo json_encode(['message' => 'Cập nhật sinh viên vào nhóm thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            echo json_encode(['message' => 'Thiếu mã nhóm sinh viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            echo json_encode(['message' => 'Không thể cập nhật sinh viên vào nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
 
-
     case 'delete':
-        $data = json_decode(file_get_contents('php://input'), true);
+        if (empty($data['MaSinhVien']) || empty($data['MaNhomNCKHSV'])) {
+            echo json_encode(['message' => 'Thiếu mã sinh viên hoặc mã nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
+        }
+        
         $maSinhVien = $data['MaSinhVien'];
         $maNhomNCKHSV = $data['MaNhomNCKHSV'];
 
-        // Xóa sinh viên khỏi nhóm trong bảng SinhVienNCKHSV
         $sql = "DELETE FROM SinhVienNCKHSV WHERE MaSinhVien = :maSinhVien AND MaNhomNCKHSV = :maNhomNCKHSV";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':maSinhVien', $maSinhVien);
@@ -79,7 +81,6 @@ switch ($action) {
             echo json_encode(['message' => 'Không thể xóa sinh viên khỏi nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
-
 
     default:
         echo json_encode(['message' => 'Action không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
