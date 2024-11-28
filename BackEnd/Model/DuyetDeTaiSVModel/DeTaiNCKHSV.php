@@ -2,7 +2,7 @@
 class DeTaiNCKHSV
 {
     private $conn;
-    private $table_name = "DeTaiNCKHSV";
+    private $table_name = "DeTaiNCKHSV";  // Đảm bảo tên bảng chính xác
 
     public $maDeTaiSV;
     public $tenDeTai;
@@ -10,7 +10,6 @@ class DeTaiNCKHSV
     public $trangThai;
     public $fileHopDong;
     public $maHoSo;
-    public $maNhomNCKHSV;
 
     // Constructor
     public function __construct($db)
@@ -31,29 +30,36 @@ class DeTaiNCKHSV
         return "DTNCSV" . ($count + 1);
     }
 
-    // Thêm đề tài mới
     public function add()
     {
         try {
-            // Tạo mã đề tài tự động
-            $this->maDeTaiSV = $this->generateMaDeTaiSV();
+            // Sinh mã đề tài tự động
+            $this->maDeTaiSV = $this->generateMaDeTaiSV();  // Gọi hàm tự sinh mã
 
+            // Câu truy vấn SQL để thêm dữ liệu vào bảng DeTaiNCKHSV
             $query = "INSERT INTO " . $this->table_name . " 
-                        (maDeTaiSV, tenDeTai, moTa, trangThai, fileHopDong, maHoSo, maNhomNCKHSV) 
-                        VALUES (:maDeTaiSV, :tenDeTai, :moTa, :trangThai, :fileHopDong, :maHoSo, :maNhomNCKHSV)";
+              (MaDeTaiSV, TenDeTai, MoTa, TrangThai, FileHopDong, MaHoSo) 
+              VALUES (:maDeTaiSV, :tenDeTai, :moTa, :trangThai, :fileHopDong, :maHoSo)";
+
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':maDeTaiSV', $this->maDeTaiSV);
+
+            // Bind tham số
+            $stmt->bindParam(':maDeTaiSV', $this->maDeTaiSV);  // Đưa mã đề tài vào bindParam
             $stmt->bindParam(':tenDeTai', $this->tenDeTai);
             $stmt->bindParam(':moTa', $this->moTa);
             $stmt->bindParam(':trangThai', $this->trangThai);
             $stmt->bindParam(':fileHopDong', $this->fileHopDong);
             $stmt->bindParam(':maHoSo', $this->maHoSo);
-            $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);
 
+            // Thực thi câu lệnh và kiểm tra kết quả
             if ($stmt->execute()) {
-                return true;
+                // Lấy mã đề tài từ trường MaDeTaiSV vừa thêm
+                return $this->maDeTaiSV;  // Trả về mã đề tài tự sinh sau khi thêm thành công
+            } else {
+                $errorInfo = $stmt->errorInfo();
+                error_log("Lỗi khi thêm đề tài: " . implode(", ", $errorInfo));
+                return false;
             }
-            return false;
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
@@ -65,7 +71,7 @@ class DeTaiNCKHSV
         try {
             $query = "UPDATE " . $this->table_name . " 
                     SET TenDeTai = :tenDeTai, MoTa = :moTa, TrangThai = :trangThai, 
-                        FileHopDong = :fileHopDong, MaHoSo = :maHoSo, MaNhomNCKHSV = :maNhomNCKHSV 
+                        FileHopDong = :fileHopDong, MaHoSo = :maHoSo 
                     WHERE MaDeTaiSV = :maDeTaiSV";
             $stmt = $this->conn->prepare($query);
 
@@ -75,7 +81,6 @@ class DeTaiNCKHSV
             $stmt->bindParam(':trangThai', $this->trangThai);
             $stmt->bindParam(':fileHopDong', $this->fileHopDong);
             $stmt->bindParam(':maHoSo', $this->maHoSo);
-            $stmt->bindParam(':maNhomNCKHSV', $this->maNhomNCKHSV);
 
             if ($stmt->execute()) {
                 return true;
@@ -102,7 +107,7 @@ class DeTaiNCKHSV
     // Lấy một đề tài theo mã
     public function readByMaDeTaiSV($maDeTaiSV)
     {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE maDeTaiSV = :maDeTaiSV";
+        $query = "SELECT * FROM " . $this->table_name . " WHERE MaDeTaiSV = :maDeTaiSV";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':maDeTaiSV', $maDeTaiSV);
         $stmt->execute();
@@ -127,4 +132,3 @@ class DeTaiNCKHSV
         }
     }
 }
-?>

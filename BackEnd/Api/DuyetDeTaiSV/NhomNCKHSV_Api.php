@@ -31,7 +31,6 @@ function successResponse($message, $data = [])
     exit;
 }
 
-
 switch ($action) {
     case 'get':
         $result = $nhomNCKHSV->readAll();
@@ -39,27 +38,36 @@ switch ($action) {
         break;
 
     case 'add': // Thêm nhóm
-        if (empty($data['MaNhomNCKHSV']) || empty($data['MaDeTaiSV'])) {
-            errorResponse("Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, MaDeTaiSV.");
+        if (empty($data['MaDeTaiSV'])) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Vui lòng cung cấp mã đề tài sinh viên.'
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
         }
 
-        $nhomNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
-        $nhomNCKHSV->MaDeTaiSV = $data['MaDeTaiSV'];
+        // Gán dữ liệu nhóm
+        $nhomNCKHSV->MaDeTaiSV = $data['MaDeTaiSV'];  // Mã đề tài sinh viên (đã có từ bước thêm đề tài)
 
-        error_log("Dữ liệu nhận từ DeTaiNCKHSV_Api: " . print_r($data, true));
+        // Thực hiện thêm nhóm
+        $result = $nhomNCKHSV->add();
 
-        if (empty($nhomNCKHSV->MaNhomNCKHSV) || empty($nhomNCKHSV->MaDeTaiSV)) {
-            errorResponse("Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, MaDeTaiSV.");
-        }
-
-        error_log("Trước khi gọi add(): MaNhomNCKHSV = {$nhomNCKHSV->MaNhomNCKHSV}, MaDeTaiSV = {$nhomNCKHSV->MaDeTaiSV}");
-
-        if ($nhomNCKHSV->add()) {
-            successResponse("Tạo nhóm nghiên cứu thành công.", ['MaNhomNCKHSV' => $nhomNCKHSV->MaNhomNCKHSV]);
+        if (isset($result['error'])) {
+            // Nếu có lỗi xảy ra
+            echo json_encode([
+                'success' => false,
+                'message' => $result['error']
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            errorResponse("Không thể tạo nhóm nghiên cứu.");
+            // Thêm thành công, trả về ID nhóm
+            echo json_encode([
+                'success' => true,
+                'message' => 'Thêm nhóm thành công.',
+                'MaNhomNCKHSV' => $result  // Sử dụng trực tiếp giá trị MaNhomNCKHSV
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
+
     case 'autoUpdateGroups':
         $url = "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/DeTaiNCKHSV_Api.php?action=get";
         $response = file_get_contents($url);
@@ -73,42 +81,31 @@ switch ($action) {
         }
         break;
 
-
     case 'update':
         if (!empty($data['MaNhomNCKHSV'])) {
             $nhomNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
             $nhomNCKHSV->MaDeTaiSV = $data['MaDeTaiSV'];
-            if ($nhomNCKHSV->update()) {
-                echo json_encode(['message' => 'Cập nhật nhóm NCKHSV thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            $result = $nhomNCKHSV->update();
+
+            if (isset($result['error'])) {
+                echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             } else {
-                echo json_encode(['message' => 'Không thể cập nhật nhóm NCKHSV'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                echo json_encode(['message' => 'Cập nhật nhóm NCKHSV thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             }
         } else {
             echo json_encode(['message' => 'Thiếu mã nhóm NCKHSV'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        }
-        break;
-    case 'addGroup':
-        if (!empty($data['MaDeTaiSV']) && !empty($data['MaNhomNCKHSV'])) {
-            $nhomNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
-            $nhomNCKHSV->MaDeTaiSV = $data['MaDeTaiSV'];
-            // Thực hiện thêm mới
-            if ($nhomNCKHSV->addNewGroup()) {
-                echo json_encode(['success' => true, 'message' => 'Thêm nhóm NCKHSV thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Không thể thêm nhóm NCKHSV'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            }
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Dữ liệu không đầy đủ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
 
     case 'delete':
         if (!empty($data['MaNhomNCKHSV'])) {
             $nhomNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
-            if ($nhomNCKHSV->delete()) {
-                echo json_encode(['message' => 'Xóa nhóm NCKHSV thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            $result = $nhomNCKHSV->delete();
+
+            if (isset($result['error'])) {
+                echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             } else {
-                echo json_encode(['message' => 'Không thể xóa nhóm NCKHSV'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                echo json_encode(['message' => 'Xóa nhóm NCKHSV thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             }
         } else {
             echo json_encode(['message' => 'Dữ liệu không đầy đủ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
