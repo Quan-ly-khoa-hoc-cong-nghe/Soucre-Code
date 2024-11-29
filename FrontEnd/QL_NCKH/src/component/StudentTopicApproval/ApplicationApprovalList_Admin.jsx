@@ -33,18 +33,21 @@ const ApplicationApprovalListAdmin = () => {
     const allowedTypes = [
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ]; // Các loại file cho phép
-
+    ]; // Allowed file types
+  
     if (!allowedTypes.includes(file.type)) {
       alert("Chỉ chấp nhận các tệp PDF hoặc DOCX.");
+      // Clear the file input field
+      event.target.value = ""; 
       return;
     }
-
+  
+    // If file type is valid, update the state
     setFiles((prevFiles) => ({
       ...prevFiles,
       [fieldName]: file,
     }));
-  };
+  };  
 
   const fetchApplications = () => {
     axios
@@ -90,18 +93,26 @@ const ApplicationApprovalListAdmin = () => {
       });
   };
   const addStudent = (studentId) => {
-    // Kiểm tra trùng lặp
+    // Kiểm tra trùng lặp ngay khi nhận được mã sinh viên
     if (students.some((student) => student.MaSinhVien === studentId)) {
       alert("Sinh viên đã có trong danh sách!");
-      return;
+      return; // Nếu trùng lặp, dừng lại và không gọi API
     }
 
+    // Gọi API để lấy thông tin sinh viên nếu không trùng lặp
     axios
       .get(
         `http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SinhVien_Api.php?action=getById&MaSinhVien=${studentId}`
       )
       .then((response) => {
         if (response.data && response.data.SinhVien) {
+          // Sau khi lấy dữ liệu từ API, kiểm tra lại danh sách để tránh trùng lặp
+          if (students.some((student) => student.MaSinhVien === studentId)) {
+            alert("Sinh viên đã có trong danh sách!");
+            return;
+          }
+
+          // Cập nhật danh sách sinh viên nếu không trùng
           setStudents((prevStudents) => [
             ...prevStudents,
             response.data.SinhVien,
@@ -136,18 +147,26 @@ const ApplicationApprovalListAdmin = () => {
       });
   };
   const addLecturer = (lecturerId) => {
-    // Kiểm tra trùng lặp
+    // Kiểm tra trùng lặp ngay khi nhận được mã giảng viên
     if (lecturers.some((lecturer) => lecturer.MaGV === lecturerId)) {
       alert("Giảng viên đã có trong danh sách!");
-      return;
+      return;  // Nếu trùng lặp, dừng lại và không gọi API
     }
-
+  
+    // Gọi API để lấy thông tin giảng viên nếu không trùng lặp
     axios
       .get(
         `http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/GiangVien_Api.php?action=getById&MaGV=${lecturerId}`
       )
       .then((response) => {
         if (response.data && response.data.GiangVien) {
+          // Sau khi lấy dữ liệu từ API, kiểm tra lại danh sách để tránh trùng lặp
+          if (lecturers.some((lecturer) => lecturer.MaGV === lecturerId)) {
+            alert("Giảng viên đã có trong danh sách!");
+            return;
+          }
+  
+          // Cập nhật danh sách giảng viên nếu không trùng
           setLecturers((prevLecturers) => [
             ...prevLecturers,
             response.data.GiangVien,
@@ -160,7 +179,7 @@ const ApplicationApprovalListAdmin = () => {
         console.error("Error fetching lecturer info:", error);
         alert("Có lỗi xảy ra khi tải thông tin giảng viên.");
       });
-  };
+  };  
 
   const approveApplication = (app) => {
     const requestData = {
