@@ -103,7 +103,6 @@ const TopicList = () => {
     setEditedTopic(null);
   };
 
-
   // Lấy thông tin giảng viên chi tiết khi xem chi tiết đề tài
   const handleViewDetails = async (topic) => {
     setSelectedTopic(topic);
@@ -221,34 +220,35 @@ const TopicList = () => {
                 </div>
 
                 <div>
-  <label className="block text-sm font-medium text-gray-600">
-    Loại Hình Nghiên Cứu
-  </label>
-  <select
-    value={selectedTopic.MaLoaiHinhNCKH} // Mặc định là loại hình của đề tài
-    onChange={(e) =>
-      setSelectedTopic({
-        ...selectedTopic,
-        MaLoaiHinhNCKH: e.target.value, // Cập nhật loại hình khi chọn
-      })
-    }
-    className="w-full px-4 py-2 border rounded-md bg-gray-100"
-    disabled={!isEditing} // Nếu không phải chế độ chỉnh sửa, không cho chọn
-  >
-    {/* Lặp qua tất cả các loại hình để tạo option */}
-    {loaiHinhDetails.map((loaiHinh) => (
-      <option key={loaiHinh.MaLoaiHinhNCKH} value={loaiHinh.MaLoaiHinhNCKH}>
-        {loaiHinh.TenLoaiHinh}
-      </option>
-    ))}
-  </select>
-</div>
-
+                  <label className="block text-sm font-medium text-gray-600">
+                    Loại Hình Nghiên Cứu
+                  </label>
+                  <select
+                    value={selectedTopic.MaLoaiHinhNCKH} // Mặc định là loại hình của đề tài
+                    onChange={(e) =>
+                      setSelectedTopic({
+                        ...selectedTopic,
+                        MaLoaiHinhNCKH: e.target.value, // Cập nhật loại hình khi chọn
+                      })
+                    }
+                    className="w-full px-4 py-2 border rounded-md bg-gray-100"
+                    disabled={!isEditing} // Nếu không phải chế độ chỉnh sửa, không cho chọn
+                  >
+                    {/* Lặp qua tất cả các loại hình để tạo option */}
+                    {loaiHinhDetails.map((loaiHinh) => (
+                      <option
+                        key={loaiHinh.MaLoaiHinhNCKH}
+                        value={loaiHinh.MaLoaiHinhNCKH}
+                      >
+                        {loaiHinh.TenLoaiHinh}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 {/* Hiển thị thông tin hồ sơ */}
                 {hoSoDetails && (
                   <>
-          
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
                         Ngày Nộp Hồ Sơ
