@@ -50,18 +50,19 @@ function callApi($api, $action, $data)
     return json_decode($result, true);
 }
 
+// Xử lý lỗi và phản hồi
 function errorResponse($message)
 {
     echo json_encode(['success' => false, 'message' => $message], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-function successResponse($message, $data = [])
+// Xử lý phản hồi thành công
+function successResponse($message)
 {
-    echo json_encode(array_merge(['success' => true, 'message' => $message], $data), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    echo json_encode(['success' => true, 'message' => $message], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     exit;
 }
-
 
 switch ($action) {
     case 'get':
@@ -69,39 +70,36 @@ switch ($action) {
         echo json_encode(['DeTaiNCKHSV' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
 
-
     case 'add': // Thêm mới đề tài
         error_log("Dữ liệu POST nhận được: " . print_r($_POST, true));
         error_log("Dữ liệu FILES nhận được: " . print_r($_FILES, true));
+
+        // Đường dẫn lưu file
         $targetDir = __DIR__ . "/../../LuuFile/";
 
         // Kiểm tra dữ liệu đầu vào
         $missingFields = [];
-        if (empty($_POST['MaDeTaiSV'])) $missingFields[] = "MaDeTaiSV";
         if (empty($_POST['TenDeTai'])) $missingFields[] = "TenDeTai";
         if (empty($_POST['MoTa'])) $missingFields[] = "MoTa";
+        if (empty($_POST['NgayBatDau'])) $missingFields[] = "NgayBatDau";
+        if (empty($_POST['NgayKetThuc'])) $missingFields[] = "NgayKetThuc";
+        if (empty($_POST['KinhPhi'])) $missingFields[] = "KinhPhi";
+        if (empty($_FILES['FileHopDong']['name'])) $missingFields[] = "File hợp đồng";
+        if (empty($_FILES['FileKeHoach']['name'])) $missingFields[] = "File kế hoạch";
+
         if (!empty($missingFields)) {
             errorResponse("Vui lòng cung cấp đầy đủ thông tin: " . implode(", ", $missingFields) . ".");
         }
 
         // Xử lý upload FileHopDong
-        if (empty($_FILES['FileHopDong']['name'])) {
-            errorResponse("File hợp đồng là bắt buộc.");
-        } else {
-            $fileHopDongName = uploadFile($_FILES['FileHopDong'], $targetDir);
-            if (!$fileHopDongName) errorResponse("Lỗi khi upload file hợp đồng.");
-        }
+        $fileHopDongName = uploadFile($_FILES['FileHopDong'], $targetDir);
+        if (!$fileHopDongName) errorResponse("Lỗi khi upload file hợp đồng.");
 
         // Xử lý upload FileKeHoach
-        if (empty($_FILES['FileKeHoach']['name'])) {
-            errorResponse("File kế hoạch là bắt buộc.");
-        } else {
-            $fileKeHoachName = uploadFile($_FILES['FileKeHoach'], $targetDir);
-            if (!$fileKeHoachName) errorResponse("Lỗi khi upload file kế hoạch.");
-        }
+        $fileKeHoachName = uploadFile($_FILES['FileKeHoach'], $targetDir);
+        if (!$fileKeHoachName) errorResponse("Lỗi khi upload file kế hoạch.");
 
-        // Gán dữ liệu đề tài
-        $deTai->maDeTaiSV = $_POST['MaDeTaiSV'];
+        // Gán dữ liệu đề tài (không cần truyền MaDeTaiSV và MaNhomNCKHSV)
         $deTai->tenDeTai = $_POST['TenDeTai'];
         $deTai->moTa = $_POST['MoTa'];
         $deTai->trangThai = 'Chưa hoàn thành';
@@ -109,7 +107,6 @@ switch ($action) {
         $deTai->maHoSo = $_POST['MaHoSo'];
 
         error_log("Dữ liệu đề tài trước khi thêm: " . print_r([
-            'maDeTaiSV' => $deTai->maDeTaiSV,
             'tenDeTai' => $deTai->tenDeTai,
             'moTa' => $deTai->moTa,
             'trangThai' => $deTai->trangThai,
@@ -117,89 +114,79 @@ switch ($action) {
             'maHoSo' => $deTai->maHoSo
         ], true));
 
+        // Thêm đề tài và lấy mã tự sinh
+        $maDeTaiSV = $deTai->add(); // Gọi phương thức để tự sinh mã đề tài
 
-        if ($deTai->add()) {
+        if ($maDeTaiSV) {
             // Gọi API thêm kế hoạch
             $keHoachData = [
                 'NgayBatDau' => $_POST['NgayBatDau'],
                 'NgayKetThuc' => $_POST['NgayKetThuc'],
                 'KinhPhi' => $_POST['KinhPhi'],
                 'FileKeHoach' => $fileKeHoachName,
-                'MaDeTaiSV' => $_POST['MaDeTaiSV']
+                'MaDeTaiSV' => $maDeTaiSV // Truyền mã đề tài đã được tự sinh vào khi thêm kế hoạch
             ];
+
+            // Gọi API thêm kế hoạch
             $keHoachResponse = callApi('KeHoachNCKHSV_Api.php', 'add', $keHoachData);
 
-            if (!$keHoachResponse['success']) {
+            if (is_array($keHoachResponse) && isset($keHoachResponse['success']) && !$keHoachResponse['success']) {
                 errorResponse("Lỗi khi thêm kế hoạch: " . $keHoachResponse['message']);
             }
 
-            // Gọi API tạo nhóm
-            $nhomData = [   
-                'MaNhomNCKHSV' => '1', // Logic tự động tạo ID nhóm
-                'MaDeTaiSV' => $_POST['MaDeTaiSV']
+            // Gọi API tạo nhóm và lấy MaNhomNCKHSV
+            $nhomData = [
+                'MaDeTaiSV' => $maDeTaiSV // Sử dụng MaDeTaiSV đã được tự động sinh
             ];
             $nhomResponse = callApi('NhomNCKHSV_Api.php', 'add', $nhomData);
 
             if (!$nhomResponse['success']) {
                 errorResponse("Lỗi khi tạo nhóm nghiên cứu: " . $nhomResponse['message']);
-            }
+            } else {
+                // Nếu nhóm được tạo thành công, lấy MaNhomNCKHSV từ kết quả trả về
+                $maNhomNCKHSV = $nhomResponse['MaNhomNCKHSV'];  // Lấy mã nhóm từ phản hồi
 
-            $MaNhomNCKHSV = $nhomResponse['MaNhomNCKHSV'] ?? 1; // ID nhóm từ phản hồi API
+                error_log("Mã nhóm tạo thành công: " . $maNhomNCKHSV);
 
-            // Gọi API thêm sinh viên vào nhóm
-            if (!empty($_POST['SinhViens'])) {
-                foreach ($_POST['SinhViens'] as $MaSinhVien) {
-                    $sinhVienData = [
-                        'MaNhomNCKHSV' => $MaNhomNCKHSV,
-                        'MaSinhVien' => $MaSinhVien
-                    ];
-                    $sinhVienResponse = callApi('SinhVienNCKHSV_Api.php', 'add', $sinhVienData);
+                if ($maNhomNCKHSV) {
+                    // Thêm sinh viên vào nhóm nếu có danh sách sinh viên
+                    if (!empty($_POST['SinhViens'])) {
+                        foreach ($_POST['SinhViens'] as $MaSinhVien) {
+                            $sinhVienData = [
+                                'MaNhomNCKHSV' => $maNhomNCKHSV,
+                                'MaSinhVien' => $MaSinhVien
+                            ];
+                            $sinhVienResponse = callApi('SinhVienNCKHSV_Api.php', 'add', $sinhVienData);
 
-                    if (!isset($sinhVienResponse['success']) || !$sinhVienResponse['success']) {
-                        error_log("Lỗi khi thêm sinh viên vào nhóm: " . ($sinhVienResponse['message'] ?? "Không nhận được phản hồi hợp lệ."));
-                    }                    
+                            if (!isset($sinhVienResponse['success']) || !$sinhVienResponse['success']) {
+                                error_log("Lỗi khi thêm sinh viên vào nhóm: " . ($sinhVienResponse['message'] ?? "Không nhận được phản hồi hợp lệ."));
+                            }
+                        }
+                    }
+
+                    // Thêm giảng viên vào nhóm nếu có danh sách giảng viên
+                    if (!empty($_POST['GiangViens'])) {
+                        foreach ($_POST['GiangViens'] as $MaGV) {
+                            $giangVienData = [
+                                'MaNhomNCKHSV' => $maNhomNCKHSV,
+                                'MaGV' => $MaGV
+                            ];
+                            error_log("Dữ liệu gửi đến GiangVienNCKHSV_Api: " . print_r($giangVienData, true));
+                            $giangVienResponse = callApi('GiangVienNCKHSV_Api.php', 'add', $giangVienData);
+
+                            if (!isset($giangVienResponse['success']) || !$giangVienResponse['success']) {
+                                error_log("Lỗi khi thêm giảng viên vào nhóm: " . ($giangVienResponse['message'] ?? "Không nhận được phản hồi hợp lệ."));
+                            }
+                        }
+                    }
+
+                    successResponse("Thêm đề tài và các thông tin liên quan thành công.");
+                } else {
+                    errorResponse("Không thể lấy MaNhomNCKHSV sau khi tạo nhóm.");
                 }
             }
-
-            // Gọi API thêm giảng viên vào nhóm
-            if (!empty($_POST['GiangViens'])) {
-                foreach ($_POST['GiangViens'] as $MaGV) {
-                    $giangVienData = [
-                        'MaNhomNCKHSV' => $MaNhomNCKHSV,
-                        'MaGV' => $MaGV
-                    ];
-                    error_log("Dữ liệu gửi đến GiangVienNCKHSV_Api: " . print_r($giangVienData, true));
-                    $giangVienResponse = callApi('GiangVienNCKHSV_Api.php', 'add', $giangVienData);
-
-                    if (!isset($giangVienResponse['success']) || !$giangVienResponse['success']) {
-                        error_log("Lỗi khi thêm giảng viên vào nhóm: " . ($giangVienResponse['message'] ?? "Không nhận được phản hồi hợp lệ."));
-                    }                    
-                }
-            }
-
-            successResponse("Thêm đề tài và các thông tin liên quan thành công.");
         } else {
             errorResponse("Không thể thêm đề tài. Vui lòng kiểm tra dữ liệu.");
-        }
-        break;
-
-    case 'update':
-        if (!empty($data['MaDeTaiSV'])) {
-            $deTai->maDeTaiSV = $data['MaDeTaiSV'];
-            $deTai->tenDeTai = $data['TenDeTai'];
-            $deTai->moTa = $data['MoTa'];
-            $deTai->trangThai = $data['TrangThai'];
-            $deTai->fileHopDong = $data['FileHopDong'];
-            $deTai->maHoSo = $data['MaHoSo'];
-            $deTai->maNhomNCKHSV = $data['MaNhomNCKHSV'];
-
-            if ($deTai->update()) {
-                echo json_encode(['message' => 'Cập nhật đề tài thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            } else {
-                echo json_encode(['message' => 'Không thể cập nhật đề tài'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            }
-        } else {
-            echo json_encode(['message' => 'Thiếu mã đề tài'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
 
@@ -220,4 +207,3 @@ switch ($action) {
         echo json_encode(['message' => 'Action không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
 }
-?>

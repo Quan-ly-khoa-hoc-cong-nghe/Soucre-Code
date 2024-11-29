@@ -35,9 +35,9 @@ switch ($action) {
         echo json_encode(['KeHoachNCKHSV' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
 
-
     case 'add': // Thêm kế hoạch
-        // Kiểm tra dữ liệu đầu vào
+        error_log("Dữ liệu nhận được: " . print_r($data, true));
+
         if (empty($data['NgayBatDau']) || empty($data['NgayKetThuc']) || empty($data['KinhPhi']) || empty($data['MaDeTaiSV']) || empty($data['FileKeHoach'])) {
             echo json_encode(['success' => false, 'message' => 'Vui lòng cung cấp đầy đủ thông tin: NgayBatDau, NgayKetThuc, KinhPhi, MaDeTaiSV, FileKeHoach'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             exit;
@@ -51,11 +51,12 @@ switch ($action) {
         $keHoach->MaDeTaiSV = $data['MaDeTaiSV'];
 
         // Thêm kế hoạch
-        if ($keHoach->add()) {
-            echo json_encode(['success' => true, 'message' => 'Thêm kế hoạch thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-
+        $addKeHoachResult = $keHoach->add();
+        if ($addKeHoachResult === true) {
+            echo json_encode(['success' => true, 'message' => 'Thêm kế hoạch và đề tài thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Không thể thêm kế hoạch'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            // Trả về thông báo lỗi nếu không thể thêm kế hoạch
+            echo json_encode(['success' => false, 'message' => 'Không thể thêm kế hoạch: ' . $addKeHoachResult['error']], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
 

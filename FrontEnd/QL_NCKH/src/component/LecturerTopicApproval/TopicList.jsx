@@ -1,848 +1,482 @@
-import { useEffect, useState } from 'react';
-import { FaCheck, FaTimes, FaEye } from 'react-icons/fa';
-
-const fetchTopics = async () => {
-  return [
-    {
-      id: 1,
-      name: 'Nghiên cứu về AI',
-      description: 'Nghiên cứu ứng dụng AI trong giáo dục.',
-      status: 'Khoa đã duyệt',
-      groupId: 'G001',
-      students: [
-        {
-          id: 'S001',
-          name: 'Nguyễn Văn A',
-          birthDate: '2000-01-01',
-          phone: '0123456789',
-          email: 'nguyenvana@example.com',
-          major: 'Công nghệ thông tin',
-        },
-        {
-          id: 'S002',
-          name: 'Trần Thị B',
-          birthDate: '2000-02-01',
-          phone: '0123456780',
-          email: 'tranthib@example.com',
-          major: 'Công nghệ thông tin',
-        },
-      ],
-      advisor: {
-        id: 'A001',
-        name: 'PGS. TS. Trần Văn B',
-        department: 'Khoa Công nghệ Thông tin',
-        email: 'tranvanb@example.com',
-        phone: '0123456780',
-      },
-      researchPlan: {
-        id: 'RP001',
-        topicId: 1,
-        planId: 'Plan01',
-        description: 'Kế hoạch nghiên cứu ứng dụng AI.',
-        startDate: '2024-01-01',
-        endDate: '2024-12-31',
-      },
-    },
-    {
-      id: 2,
-      name: 'Phát triển hệ thống IoT',
-      description: 'Hệ thống IoT cho nông nghiệp thông minh.',
-      status: 'Khoa đã duyệt',
-      groupId: 'G002',
-      students: [
-        {
-          id: 'S003',
-          name: 'Trần Thị C',
-          birthDate: '2000-02-02',
-          phone: '0123456790',
-          email: 'tranthic@example.com',
-          major: 'Kỹ thuật Điện tử',
-        },
-        {
-          id: 'S004',
-          name: 'Lê Văn D',
-          birthDate: '2000-03-03',
-          phone: '0123456791',
-          email: 'levand@example.com',
-          major: 'Kỹ thuật Điện tử',
-        },
-        {
-          id: 'S005',
-          name: 'Nguyễn Văn E',
-          birthDate: '2000-04-04',
-          phone: '0123456792',
-          email: 'nguyenvane@example.com',
-          major: 'Kỹ thuật Điện tử',
-        },
-      ],
-      advisor: {
-        id: 'A002',
-        name: 'TS. Nguyễn Thị D',
-        department: 'Khoa Kỹ thuật Điện tử',
-        email: 'nguyentd@example.com',
-        phone: '0123456781',
-      },
-      researchPlan: {
-        id: 'RP002',
-        topicId: 2,
-        planId: 'Plan02',
-        description: 'Kế hoạch nghiên cứu hệ thống IoT.',
-        startDate: '2024-02-01',
-        endDate: '2024-11-30',
-      },
-    },
-    {
-      id: 3,
-      name: 'Ứng dụng Machine Learning trong y tế',
-      description: 'Nghiên cứu ứng dụng Machine Learning trong chẩn đoán bệnh.',
-      status: 'Khoa đã duyệt',
-      groupId: 'G003',
-      students: [
-        {
-          id: 'S006',
-          name: 'Lê Văn H',
-          birthDate: '2000-03-03',
-          phone: '0123456791',
-          email: 'levanh@example.com',
-          major: 'Công nghệ thông tin',
-        },
-      ],
-      advisor: {
-        id: 'A003',
-        name: 'TS. Trần Thị H',
-        department: 'Khoa Y Dược',
-        email: 'tranthih@example.com',
-        phone: '0123456782',
-      },
-      researchPlan: {
-        id: 'RP003',
-        topicId: 3,
-        planId: 'Plan03',
-        description: 'Kế hoạch nghiên cứu Machine Learning.',
-        startDate: '2024-01-15',
-        endDate: '2024-12-15',
-      },
-    },
-    {
-      id: 4,
-      name: 'Phát triển phần mềm giáo dục',
-      description: 'Nghiên cứu phát triển phần mềm hỗ trợ học tập.',
-      status: 'Khoa đã duyệt',
-      groupId: 'G004',
-      students: [
-        {
-          id: 'S007',
-          name: 'Nguyễn Thị I',
-          birthDate: '2000-04-04',
-          phone: '0123456793',
-          email: 'nguyenthi@example.com',
-          major: 'Khoa học máy tính',
-        },
-        {
-          id: 'S008',
-          name: 'Trần Văn J',
-          birthDate: '2000-05-05',
-          phone: '0123456794',
-          email: 'tranvj@example.com',
-          major: 'Khoa học máy tính',
-        },
-      ],
-      advisor: {
-        id: 'A004',
-        name: 'PGS. TS. Lê Văn M',
-        department: 'Khoa Công nghệ Thông tin',
-        email: 'levanm@example.com',
-        phone: '0123456784',
-      },
-      researchPlan: {
-        id: 'RP004',
-        topicId: 4,
-        planId: 'Plan04',
-        description: 'Kế hoạch phát triển phần mềm giáo dục.',
-        startDate: '2024-03-01',
-        endDate: '2024-09-30',
-      },
-    },
-    {
-      id: 5,
-      name: 'Nghiên cứu dữ liệu lớn',
-      description: 'Phân tích và nghiên cứu về Big Data.',
-      status: 'Khoa đã duyệt',
-      groupId: 'G005',
-      students: [
-        {
-          id: 'S009',
-          name: 'Trần Văn T',
-          birthDate: '2000-05-05',
-          phone: '0123456794',
-          email: 'tranvt@example.com',
-          major: 'Khoa học dữ liệu',
-        },
-        {
-          id: 'S010',
-          name: 'Nguyễn Văn K',
-          birthDate: '2000-06-06',
-          phone: '0123456795',
-          email: 'nguyenvank@example.com',
-          major: 'Khoa học dữ liệu',
-        },
-        {
-          id: 'S011',
-          name: 'Lê Văn L',
-          birthDate: '2000-07-07',
-          phone: '0123456796',
-          email: 'levanl@example.com',
-          major: 'Khoa học dữ liệu',
-        },
-      ],
-      advisor: {
-        id: 'A005',
-        name: 'TS. Nguyễn Văn P',
-        department: 'Khoa Khoa học máy tính',
-        email: 'nguyenp@example.com',
-        phone: '0123456785',
-      },
-      researchPlan: {
-        id: 'RP005',
-        topicId: 5,
-        planId: 'Plan05',
-        description: 'Kế hoạch nghiên cứu dữ liệu lớn.',
-        startDate: '2024-04-01',
-        endDate: '2024-12-01',
-      },
-    },
-    {
-      id: 6,
-      name: 'Phát triển ứng dụng di động',
-      description: 'Xây dựng ứng dụng di động cho học sinh.',
-      status: 'Khoa đã duyệt',
-      groupId: 'G006',
-      students: [
-        {
-          id: 'S012',
-          name: 'Nguyễn Văn M',
-          birthDate: '2000-08-08',
-          phone: '0123456798',
-          email: 'nguyenm@example.com',
-          major: 'Kỹ thuật phần mềm',
-        },
-      ],
-      advisor: {
-        id: 'A006',
-        name: 'PGS. TS. Hoàng Văn R',
-        department: 'Khoa Kỹ thuật phần mềm',
-        email: 'hoangvr@example.com',
-        phone: '0123456786',
-      },
-      researchPlan: {
-        id: 'RP006',
-        topicId: 6,
-        planId: 'Plan06',
-        description: 'Kế hoạch phát triển ứng dụng di động.',
-        startDate: '2024-05-01',
-        endDate: '2024-11-30',
-      },
-    },
-    {
-      id: 7,
-      name: 'Nghiên cứu về Blockchain',
-      description: 'Ứng dụng Blockchain trong tài chính.',
-      status: 'Khoa đã duyệt',
-      groupId: 'G007',
-      students: [
-        {
-          id: 'S013',
-          name: 'Trần Thị N',
-          birthDate: '2000-09-09',
-          phone: '0123456799',
-          email: 'tranthyn@example.com',
-          major: 'Khoa học máy tính',
-        },
-      ],
-      advisor: {
-        id: 'A007',
-        name: 'TS. Lê Thị N',
-        department: 'Khoa Tài chính',
-        email: 'lethinh@example.com',
-        phone: '0123456788',
-      },
-      researchPlan: {
-        id: 'RP007',
-        topicId: 7,
-        planId: 'Plan07',
-        description: 'Kế hoạch nghiên cứu về Blockchain.',
-        startDate: '2024-06-01',
-        endDate: '2024-12-31',
-      },
-    },
-    {
-      id: 8,
-      name: 'Tối ưu hóa thuật toán tìm kiếm',
-      description: 'Nghiên cứu tối ưu hóa thuật toán tìm kiếm.',
-      status: 'Khoa đã duyệt',
-      groupId: 'G008',
-      students: [
-        {
-          id: 'S014',
-          name: 'Nguyễn Văn O',
-          birthDate: '2000-10-10',
-          phone: '0123456700',
-          email: 'nguyenvano@example.com',
-          major: 'Khoa học máy tính',
-        },
-      ],
-      advisor: {
-        id: 'A008',
-        name: 'PGS. TS. Trần Văn X',
-        department: 'Khoa Công nghệ thông tin',
-        email: 'tranvx@example.com',
-        phone: '0123456789',
-      },
-      researchPlan: {
-        id: 'RP008',
-        topicId: 8,
-        planId: 'Plan08',
-        description: 'Kế hoạch tối ưu hóa thuật toán.',
-        startDate: '2024-07-01',
-        endDate: '2024-12-01',
-      },
-    },
-    {
-      id: 9,
-      name: 'Phân tích dữ liệu trong ngành y tế',
-      description: 'Nghiên cứu phân tích dữ liệu trong chăm sóc sức khỏe.',
-      status: 'Khoa đã duyệt',
-      groupId: 'G009',
-      students: [
-        {
-          id: 'S015',
-          name: 'Lê Thị P',
-          birthDate: '2000-11-11',
-          phone: '0123456701',
-          email: 'lethip@example.com',
-          major: 'Khoa học dữ liệu',
-        },
-      ],
-      advisor: {
-        id: 'A009',
-        name: 'TS. Nguyễn Thị H',
-        department: 'Khoa Y Dược',
-        email: 'nguyenh@example.com',
-        phone: '0123456790',
-      },
-      researchPlan: {
-        id: 'RP009',
-        topicId: 9,
-        planId: 'Plan09',
-        description: 'Kế hoạch phân tích dữ liệu trong ngành y tế.',
-        startDate: '2024-08-01',
-        endDate: '2024-11-30',
-      },
-    },
-    {
-      id: 10,
-      name: 'Khoa học máy tính trong giáo dục',
-      description: 'Nghiên cứu ứng dụng khoa học máy tính trong giáo dục.',
-      status: 'Khoa đã duyệt',
-      groupId: 'G010',
-      students: [
-        {
-          id: 'S016',
-          name: 'Nguyễn Thị Q',
-          birthDate: '2000-12-12',
-          phone: '0123456702',
-          email: 'nguyenthiq@example.com',
-          major: 'Công nghệ thông tin',
-        },
-      ],
-      advisor: {
-        id: 'A010',
-        name: 'PGS. TS. Phạm Văn Y',
-        department: 'Khoa Giáo dục',
-        email: 'phamvy@example.com',
-        phone: '0123456703',
-      },
-      researchPlan: {
-        id: 'RP010',
-        topicId: 10,
-        planId: 'Plan10',
-        description: 'Kế hoạch ứng dụng khoa học máy tính trong giáo dục.',
-        startDate: '2024-09-01',
-        endDate: '2024-12-31',
-      },
-    },
-  ];
-};
-
-const StudentDetailModal = ({ student, onClose }) => (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white rounded-lg p-6 max-w-lg w-full shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">{student.name} (ID: {student.id})</h2>
-      <p><strong>Birth Date:</strong> {student.birthDate}</p>
-      <p><strong>Phone:</strong> {student.phone}</p>
-      <p><strong>Email:</strong> {student.email}</p>
-      <p><strong>Major:</strong> {student.major}</p>
-      <div className="mt-4 flex justify-center">
-        <button onClick={onClose} className="mt-4 p-2 bg-blue-500 text-white rounded">Close</button>
-      </div>
-    </div>
-  </div>
-);
-
-const AdvisorDetailModal = ({ advisor, onClose }) => (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white rounded-lg p-6 max-w-lg w-full shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">{advisor.name} (ID: {advisor.id})</h2>
-      <p><strong>Department:</strong> {advisor.department}</p>
-      <p><strong>Email:</strong> {advisor.email}</p>
-      <p><strong>Phone:</strong> {advisor.phone}</p>
-      <div className="mt-4 flex justify-center">
-        <button onClick={onClose} className="mt-4 p-2 bg-blue-500 text-white rounded">Close</button>
-      </div>
-    </div>
-  </div>
-);
+import { useEffect, useState } from "react";
+import { FaEye, FaEdit } from "react-icons/fa";
 
 const TopicList = () => {
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [showStudentDetail, setShowStudentDetail] = useState(false);
-  const [showAdvisorDetail, setShowAdvisorDetail] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [hoSoDetails, setHoSoDetails] = useState(null);
+  const [loaiHinhDetails, setLoaiHinhDetails] = useState([]);
+  const [nhomNCKHDetails, setNhomNCKHDetails] = useState([]);
+  const [giangVienDetails, setGiangVienDetails] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTopic, setEditedTopic] = useState({});
+  const [editedTopic, setEditedTopic] = useState(null);
 
+  // Tải dữ liệu đề tài và loại hình
   useEffect(() => {
-    const getTopics = async () => {
-      const data = await fetchTopics();
-      setTopics(data);
+    const fetchData = async () => {
+      const topicsData = await fetchTopics();
+      setTopics(topicsData);
+
+      const loaiHinhData = await fetchLoaiHinh();
+      setLoaiHinhDetails(loaiHinhData);
     };
-    getTopics();
+
+    fetchData();
   }, []);
 
-  const handleEdit = (topic) => {
-    setIsEditing(true);
-    setEditedTopic({ ...topic }); // sao chép thông tin đề tài để chỉnh sửa
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedTopic((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleStudentInputChange = (e, index) => {
-    const { name, value } = e.target;
-    const updatedStudents = [...editedTopic.students];
-    updatedStudents[index] = { ...updatedStudents[index], [name]: value };
-    setEditedTopic((prev) => ({
-      ...prev,
-      students: updatedStudents,
-    }));
-  };
-
-  const handleUpdate = () => {
-    setTopics((prev) =>
-      prev.map((topic) => (topic.id === editedTopic.id ? editedTopic : topic))
+  // Lấy danh sách đề tài
+  const fetchTopics = async () => {
+    const response = await fetch(
+      "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/DeTaiNCKHGiangVien_Api.php?action=GET"
     );
+    const data = await response.json();
+    return data;
+  };
+
+  // Lấy thông tin hồ sơ
+  const fetchHoSo = async (maHoSo) => {
+    const response = await fetch(
+      "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/HoSoNCKHGiangVien_Api.php?action=GET"
+    );
+    const data = await response.json();
+    return data.find((hoSo) => hoSo.MaHoSo === maHoSo);
+  };
+
+  // Lấy dữ liệu loại hình nghiên cứu
+  const fetchLoaiHinh = async () => {
+    const response = await fetch(
+      "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/LoaiHinhNCKHGV_Api.php?action=GET"
+    );
+    const data = await response.json();
+    return data;
+  };
+
+  // Lấy thông tin nhóm nghiên cứu
+  const fetchNhomNCKH = async (maDeTai) => {
+    const response = await fetch(
+      "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/NhomNCKHGV_Api.php?action=GET"
+    );
+    const data = await response.json();
+    return data.filter((nhom) => nhom.MaDeTaiNCKHGV === maDeTai);
+  };
+
+  // Lấy thông tin giảng viên theo mã nhóm nghiên cứu
+  const fetchGiangVien = async (maNhom) => {
+    const response = await fetch(
+      "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/GiangVienNCKHGV_Api.php?action=GET"
+    );
+    const data = await response.json();
+    return data.filter((giangVien) => giangVien.MaNhomNCKHGV === maNhom);
+  };
+
+  // Lấy thông tin giảng viên chi tiết
+  // Lấy thông tin giảng viên chi tiết từ mã giảng viên
+  const fetchGiangVienDetail = async (maGV) => {
+    const response = await fetch(
+      "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/GiangVien_Api.php?action=get"
+    );
+    const data = await response.json();
+
+    // Lọc giảng viên theo mã giảng viên
+    const giangVien = data.GiangVien.find(
+      (giangVien) => giangVien.MaGV === maGV
+    );
+    return giangVien;
+  };
+
+  // Lấy tên loại hình từ mã loại hình
+  const getLoaiHinhName = (maLoaiHinh) => {
+    const loaiHinh = loaiHinhDetails.find(
+      (item) => item.MaLoaiHinhNCKH === maLoaiHinh
+    );
+    return loaiHinh ? loaiHinh.TenLoaiHinh : "Không xác định";
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditedTopic({ ...selectedTopic }); // Sao chép đề tài hiện tại để chỉnh sửa
+  };
+
+  // Hủy bỏ chế độ chỉnh sửa
+  const handleCancel = () => {
     setIsEditing(false);
-    setSelectedTopic(null);
+    setEditedTopic(null);
   };
 
-  const handleDelete = (id) => {
-    setTopics((prev) => prev.filter((topic) => topic.id !== id));
-  };
 
-  const handleViewDetails = (topic) => {
+  // Lấy thông tin giảng viên chi tiết khi xem chi tiết đề tài
+  const handleViewDetails = async (topic) => {
     setSelectedTopic(topic);
-  };
+    const hoSo = await fetchHoSo(topic.MaHoSo);
+    setHoSoDetails(hoSo);
+    const nhom = await fetchNhomNCKH(topic.MaDeTaiNCKHGV);
+    setNhomNCKHDetails(nhom);
 
-  const handleStudentDetail = (student) => {
-    setSelectedStudent(student);
-    setShowStudentDetail(true);
-  };
+    // Lấy thông tin giảng viên cho mỗi nhóm nghiên cứu
+    const giangVienPromises = nhom.map((nhom) =>
+      fetchGiangVien(nhom.MaNhomNCKHGV)
+    );
+    const giangVienData = await Promise.all(giangVienPromises);
+    setGiangVienDetails(giangVienData.flat());
 
-  const handleAdvisorDetail = () => {
-    setShowAdvisorDetail(true);
-  };
+    // Lấy thông tin chi tiết giảng viên
+    const giangVienDetailPromises = giangVienData
+      .flat()
+      .map((giangVien) => fetchGiangVienDetail(giangVien.MaGV));
+    const giangVienDetails = await Promise.all(giangVienDetailPromises);
 
-  const closeDetailView = () => {
-    setSelectedTopic(null);
-    setShowStudentDetail(false);
-    setShowAdvisorDetail(false);
-    setSelectedStudent(null);
-    setIsEditing(false);
+    // Cập nhật giảng viên chi tiết
+    setGiangVienDetails(giangVienDetails);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b">
-            <th className="text-left py-4 px-2">Topic Name</th>
-            <th className="text-left py-4 px-2">Advisor Name</th>
-            <th className="text-left py-4 px-2">Group ID</th>
-            <th className="text-left py-4 px-2">Status</th>
-            <th className="text-right py-4 px-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {topics.map((topic) => (
-            <tr key={topic.id} className="border-b hover:bg-gray-50">
-              <td className="py-4 px-2">{topic.name}</td>
-              <td className="py-4 px-2">{topic.advisor.name}</td>
-              <td className="py-4 px-2">{topic.groupId}</td>
-              <td className="py-4 px-2">
-                <span
-                  className={`px-2 py-1 rounded-full text-sm ${
-                    topic.status === 'Đã duyệt'
-                      ? 'bg-green-100 text-green-800'
-                      : topic.status === 'Hủy'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-blue-100 text-blue-800'
-                  }`}
-                >
-                  {topic.status}
-                </span>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <div className="flex justify-end space-x-2">
-                  {topic.status === 'Khoa đã duyệt' && (
-                    <>
-                      <button
-                        onClick={() => handleApprove(topic.id)}
-                        className="p-2 text-green-600 hover:bg-green-100 rounded-full"
-                        title="Chấp nhận"
-                      >
-                        <FaCheck className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleReject(topic.id)}
-                        className="p-2 text-red-600 hover:bg-red-100 rounded-full"
-                        title="Hủy"
-                      >
-                        <FaTimes className="w-5 h-5" />
-                      </button>
-                    </>
-                  )}
-                  <button
-                    onClick={() => handleViewDetails(topic)}
-                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
-                    title="Xem chi tiết"
-                  >
-                    <FaEye className="w-5 h-5" />
-                  </button>
-                </div>
-              </td>
+    <div className="container mx-auto p-6">
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <table className="w-full table-auto">
+          <thead>
+            <tr className="bg-gray-100 border-b">
+              <th className="text-left py-3 px-4 font-semibold">Tên Đề Tài</th>
+              <th className="text-left py-3 px-4 font-semibold">Mã Hồ Sơ</th>
+              <th className="text-left py-3 px-4 font-semibold">Mô Tả</th>
+              <th className="text-left py-3 px-4 font-semibold">
+                Loại Hình Nghiên Cứu
+              </th>
+              <th className="text-right py-3 px-4 font-semibold">Hành Động</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {topics.map((topic) => (
+              <tr
+                key={topic.MaDeTaiNCKHGV}
+                className="border-b hover:bg-gray-50"
+              >
+                <td className="py-3 px-4">{topic.TenDeTai}</td>
+                <td className="py-3 px-4">{topic.MaHoSo}</td>
+                <td className="py-3 px-4">{topic.MoTa}</td>
+                <td className="py-3 px-4">
+                  <span className="px-2 py-1 rounded-full text-sm text-blue-600">
+                    {getLoaiHinhName(topic.MaLoaiHinhNCKH)}
+                  </span>
+                </td>
+                <td className="py-3 px-4 text-right">
+                  <div className="flex justify-end space-x-2">
+                    {/* Icon mắt để xem chi tiết */}
+                    <button
+                      onClick={() => handleViewDetails(topic)}
+                      className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
+                      title="Xem chi tiết"
+                    >
+                      <FaEye className="w-5 h-5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-      {/* Detail View Modal */}
-      {selectedTopic && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full shadow-lg">
-            <h2 className="text-2xl font-bold mb-4 text-center">{selectedTopic.name}</h2>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
-                <h3 className="font-semibold">Student Details</h3>
-                <div className="max-h-40 overflow-y-auto">
-                  {selectedTopic.students.map((student, index) => (
-                    <div key={student.id}>
-                      <p><strong>ID:</strong> {student.id}</p>
-                      <p><strong>Name:</strong> {student.name}</p>
+        {/* Modal xem chi tiết */}
+        {selectedTopic && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg p-8 max-w-lg w-full shadow-lg max-h-[80vh] overflow-y-auto">
+              <h2 className="text-2xl font-bold text-center mb-6">
+                {selectedTopic.TenDeTai}
+              </h2>
+
+              {/* Hiển thị thông tin chi tiết đề tài */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Mã Hồ Sơ
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedTopic.MaHoSo}
+                    onChange={(e) =>
+                      setSelectedTopic({
+                        ...selectedTopic,
+                        MaHoSo: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-2 border rounded-md"
+                    disabled={!isEditing}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Mô Tả
+                  </label>
+                  <textarea
+                    value={selectedTopic.MoTa}
+                    onChange={(e) =>
+                      setSelectedTopic({
+                        ...selectedTopic,
+                        MoTa: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-2 border rounded-md"
+                    disabled={!isEditing}
+                  />
+                </div>
+
+                <div>
+  <label className="block text-sm font-medium text-gray-600">
+    Loại Hình Nghiên Cứu
+  </label>
+  <select
+    value={selectedTopic.MaLoaiHinhNCKH} // Mặc định là loại hình của đề tài
+    onChange={(e) =>
+      setSelectedTopic({
+        ...selectedTopic,
+        MaLoaiHinhNCKH: e.target.value, // Cập nhật loại hình khi chọn
+      })
+    }
+    className="w-full px-4 py-2 border rounded-md bg-gray-100"
+    disabled={!isEditing} // Nếu không phải chế độ chỉnh sửa, không cho chọn
+  >
+    {/* Lặp qua tất cả các loại hình để tạo option */}
+    {loaiHinhDetails.map((loaiHinh) => (
+      <option key={loaiHinh.MaLoaiHinhNCKH} value={loaiHinh.MaLoaiHinhNCKH}>
+        {loaiHinh.TenLoaiHinh}
+      </option>
+    ))}
+  </select>
+</div>
+
+
+                {/* Hiển thị thông tin hồ sơ */}
+                {hoSoDetails && (
+                  <>
+          
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Ngày Nộp Hồ Sơ
+                      </label>
+                      <input
+                        type="date"
+                        value={hoSoDetails.NgayNop}
+                        onChange={(e) =>
+                          setHoSoDetails({
+                            ...hoSoDetails,
+                            NgayNop: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border rounded-md"
+                        disabled={!isEditing}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Trạng Thái Hồ Sơ
+                      </label>
                       <input
                         type="text"
-                        name="name"
-                        value={student.name}
-                        onChange={(e) => handleStudentInputChange(e, index)}
-                        className="border p-1 rounded mt-2 w-full"
+                        value={hoSoDetails.TrangThai}
+                        onChange={(e) =>
+                          setHoSoDetails({
+                            ...hoSoDetails,
+                            TrangThai: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border rounded-md"
+                        disabled={!isEditing}
                       />
-                      <button onClick={() => handleStudentDetail(student)} className="text-blue-500 mt-2">View Full Details</button>
-                      <hr className="my-2" />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Tệp Hồ Sơ
+                      </label>
+                      <input
+                        type="file"
+                        onChange={(e) =>
+                          setHoSoDetails({
+                            ...hoSoDetails,
+                            FileHoSo: e.target.files[0]?.name,
+                          })
+                        }
+                        className="w-full px-4 py-2 border rounded-md"
+                        disabled={!isEditing}
+                      />
+                      {hoSoDetails.FileHoSo && (
+                        <a
+                          href={`/path/to/hoso/${hoSoDetails.FileHoSo}`}
+                          target="_blank"
+                          className="text-blue-600"
+                        >
+                          {hoSoDetails.FileHoSo}
+                        </a>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* Hiển thị thông tin nhóm nghiên cứu */}
+                {nhomNCKHDetails &&
+                  nhomNCKHDetails.map((nhom) => (
+                    <div key={nhom.MaNhomNCKHGV}>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">
+                          Mã Nhóm NCKH
+                        </label>
+                        <input
+                          type="text"
+                          value={nhom.MaNhomNCKHGV}
+                          onChange={(e) => {
+                            const updatedNhom = [...nhomNCKHDetails];
+                            updatedNhom[nhomNCKHDetails.indexOf(nhom)] = {
+                              ...nhom,
+                              MaNhomNCKHGV: e.target.value,
+                            };
+                            setNhomNCKHDetails(updatedNhom);
+                          }}
+                          className="w-full px-4 py-2 border rounded-md"
+                          disabled={!isEditing}
+                        />
+                      </div>
                     </div>
                   ))}
+                {/* Hiển thị thông tin giảng viên */}
+                {giangVienDetails &&
+                  giangVienDetails.map((giangVien) => (
+                    <div key={giangVien.MaGV}>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">
+                          Giảng Viên
+                        </label>
+                        <input
+                          type="text"
+                          value={giangVien.HoTenGV}
+                          onChange={(e) => {
+                            const updatedGiangVien = [...giangVienDetails];
+                            updatedGiangVien[
+                              giangVienDetails.indexOf(giangVien)
+                            ] = { ...giangVien, HoTenGV: e.target.value };
+                            setGiangVienDetails(updatedGiangVien);
+                          }}
+                          className="w-full px-4 py-2 border rounded-md"
+                          disabled={!isEditing}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          value={giangVien.EmailGV}
+                          onChange={(e) => {
+                            const updatedGiangVien = [...giangVienDetails];
+                            updatedGiangVien[
+                              giangVienDetails.indexOf(giangVien)
+                            ] = { ...giangVien, EmailGV: e.target.value };
+                            setGiangVienDetails(updatedGiangVien);
+                          }}
+                          className="w-full px-4 py-2 border rounded-md"
+                          disabled={!isEditing}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">
+                          Địa chỉ
+                        </label>
+                        <input
+                          type="text"
+                          value={giangVien.DiaChiGV}
+                          onChange={(e) => {
+                            const updatedGiangVien = [...giangVienDetails];
+                            updatedGiangVien[
+                              giangVienDetails.indexOf(giangVien)
+                            ] = { ...giangVien, DiaChiGV: e.target.value };
+                            setGiangVienDetails(updatedGiangVien);
+                          }}
+                          className="w-full px-4 py-2 border rounded-md"
+                          disabled={!isEditing}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">
+                          Ngày sinh
+                        </label>
+                        <input
+                          type="date"
+                          value={giangVien.NgaySinhGV}
+                          onChange={(e) => {
+                            const updatedGiangVien = [...giangVienDetails];
+                            updatedGiangVien[
+                              giangVienDetails.indexOf(giangVien)
+                            ] = { ...giangVien, NgaySinhGV: e.target.value };
+                            setGiangVienDetails(updatedGiangVien);
+                          }}
+                          className="w-full px-4 py-2 border rounded-md"
+                          disabled={!isEditing}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">
+                          Điểm NCKH
+                        </label>
+                        <input
+                          type="number"
+                          value={giangVien.DiemNCKH}
+                          onChange={(e) => {
+                            const updatedGiangVien = [...giangVienDetails];
+                            updatedGiangVien[
+                              giangVienDetails.indexOf(giangVien)
+                            ] = { ...giangVien, DiemNCKH: e.target.value };
+                            setGiangVienDetails(updatedGiangVien);
+                          }}
+                          className="w-full px-4 py-2 border rounded-md"
+                          disabled={!isEditing}
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                {/* Nút chỉnh sửa */}
+                <div className="text-center">
+                  {!isEditing && (
+                    <button
+                      onClick={handleEdit}
+                      className="p-2 mt-4 bg-blue-500 text-white rounded"
+                      title="Chỉnh sửa thông tin"
+                    >
+                      <FaEdit className="inline-block mr-2" />
+                      Chỉnh Sửa
+                    </button>
+                  )}
                 </div>
               </div>
 
-              <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
-                <h3 className="font-semibold">Advisor Details</h3>
-                <p><strong>ID:</strong> {selectedTopic.advisor.id}</p>
-                <p><strong>Name:</strong> {selectedTopic.advisor.name}</p>
-                <button onClick={handleAdvisorDetail} className="text-blue-500 mt-2">View Full Details</button>
-              </div>
-            </div>
-
-            <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
-              <h3 className="font-semibold">Research Plan Details</h3>
-              <p><strong>Plan ID:</strong> {selectedTopic.researchPlan.planId}</p>
-              <p><strong>Description:</strong> {selectedTopic.researchPlan.description}</p>
-              <p><strong>Start Date:</strong> {selectedTopic.researchPlan.startDate}</p>
-              <p><strong>End Date:</strong> {selectedTopic.researchPlan.endDate}</p>
-            </div>
-
-            <div className="mt-4 flex justify-center space-x-4">
-              <button
-                onClick={() => handleEdit(selectedTopic)}
-                className="h-10 px-4 bg-yellow-500 text-white rounded transition duration-300 ease-in-out hover:bg-yellow-600"
-              >
-                Edit Topic
-              </button>
-              <button
-                onClick={() => handleDelete(selectedTopic.id)}
-                className="h-10 px-4 bg-red-500 text-white rounded transition duration-300 ease-in-out hover:bg-red-600"
-              >
-                Delete Topic
-              </button>
-              <button
-                onClick={closeDetailView}
-                className="h-10 px-4 bg-blue-500 text-white rounded"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Topic Modal */}
-      {isEditing && editedTopic && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 mt-6">
-    <div className="bg-white rounded-lg p-6 max-w-3xl w-full h-[80vh] overflow-y-auto shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">Edit Topic</h2>
-      <form onSubmit={handleUpdate} className="space-y-6">
-
-        {/* Thông tin đề tài */}
-        <div className="border-b-2 border-gray-400 pb-4">
-          <h3 className="text-xl font-semibold mb-2">Topic Information</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Topic Name</label>
-              <input
-                type="text"
-                name="name"
-                value={editedTopic.name}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Description</label>
-              <textarea
-                name="description"
-                value={editedTopic.description}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Chỉnh sửa thông tin sinh viên */}
-        <div className="border-b-2 border-gray-400 pb-4 my-4">
-          <h3 className="text-xl font-semibold mb-2">Student Details</h3>
-          <div className="space-y-4">
-            {editedTopic.students.map((student, index) => (
-              <div key={student.id} className="border-2 border-gray-400 rounded-lg p-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium">Student ID</label>
-                    <input
-                      type="text"
-                      name="id"
-                      value={student.id}
-                      readOnly
-                      className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">Student Name</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={student.name}
-                      onChange={(e) => handleStudentInputChange(e, index)}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">Birth Date</label>
-                    <input
-                      type="date"
-                      name="birthDate"
-                      value={student.birthDate}
-                      onChange={(e) => handleStudentInputChange(e, index)}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">Phone</label>
-                    <input
-                      type="text"
-                      name="phone"
-                      value={student.phone}
-                      onChange={(e) => handleStudentInputChange(e, index)}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={student.email}
-                      onChange={(e) => handleStudentInputChange(e, index)}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">Major</label>
-                    <input
-                      type="text"
-                      name="major"
-                      value={student.major}
-                      onChange={(e) => handleStudentInputChange(e, index)}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
+              {/* Modal chỉnh sửa */}
+              {isEditing && editedTopic && (
+                <div className="mt-6">
+                  <div className="space-y-4">
+                    {/* Lưu và hủy */}
+                    <div className="flex justify-end space-x-4 mt-4">
+                      <button
+                        onClick={handleCancel}
+                        className="p-2 bg-gray-500 text-white rounded"
+                      >
+                        Hủy
+                      </button>
+                      <button className="p-2 bg-blue-600 text-white rounded">
+                        Lưu
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Chỉnh sửa thông tin giảng viên hướng dẫn */}
-        <div className="border-b-2 border-gray-400 pb-4 my-4">
-          <h3 className="text-xl font-semibold mb-2">Advisor Details</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium">Advisor ID</label>
-              <input
-                type="text"
-                name="advisorId"
-                value={editedTopic.advisor.id}
-                readOnly
-                className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Advisor Name</label>
-              <input
-                type="text"
-                name="advisorName"
-                value={editedTopic.advisor.name}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Department</label>
-              <input
-                type="text"
-                name="department"
-                value={editedTopic.advisor.department}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Email</label>
-              <input
-                type="email"
-                name="advisorEmail"
-                value={editedTopic.advisor.email}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Phone</label>
-              <input
-                type="text"
-                name="advisorPhone"
-                value={editedTopic.advisor.phone}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
+              )}
             </div>
           </div>
-        </div>
-
-        {/* Chỉnh sửa kế hoạch nghiên cứu */}
-        <div className="border-t-2 border-gray-400 pt-4 my-4">
-          <h3 className="text-xl font-semibold mb-2">Research Plan Details</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium">Plan ID</label>
-              <input
-                type="text"
-                name="planId"
-                value={editedTopic.researchPlan.planId}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Description</label>
-              <textarea
-                name="description"
-                value={editedTopic.researchPlan.description}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Start Date</label>
-              <input
-                type="date"
-                name="startDate"
-                value={editedTopic.researchPlan.startDate}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">End Date</label>
-              <input
-                type="date"
-                name="endDate"
-                value={editedTopic.researchPlan.endDate}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-600 my-4 w-full"></div> 
-        <div className="flex justify-center space-x-10">
-          <button type="submit" className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg transition duration-300 ease-in-out hover:bg-blue-700">
-            Update
-          </button>
-          <button
-            onClick={() => setIsEditing(false)}
-            className="w-full px-4 py-2 bg-red-600 text-white rounded-lg transition duration-300 ease-in-out hover:bg-red-700"
-          >
-            Cancel
-          </button>
-          
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-
-      {/* Student Detail Modal */}
-      {showStudentDetail && selectedStudent && (
-        <StudentDetailModal student={selectedStudent} onClose={() => setShowStudentDetail(false)} />
-      )}
-
-      {/* Advisor Detail Modal */}
-      {showAdvisorDetail && selectedTopic && (
-        <AdvisorDetailModal advisor={selectedTopic.advisor} onClose={() => setShowAdvisorDetail(false)} />
-      )}
+        )}
+      </div>
     </div>
   );
 };
