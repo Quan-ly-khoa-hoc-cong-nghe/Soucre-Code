@@ -18,7 +18,9 @@ class TacGiaGiangVien {
 
         // Ràng buộc dữ liệu
 
+
         $stmt->bindParam(":MaBaiBao", $this->MaBaiBao);
+
 
         $stmt->bindParam(":MaGV", $this->MaGV);
         $stmt->bindParam(":VaiTro", $this->VaiTro);
@@ -38,7 +40,9 @@ class TacGiaGiangVien {
     public function update() {
 
 
+
         $query = "UPDATE " . $this->table_name . " SET VaiTro=:VaiTro WHERE MaBaiBao=:MaBaiBao AND MaGV=:MaGV";
+
 
         $stmt = $this->conn->prepare($query);
 

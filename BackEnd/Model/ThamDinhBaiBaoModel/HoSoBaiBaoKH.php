@@ -6,6 +6,7 @@ class HoSoBaiBaoKH {
     public $MaHoSo;
     public $TrangThai;
     public $NgayNop;
+    public $fileHoSo;
     public $MaKhoa;
 
     public function __construct($db) {
@@ -36,13 +37,14 @@ class HoSoBaiBaoKH {
         // Tạo mã hồ sơ tự động
         $this->MaHoSo = $this->generateMaHoSo();
 
-        $query = "INSERT INTO " . $this->table_name . " SET MaHoSo=:MaHoSo, TrangThai=:TrangThai, NgayNop=:NgayNop, MaKhoa=:MaKhoa";
+        $query = "INSERT INTO " . $this->table_name . " SET MaHoSo=:MaHoSo, TrangThai=:TrangThai, NgayNop=:NgayNop, fileHoSo:= fileHoSo, MaKhoa=:MaKhoa";
         $stmt = $this->conn->prepare($query);
 
         // Ràng buộc dữ liệu
         $stmt->bindParam(":MaHoSo", $this->MaHoSo);
         $stmt->bindParam(":TrangThai", $this->TrangThai);
         $stmt->bindParam(":NgayNop", $this->NgayNop);
+        $stmt->bindParam("fileHoSo", $this->fileHoSo);
         $stmt->bindParam(":MaKhoa", $this->MaKhoa);
 
         return $stmt->execute();
@@ -58,13 +60,14 @@ class HoSoBaiBaoKH {
 
     // Cập nhật hồ sơ bài báo
     public function update() {
-        $query = "UPDATE " . $this->table_name . " SET TrangThai=:TrangThai, NgayNop=:NgayNop, MaKhoa=:MaKhoa WHERE MaHoSo=:MaHoSo";
+        $query = "UPDATE " . $this->table_name . " SET TrangThai=:TrangThai, NgayNop=:NgayNop, fileHoSo:=fileHoSo, MaKhoa=:MaKhoa WHERE MaHoSo=:MaHoSo";
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":MaHoSo", $this->MaHoSo);
         $stmt->bindParam(":TrangThai", $this->TrangThai);
         $stmt->bindParam(":NgayNop", $this->NgayNop);
         $stmt->bindParam(":MaKhoa", $this->MaKhoa);
+        $stmt->bindParam("fileHoSo", $this->fileHoSo);
 
         return $stmt->execute();
     }
