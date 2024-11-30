@@ -38,7 +38,7 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaHoSo, $data->TrangThai, $data->MaNguoiDung, $data->NgayNop, $data->MaTacGia, $data->MaKhoa)) {
+        if (!isset($data->MaHoSo, $data->TrangThai, $data->MaNguoiDung, $data->NgayNop, $data->fileHoSo, $data->MaKhoa)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
@@ -47,7 +47,7 @@ switch ($method) {
         $hosobaibao->MaHoSo = $data->MaHoSo;
         $hosobaibao->TrangThai = $data->TrangThai;
         $hosobaibao->NgayNop = $data->NgayNop;
-        $hosobaibao->MaTacGia = $data->MaTacGia;
+        $hosobaibao->fileHoSo = $data-> fileHoSo;
         $hosobaibao->MaKhoa = $data->MaKhoa;
 
         if ($hosobaibao->add()) {
@@ -66,7 +66,7 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaHoSo, $data->TrangThai, $data->MaNguoiDung, $data->NgayNop, $data->MaTacGia, $data->MaKhoa)) {
+        if (!isset($data->MaHoSo, $data->TrangThai, $data->MaNguoiDung, $data->NgayNop, $data->fileHoSo, $data->MaKhoa)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
@@ -75,7 +75,7 @@ switch ($method) {
         $hosobaibao->MaHoSo = $data->MaHoSo;
         $hosobaibao->TrangThai = $data->TrangThai;
         $hosobaibao->NgayNop = $data->NgayNop;
-        $hosobaibao->MaTacGia = $data->MaTacGia;
+        $hosobaibao->fileHoSo = $data->fileHoSo;
         $hosobaibao->MaKhoa = $data->MaKhoa;
 
         if ($hosobaibao->update()) {
