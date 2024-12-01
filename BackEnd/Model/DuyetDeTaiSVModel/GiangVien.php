@@ -30,9 +30,10 @@ class GiangVien {
     // Thêm giảng viên
     public function add() {
         try {
-            $sql = "INSERT INTO " . $this->table_name . " (HoTenGV, NgaySinhGV, EmailGV, DiaChiGV, DiemNCKH, MaKhoa) 
-                    VALUES (:hoTenGV, :ngaySinhGV, :emailGV, :diaChiGV, :diemNCKH, :maKhoa)";
+            $sql = "INSERT INTO " . $this->table_name . " (MaGV, HoTenGV, NgaySinhGV, EmailGV, DiaChiGV, DiemNCKH, MaKhoa) 
+                    VALUES (:MaGV, :hoTenGV, :ngaySinhGV, :emailGV, :diaChiGV, :diemNCKH, :maKhoa)";
             $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':MaGV', $this->MaGV);
             $stmt->bindParam(':hoTenGV', $this->HoTenGV);
             $stmt->bindParam(':ngaySinhGV', $this->NgaySinhGV);
             $stmt->bindParam(':emailGV', $this->EmailGV);

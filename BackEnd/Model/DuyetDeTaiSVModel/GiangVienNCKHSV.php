@@ -4,6 +4,8 @@ class GiangVienNCKHSV {
     private $table_name = "GiangVienNCKHSV"; // Sửa tên bảng cho đúng
 
     public $MaNhomNCKHSV;
+
+    public $VaiTro;
     public $MaGV;
     public $VaiTro;  // Thêm VaiTro vào model
 
@@ -26,9 +28,11 @@ class GiangVienNCKHSV {
     // Thêm dữ liệu mới
     public function add() {
         try {
-            $sql = "INSERT INTO " . $this->table_name . " (MaNhomNCKHSV, MaGV, VaiTro) VALUES (:maNhomNCKHSV, :maGV, :vaiTro)";
+            // Không cần MaNhomNCKHSV vì nó là khóa phụ
+            $sql = "INSERT INTO " . $this->table_name . " (MaNhomNCKHSV,VaiTro, MaGV) VALUES (:maNhomNCKHSV, :maGV)";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':maNhomNCKHSV', $this->MaNhomNCKHSV);
+            $stmt->bindParam(':VaiTro', $this->VaiTro);
             $stmt->bindParam(':maGV', $this->MaGV);
             $stmt->bindParam(':vaiTro', $this->VaiTro);  // Thêm VaiTro vào bind
             return $stmt->execute();
@@ -40,11 +44,12 @@ class GiangVienNCKHSV {
     // Cập nhật dữ liệu
     public function update() {
         try {
-            $sql = "UPDATE " . $this->table_name . " SET MaGV = :maGV, VaiTro = :vaiTro WHERE MaNhomNCKHSV = :maNhomNCKHSV";
+            $sql = "UPDATE " . $this->table_name . " SET VaiTro =: VaiTro, MaGV = :maGV WHERE MaNhomNCKHSV = :maNhomNCKHSV";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':maGV', $this->MaGV);
             $stmt->bindParam(':vaiTro', $this->VaiTro);  // Thêm VaiTro vào bind
             $stmt->bindParam(':maNhomNCKHSV', $this->MaNhomNCKHSV);
+            $stmt->bindParam('VaiTro', $this->VaiTro);
             return $stmt->execute();
         } catch (PDOException $e) {
             return ["error" => "Lỗi: " . $e->getMessage()];

@@ -49,25 +49,10 @@ const ApplicationApprovalList = () => {
 
   const handleEdit = (application) => {
     setEditFormData({ ...application });
-    setIsEditModalOpen(true); // Mở modal chỉnh sửa
+    setIsEditModalOpen(true); // Open edit modal
   };
 
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    axios
-      .post(
-        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/HoSoNCKHSV_Api.php?action=update",
-        editFormData
-      )
-      .then((response) => {
-        alert(response.data.message || "Application updated successfully!");
-        setIsEditModalOpen(false);
-        fetchApplications(); // Refresh the list
-      })
-      .catch((error) => {
-        console.error("Error updating application:", error);
-      });
-  };
+
 
   const handleDelete = (maHoSo) => {
     if (window.confirm("Are you sure you want to delete this application?")) {
@@ -103,6 +88,12 @@ const ApplicationApprovalList = () => {
       });
   };
 
+  // Helper function to get department name by MaKhoa
+  const getDepartmentName = (maKhoa) => {
+    const department = departments.find((dept) => dept.MaKhoa === maKhoa);
+    return department ? department.TenKhoa : "Unknown Department";
+  };
+
   return (
     <div className="bg-white shadow-lg rounded-lg p-6">
       <button
@@ -118,6 +109,7 @@ const ApplicationApprovalList = () => {
             <th className="px-4 py-2 border">Submission Date</th>
             <th className="px-4 py-2 border">File</th>
             <th className="px-4 py-2 border">Status</th>
+            <th className="px-4 py-2 border">Department</th> {/* Changed to display department name */}
             <th className="px-4 py-2 border">Actions</th>
           </tr>
         </thead>
@@ -151,6 +143,9 @@ const ApplicationApprovalList = () => {
                   </span>
                 </td>
                 <td className="px-4 py-2 border">
+                  {getDepartmentName(app.MaKhoa)} {/* Display department name */}
+                </td>
+                <td className="px-4 py-2 border">
                   <button
                     className="text-blue-500 hover:underline mr-2"
                     onClick={() => handleEdit(app)}
@@ -168,10 +163,7 @@ const ApplicationApprovalList = () => {
             ))
           ) : (
             <tr>
-              <td
-                colSpan="5"
-                className="px-4 py-2 border text-center text-gray-500"
-              >
+              <td colSpan="6" className="px-4 py-2 border text-center text-gray-500">
                 No applications found.
               </td>
             </tr>
@@ -187,9 +179,7 @@ const ApplicationApprovalList = () => {
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Application ID
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Application ID</label>
                   <input
                     type="text"
                     value={createFormData.MaHoSo}
@@ -203,9 +193,7 @@ const ApplicationApprovalList = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Submission Date
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Submission Date</label>
                   <input
                     type="date"
                     value={createFormData.NgayNop}
@@ -233,20 +221,6 @@ const ApplicationApprovalList = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">File Name</label>
-                  <input
-                    type="text"
-                    value={createFormData.FileHoSo}
-                    onChange={(e) =>
-                      setCreateFormData((prev) => ({
-                        ...prev,
-                        FileHoSo: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg"
-                  />
-                </div>
-                <div>
                   <label className="block text-sm font-medium mb-1">Department</label>
                   <select
                     value={createFormData.MaKhoa}
@@ -266,110 +240,31 @@ const ApplicationApprovalList = () => {
                     ))}
                   </select>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">File</label>
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      setCreateFormData((prev) => ({
+                        ...prev,
+                        FileHoSo: e.target.files[0].name,
+                      }))
+                    }
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
               </div>
-              <div className="flex justify-end mt-6">
+              <div className="flex justify-end mt-4">
                 <button
                   type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
+                  className="bg-blue-500 text-white px-6 py-2 rounded-lg"
                 >
-                  Save
+                  Add Application
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">Edit Application</h2>
-            <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Submission Date
-                  </label>
-                  <input
-                    type="date"
-                    value={editFormData.NgayNop || ""}
-                    onChange={(e) =>
-                      setEditFormData((prev) => ({
-                        ...prev,
-                        NgayNop: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Status</label>
-                  <input
-                    type="text"
-                    value={editFormData.TrangThai || ""}
-                    onChange={(e) =>
-                      setEditFormData((prev) => ({
-                        ...prev,
-                        TrangThai: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">File Name</label>
-                  <input
-                    type="text"
-                    value={editFormData.FileHoSo || ""}
-                    onChange={(e) =>
-                      setEditFormData((prev) => ({
-                        ...prev,
-                        FileHoSo: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Department</label>
-                  <select
-                    value={editFormData.MaKhoa || ""}
-                    onChange={(e) =>
-                      setEditFormData((prev) => ({
-                        ...prev,
-                        MaKhoa: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg"
-                  >
-                    <option value="">Select Department</option>
-                    {departments.map((department) => (
-                      <option key={department.MaKhoa} value={department.MaKhoa}>
-                        {department.TenKhoa}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="flex justify-end mt-6">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                  className="ml-4 bg-gray-200 text-gray-700 px-6 py-2 rounded-lg"
                 >
                   Cancel
                 </button>

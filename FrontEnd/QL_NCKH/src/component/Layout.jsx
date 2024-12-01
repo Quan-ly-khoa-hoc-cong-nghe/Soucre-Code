@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   FaUser,
   FaMusic,
-  FaList,
-  FaGift,
-  FaUpload,
+  FaLaptopCode,
+  FaBox,
+  FaUserFriends,
   FaComment,
   FaChartBar,
   FaBars,
@@ -12,7 +12,15 @@ import {
   FaSignOutAlt,
   FaBook,
   FaClipboardList,
+  FaTachometerAlt,
+  FaUserEdit,
+  FaUserPlus,
+  FaRegHandshake,
+  FaCheckCircle,
+  FaClipboardCheck,
+  FaUserCircle,
 } from "react-icons/fa";
+
 import { GoBell } from "react-icons/go";
 import { CiUser } from "react-icons/ci";
 import { Link } from "react-router-dom";
@@ -83,20 +91,11 @@ const Layout = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
-                to="/admin/article-review"
-                className="flex items-center space-x-3"
-              >
-                <FaBook />
-                <span className="font-semibold">Article Review</span>
-              </Link>
-            </li>
-            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-              <Link
                 to="/admin/lecturer-topic-approval"
                 className="flex items-center space-x-3"
               >
                 <FaClipboardList />
-                <span className="font-semibold">Lecturer Topic Approva</span>
+                <span className="font-semibold">Chi tiết đề tài GV</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -105,7 +104,7 @@ const Layout = ({ children }) => {
                 className="flex items-center space-x-3"
               >
                 <FaClipboardList />
-                <span className="font-semibold">Student Topic Approval</span>
+                <span className="font-semibold">Chi tiết đề tài SV</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -113,8 +112,8 @@ const Layout = ({ children }) => {
                 to="/admin/science-seminar"
                 className="flex items-center space-x-3"
               >
-                <FaGift />
-                <span className="font-semibold"> Science Seminar</span>
+                <FaLaptopCode />
+                <span className="font-semibold"> hội thảo khoa học</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -122,8 +121,8 @@ const Layout = ({ children }) => {
                 to="/admin/edit-student"
                 className="flex items-center space-x-3"
               >
-                <FaUpload />
-                <span className="font-semibold">Edir Student</span>
+                <FaUserFriends />
+                <span className="font-semibold">Chỉnh nhóm sinh viên</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -131,8 +130,8 @@ const Layout = ({ children }) => {
                 to="/admin/product-manager"
                 className="flex items-center space-x-3"
               >
-                <FaComment />
-                <span className="font-semibold">Product Manager</span>
+                <FaBox />
+                <span className="font-semibold">Quan ý sản phẩm sinh viên</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -140,8 +139,10 @@ const Layout = ({ children }) => {
                 to="/admin/application-approval"
                 className="flex items-center space-x-3"
               >
-                <FaComment />
-                <span className="font-semibold">Duyệt hồ sơ SV Role khoa</span>
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ NCKHSV Role khoa
+                </span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -149,9 +150,9 @@ const Layout = ({ children }) => {
                 to="/admin/application-approval-admin"
                 className="flex items-center space-x-3"
               >
-                <FaComment />
+                <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ thêm đề tài role KHCN
+                  Duyệt hồ sơ thêm đề tài role KHCNSV
                 </span>
               </Link>
             </li>
@@ -160,8 +161,10 @@ const Layout = ({ children }) => {
                 to="/admin/lecturer-application-approval-admin"
                 className="flex items-center space-x-3"
               >
-                <FaComment />
-                <span className="font-semibold">Duyệt hồ sơ GV role KHCN</span>
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ NCKHGV role KHCN
+                </span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -169,8 +172,10 @@ const Layout = ({ children }) => {
                 to="/admin/lecturer-application-approval-list-admin"
                 className="flex items-center space-x-3"
               >
-                <FaComment />
-                <span className="font-semibold">Duyệt hồ sơ GV role khoa </span>
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ NCKHGV role khoa
+                </span>
               </Link>
             </li>
 
@@ -179,8 +184,10 @@ const Layout = ({ children }) => {
                 to="/admin/science-seminar-departments"
                 className="flex items-center space-x-3"
               >
-                <FaComment />
-                <span className="font-semibold">Duyệt hồ sơ hội thảo role khoa</span>
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ hội thảo role khoa
+                </span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -188,8 +195,52 @@ const Layout = ({ children }) => {
                 to="/admin/science-seminar-sciTech"
                 className="flex items-center space-x-3"
               >
-                <FaComment />
-                <span className="font-semibold">Duyệt hồ sơ và thêm hội thảo</span>
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ và thêm hội thảo
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/admin/article-review-department"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ bài báo role Khoa{" "}
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/admin/article-review-scitech"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ thêm bài báo role KHCN
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/admin/approval-of-school-topic-department"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ DTCS role khoa
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/admin/approval-of-school-topic-sciTech"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">Duyệt hồ sơ và thêm DTCS</span>
               </Link>
             </li>
             <hr className="border-gray-400 my-4" />

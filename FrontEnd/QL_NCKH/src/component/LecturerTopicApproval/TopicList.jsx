@@ -23,7 +23,11 @@ const TopicList = () => {
 
     fetchData();
   }, []);
-
+  const handleClose = () => {
+    setSelectedTopic(null); // Hoặc cách khác để ẩn modal, tùy thuộc vào trạng thái bạn đang dùng
+    setIsEditing(false); // Nếu bạn muốn tắt chế độ chỉnh sửa khi đóng modal
+  };
+  
   // Lấy danh sách đề tài
   const fetchTopics = async () => {
     const response = await fetch(
@@ -133,6 +137,7 @@ const TopicList = () => {
       <div className="bg-white rounded-lg shadow-lg p-6">
         <table className="w-full table-auto">
           <thead>
+            
             <tr className="bg-gray-100 border-b">
               <th className="text-left py-3 px-4 font-semibold">Tên Đề Tài</th>
               <th className="text-left py-3 px-4 font-semibold">Mã Hồ Sơ</th>
@@ -450,7 +455,15 @@ const TopicList = () => {
                       <FaEdit className="inline-block mr-2" />
                       Chỉnh Sửa
                     </button>
+                    
                   )}
+                  <button
+    onClick={handleClose}  // Hàm này sẽ gọi để đóng modal
+    className="p-2 mt-4 bg-gray-500 text-white rounded ml-4"
+    title="Đóng"
+  >
+    Đóng
+  </button>
                 </div>
               </div>
 

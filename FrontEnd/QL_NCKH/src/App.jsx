@@ -21,7 +21,10 @@ import LayoutDepartment from './component/LayoutDepartment';
 import LayoutSciTech from './component/LayoutSciTech';
 import ScienceSeminardepartments from './component/ScienceSeminar/ScienceSeminardepartments';
 import ScienceSeminarSciTech from './component/ScienceSeminar/ScienceSeminarSciTech';
-
+import ListArticleReviewDepartment from './component/ArticleReview/ListArticleReviewDepartment';
+import ListArticleReviewSciTech from './component/ArticleReview/ListArticleReviewSciTech';
+import ApprovalOfSchoolTopicDepartment from './component/School-LevelTopic/ApprovalOfSchoolTopicDepartment';
+import ApprovalOfSchoolTopicSciTech from './component/School-LevelTopic/ApprovalOfSchoolTopicSciTech';
 // Component bảo vệ route
 const PrivateRoute = ({ element, layout: LayoutComponent }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -47,8 +50,13 @@ function App() {
         <Route path="/admin/lecturer-application-approval-admin" element={<PrivateRoute element={<LecturerApplicationApprovalListAdmin />} layout={Layout} />} />
         <Route path="/admin/lecturer-application-approval-list-admin" element={<PrivateRoute element={<LecturerApplicationApprovalList />} layout={Layout} />} />
         <Route path="/admin/science-seminar-departments" element={<PrivateRoute element={<ScienceSeminardepartments/>} layout={Layout} />} />
-        <Route path="/admin/science-seminar-sciTech" element={<PrivateRoute element={<ScienceSeminarSciTech />} layout={Layout} />} />
+        <Route path="/admin/science-seminar-sciTech" element={<PrivateRoute element={< ScienceSeminarSciTech/>} layout={Layout} />} />
+        <Route path="/admin/article-review-department" element={<PrivateRoute element={< ListArticleReviewDepartment/>} layout={Layout} />} />
+        <Route path="/admin/article-review-scitech" element={<PrivateRoute element={< ListArticleReviewSciTech/>} layout={Layout} />} />
+        <Route path="/admin/approval-of-school-topic-department" element={<PrivateRoute element={< ApprovalOfSchoolTopicDepartment/>} layout={Layout} />} />
+        <Route path="/admin/approval-of-school-topic-sciTech" element={<PrivateRoute element={< ApprovalOfSchoolTopicSciTech/>} layout={Layout} />} />
 
+        
         {/* Các route cho LayoutDepartment */}
         <Route path="/department" element={<PrivateRoute element={<Statistics />} layout={LayoutDepartment} />} />
         <Route path="/department/lecturer-topic-approval" element={<PrivateRoute element={<LecturerTopicApproval />} layout={LayoutDepartment} />} />
