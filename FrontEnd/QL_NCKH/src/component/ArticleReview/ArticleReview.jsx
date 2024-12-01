@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ListArticleReview from './ListArticleReview'; 
+import ListArticleReview from './ListArticleReviewDepartment'; 
 
 const ArticleReview = () => {
     const [showForm, setShowForm] = useState(false);
@@ -56,17 +56,8 @@ const ArticleReview = () => {
                             placeholder="Search"
                             className="px-4 py-2 border rounded-lg"
                         />
-                        <button className="px-4 py-2 border rounded-lg">Filters</button>
                     </div>
-                    <button
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center space-x-2"
-                        onClick={() => setShowForm(true)}
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span>New Article</span>
-                    </button>
+                    
                 </div>
 
                 {/* Modal form */}

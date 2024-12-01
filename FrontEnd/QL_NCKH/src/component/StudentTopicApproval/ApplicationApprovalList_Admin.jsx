@@ -4,19 +4,15 @@ import axios from "axios";
 
 const ApplicationApprovalListAdmin = () => {
   const [applications, setApplications] = useState([]);
-  const [departments, setDepartments] = useState([]); // Danh sách Khoa
-  const [studentInfo, setStudentInfo] = useState({}); // Thông tin Sinh Viên
   const [students, setStudents] = useState([]); // Danh sách sinh viên được thêm
-  const [lecturerInfo, setLecturerInfo] = useState({}); // Thông tin Giảng Viên
   const [lecturers, setLecturers] = useState([]); // Danh sách giảng viên được thêm
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedApp, setSelectedApp] = useState(null);
   const [showAddTopicModal, setShowAddTopicModal] = useState(false);
+  const [departments, setDepartments] = useState([]);
   const [files, setFiles] = useState({
     FileHopDong: null,
     FileKeHoach: null,
   });
-  const [loading, setLoading] = useState(false);
   const [tenDeTai, setTenDeTai] = useState("");
   const [moTa, setMoTa] = useState("");
   const [ngayBatDau, setNgayBatDau] = useState("");
@@ -75,111 +71,7 @@ const ApplicationApprovalListAdmin = () => {
       });
   };
 
-  const fetchStudentInfo = (studentId) => {
-    axios
-      .get(
-        `http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SinhVien_Api.php?action=getById&MaSinhVien=${studentId}`
-      ) // Thay MaSV thành MaSinhVien
-      .then((response) => {
-        if (response.data && response.data.SinhVien) {
-          setStudentInfo(response.data.SinhVien);
-        } else {
-          alert("Không tìm thấy thông tin sinh viên!");
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching student info:", error);
-        alert("Có lỗi xảy ra khi tải thông tin sinh viên.");
-      });
-  };
-  const addStudent = (studentId) => {
-    // Kiểm tra trùng lặp ngay khi nhận được mã sinh viên
-    if (students.some((student) => student.MaSinhVien === studentId)) {
-      alert("Sinh viên đã có trong danh sách!");
-      return; // Nếu trùng lặp, dừng lại và không gọi API
-    }
 
-    // Gọi API để lấy thông tin sinh viên nếu không trùng lặp
-    axios
-      .get(
-        `http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SinhVien_Api.php?action=getById&MaSinhVien=${studentId}`
-      )
-      .then((response) => {
-        if (response.data && response.data.SinhVien) {
-          // Sau khi lấy dữ liệu từ API, kiểm tra lại danh sách để tránh trùng lặp
-          if (students.some((student) => student.MaSinhVien === studentId)) {
-            alert("Sinh viên đã có trong danh sách!");
-            return;
-          }
-
-          // Cập nhật danh sách sinh viên nếu không trùng
-          setStudents((prevStudents) => [
-            ...prevStudents,
-            response.data.SinhVien,
-          ]);
-        } else {
-          alert("Không tìm thấy thông tin sinh viên!");
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching student info:", error);
-        alert("Có lỗi xảy ra khi tải thông tin sinh viên.");
-      });
-  };
-
-  const fetchLecturerInfo = (lecturerId) => {
-    axios
-      .get(
-        `http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/GiangVien_Api.php?action=getById&MaGV=${lecturerId}`
-      )
-      .then((response) => {
-        if (response.data && response.data.GiangVien) {
-          setLecturerInfo(response.data.GiangVien); // Cập nhật state lecturerInfo
-        } else {
-          setLecturerInfo({}); // Xóa thông tin cũ nếu không tìm thấy
-          alert("Không tìm thấy thông tin giảng viên!");
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching lecturer info:", error);
-        setLecturerInfo({}); // Xóa thông tin cũ nếu gặp lỗi
-        alert("Có lỗi xảy ra khi tải thông tin giảng viên.");
-      });
-  };
-  const addLecturer = (lecturerId) => {
-    // Kiểm tra trùng lặp ngay khi nhận được mã giảng viên
-    if (lecturers.some((lecturer) => lecturer.MaGV === lecturerId)) {
-      alert("Giảng viên đã có trong danh sách!");
-      return;  // Nếu trùng lặp, dừng lại và không gọi API
-    }
-  
-    // Gọi API để lấy thông tin giảng viên nếu không trùng lặp
-    axios
-      .get(
-        `http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/GiangVien_Api.php?action=getById&MaGV=${lecturerId}`
-      )
-      .then((response) => {
-        if (response.data && response.data.GiangVien) {
-          // Sau khi lấy dữ liệu từ API, kiểm tra lại danh sách để tránh trùng lặp
-          if (lecturers.some((lecturer) => lecturer.MaGV === lecturerId)) {
-            alert("Giảng viên đã có trong danh sách!");
-            return;
-          }
-  
-          // Cập nhật danh sách giảng viên nếu không trùng
-          setLecturers((prevLecturers) => [
-            ...prevLecturers,
-            response.data.GiangVien,
-          ]);
-        } else {
-          alert("Không tìm thấy thông tin giảng viên!");
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching lecturer info:", error);
-        alert("Có lỗi xảy ra khi tải thông tin giảng viên.");
-      });
-  };  
 
   const approveApplication = (app) => {
     const requestData = {
@@ -241,15 +133,7 @@ const ApplicationApprovalListAdmin = () => {
         alert("Đã xảy ra lỗi khi gửi yêu cầu: " + error.message); // Thông báo lỗi khi gặp sự cố
       });
   };
-  const openModal = (app) => {
-    setSelectedApp(app);
-    setIsModalOpen(true);
-  };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedApp(null);
-  };
   const handleAddTopicClick = (app) => {
     setSelectedApp(app); // Lưu hồ sơ được chọn
     setShowAddTopicModal(true);
@@ -355,6 +239,7 @@ const ApplicationApprovalListAdmin = () => {
             <th className="px-4 py-2 border">Submission Date</th>
             <th className="px-4 py-2 border">File</th>
             <th className="px-4 py-2 border">Status</th>
+            <th className="px-4 py-2 border">Department</th> 
             <th className="px-4 py-2 border">Actions</th>
           </tr>
         </thead>
@@ -387,6 +272,12 @@ const ApplicationApprovalListAdmin = () => {
                     {app.TrangThai}
                   </span>
                 </td>
+                <td className="px-4 py-2 border">
+                {
+                  // Tìm tên khoa từ danh sách departments
+                  departments.find((dept) => dept.MaKhoa === app.MaKhoa)?.TenKhoa || "Chưa có"
+                }
+              </td>
                 <td className="py-4 px-2 text-right">
                   <div className="flex justify-end space-x-2">
                     {app.TrangThai !== "Đã duyệt" && app.TrangThai !== "Hủy" ? (
@@ -462,11 +353,10 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={tenDeTai}
-                      onChange={(e) => setTenDeTai(e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">
+                    <label classNaame="block text-sm font-medium mb-1">
                       Mô Tả
                     </label>
                     <textarea
@@ -474,7 +364,6 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={moTa}
-                      onChange={(e) => setMoTa(e.target.value)}
                     />
                   </div>
                   <div>
@@ -485,7 +374,6 @@ const ApplicationApprovalListAdmin = () => {
                       type="file"
                       name="FileHopDong"
                       className="w-full px-4 py-2 border rounded-lg"
-                      onChange={(e) => handleFileUpload(e, "FileHopDong")}
                       required
                     />
                   </div>
@@ -508,7 +396,6 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={ngayBatDau}
-                      onChange={(e) => setNgayBatDau(e.target.value)}
                     />
                   </div>
                   <div>
@@ -534,7 +421,6 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={kinhPhi}
-                      onChange={(e) => setKinhPhi(e.target.value)}
                     />
                   </div>
                   <div>
@@ -565,13 +451,7 @@ const ApplicationApprovalListAdmin = () => {
                     <input
                       type="text"
                       className="w-full px-4 py-2 border rounded-lg"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addStudent(e.target.value); // Thêm sinh viên vào danh sách
-                          e.target.value = ""; // Xóa nội dung ô input sau khi thêm
-                        }
-                      }}
+
                     />
                   </div>
                 </div>
@@ -626,13 +506,7 @@ const ApplicationApprovalListAdmin = () => {
                     <input
                       type="text"
                       className="w-full px-4 py-2 border rounded-lg"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addLecturer(e.target.value); // Thêm giảng viên vào danh sách
-                          e.target.value = ""; // Xóa nội dung ô input sau khi thêm
-                        }
-                      }}
+                     
                     />
                   </div>
                 </div>
@@ -654,11 +528,6 @@ const ApplicationApprovalListAdmin = () => {
                           </span>
                           <button
                             className="text-red-600 hover:underline ml-2"
-                            onClick={() =>
-                              setLecturers((prevLecturers) =>
-                                prevLecturers.filter((_, i) => i !== index)
-                              )
-                            }
                           >
                             Xóa
                           </button>
@@ -678,7 +547,6 @@ const ApplicationApprovalListAdmin = () => {
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  onClick={handleSubmit}
                 >
                   Lưu Đề Tài
                 </button>
@@ -693,39 +561,9 @@ const ApplicationApprovalListAdmin = () => {
           </div>
         </div>
       )}
-      {/* Modal */}
-      {/* {isModalOpen && selectedApp && (
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
-              <h2 className="text-xl font-semibold mb-4">Thêm Đề Tài</h2>
-              <p>
-                <strong>Application ID:</strong> {selectedApp.MaHoSo}
-              </p>
-              <p>
-                <strong>Submission Date:</strong> {selectedApp.NgayNop}
-              </p>
-              <div className="mt-4">
-                <textarea
-                  className="w-full h-32 p-2 border border-gray-300 rounded-lg"
-                  placeholder="Enter topic details here..."
-                ></textarea>
-              </div>
-              <div className="mt-4 flex justify-end space-x-2">
-                <button
-                  onClick={closeModal}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md"
-                >
-                  Close
-                </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
-                  Save Topic
-                </button>
-              </div>
-            </div>
-          </div>
-        )} */}
     </div>
   );
 };
 
 export default ApplicationApprovalListAdmin;
+

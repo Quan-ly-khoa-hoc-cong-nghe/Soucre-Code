@@ -50,6 +50,19 @@ class HoSoBaiBaoKH {
         return $stmt->execute();
     }
 
+    public function updateTrangThai() {
+        try {
+            $sql = "UPDATE " . $this->table_name . " 
+                    SET TrangThai = :trangThai 
+                    WHERE MaHoSo = :maHoSo";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':trangThai', $this->TrangThai);
+            $stmt->bindParam(':maHoSo', $this->MaHoSo);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi: " . $e->getMessage()];
+        }
+    }
     // Lấy tất cả hồ sơ bài báo
     public function getAll() {
         $query = "SELECT * FROM " . $this->table_name;

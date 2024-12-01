@@ -1,4 +1,9 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
+header("Access-Control-Allow-Headers: Content-Type");
+
+
 header("Content-Type: application/json");
 require_once __DIR__. '/../../config/Database.php';
 require_once __DIR__. '/../../Model/ThamDinhBaiBaoModel/HoSoBaiBaoKH.php';
@@ -57,6 +62,23 @@ switch ($method) {
             http_response_code(500);
         }
         break;
+        case 'updateTrangThai':
+            if (!empty($data->MaHoSo) && !empty($data->TrangThai)) {
+                error_log("MaHoSo: " . $data->MaHoSo);  // Log dữ liệu nhận được
+                error_log("TrangThai: " . $data->TrangThai);
+        
+                $hosobaibao->MaHoSo = $data->MaHoSo;
+                $hosobaibao->TrangThai = $data->TrangThai;
+                if ($hosobaibao->updateTrangThai()) {
+                    echo json_encode(['message' => 'Cập nhật trạng thái hồ sơ thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                } else {
+                    echo json_encode(['message' => 'Không thể cập nhật trạng thái hồ sơ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                }
+            } else {
+                echo json_encode(['message' => 'Thiếu mã hồ sơ hoặc trạng thái'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            }
+            break;
+        
 
     case 'PUT':
         if ($action !== "update") {
