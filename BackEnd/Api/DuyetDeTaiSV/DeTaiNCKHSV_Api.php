@@ -190,6 +190,23 @@ switch ($action) {
         }
         break;
 
+    case 'getDetailedInfo': // Action lấy tất cả các đề tài và thông tin chi tiết
+        // Gọi phương thức 'getDetailedInfo' từ model
+        $result = $deTai->getDetailedInfo();
+
+        // Kiểm tra kết quả trả về từ model
+        if (isset($result['error'])) {
+            // Nếu có lỗi truy vấn, trả về lỗi
+            echo json_encode(['error' => $result['error']], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } elseif (isset($result['message'])) {
+            // Nếu không có đề tài nào, trả về thông báo lỗi
+            echo json_encode(['message' => $result['message']], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } else {
+            // Nếu có kết quả, trả về tất cả các đề tài và thông tin đi kèm
+            echo json_encode(['DeTaiNCKHSV' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
+        break;
+
     case 'delete':
         if (!empty($data['MaDeTaiSV'])) {
             $deTai->maDeTaiSV = $data['MaDeTaiSV'];

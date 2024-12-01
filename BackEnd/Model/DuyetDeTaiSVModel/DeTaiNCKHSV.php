@@ -119,6 +119,33 @@ class DeTaiNCKHSV
         }
     }
 
+    public function getDetailedInfo()
+    {
+        try {
+            $query = "SELECT 
+                        DT.TenDeTai, 
+                        GV.HoTenGV, 
+                        DT.TrangThai
+                    FROM " . $this->table_name . " DT
+                    LEFT JOIN NhomNCKHSV N ON DT.MaDeTaiSV = N.MaDeTaiSV
+                    LEFT JOIN GiangVienNCKHSV GVN ON N.MaNhomNCKHSV = GVN.MaNhomNCKHSV
+                    LEFT JOIN GiangVien GV ON GVN.MaGV = GV.MaGV
+                    WHERE GVN.VaiTro = 'Chủ nhiệm'
+                    ORDER BY DT.TenDeTai ASC";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) {
+                return $stmt->fetchAll(PDO::FETCH_ASSOC); // Trả về tất cả các đề tài cùng thông tin đi kèm
+            } else {
+                return ["message" => "Không có đề tài nào"];
+            }
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+        }
+    }
+
     // Xóa đề tài theo mã
     public function delete()
     {

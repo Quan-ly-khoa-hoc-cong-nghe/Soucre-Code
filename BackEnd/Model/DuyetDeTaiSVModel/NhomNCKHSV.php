@@ -94,6 +94,27 @@ class NhomNCKHSV
         }
     }
 
+    // Thêm vào trong class NhomNCKHSV
+    public function getGroupByMaDeTaiSV($maDeTaiSV)
+    {
+        try {
+            $query = "SELECT MaNhomNCKHSV FROM " . $this->table_name . " WHERE MaDeTaiSV = :maDeTaiSV LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":maDeTaiSV", $maDeTaiSV);
+            $stmt->execute();
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($result) {
+                return $result['MaNhomNCKHSV'];  // Trả về MaNhomNCKHSV
+            } else {
+                return ["error" => "Không tìm thấy nhóm cho mã đề tài: " . $maDeTaiSV];
+            }
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+        }
+    }
+
     // Cập nhật hoặc thêm nhóm nghiên cứu tự động
     public function autoUpdateGroups($deTaiData)
     {
