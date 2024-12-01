@@ -1,6 +1,6 @@
 <?php
 header("Content-Type: application/json");
-require_once __DIR__. '/../../config/Database.php';
+require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../../Model/DuAnNCNTModel/NhomNCNT.php';
 
 $database = new Database();
@@ -23,15 +23,15 @@ switch ($method) {
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($result);
         } elseif ($action === "getOne") {
-            $maHoSo = isset($_GET['ma_ho_so']) ? $_GET['ma_ho_so'] : null;
-            $maGV = isset($_GET['ma_gv']) ? $_GET['ma_gv'] : null;
-            if (!$maHoSo || !$maGV) {
-                echo json_encode(["message" => "Thiếu mã hồ sơ hoặc mã giảng viên"]);
+            $MaDuAn = isset($_GET['MaDuAn']) ? $_GET['MaDuAn'] : null; // Changed parameter name
+            $MaGV = isset($_GET['MaGV']) ? $_GET['MaGV'] : null; // Changed parameter name
+            if (!$MaDuAn || !$MaGV) {
+                echo json_encode(["message" => "Thiếu mã dự án hoặc mã giảng viên"]);
                 http_response_code(400);
                 exit;
             }
-            $nhom->ma_ho_so = $maHoSo;
-            $nhom->ma_gv = $maGV;
+            $nhom->MaDuAn = $MaDuAn;
+            $nhom->MaGV = $MaGV;
             $data = $nhom->getOne();
             echo json_encode($data);
         } else {
@@ -48,14 +48,14 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_ho_so, $data->ma_gv)) {
+        if (!isset($data->MaDuAn, $data->MaGV)) { // Changed parameter name
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $nhom->ma_ho_so = $data->ma_ho_so;
-        $nhom->ma_gv = $data->ma_gv;
+        $nhom->MaDuAn = $data->MaDuAn; // Changed property name
+        $nhom->MaGV = $data->MaGV; // Changed property name
 
         if ($nhom->add()) {
             echo json_encode(["message" => "Thêm thành viên vào nhóm thành công"]);
@@ -73,17 +73,17 @@ switch ($method) {
         }
 
         parse_str(file_get_contents("php://input"), $_PUT);
-        if (!isset($_PUT['ma_ho_so'], $_PUT['ma_gv'], $_PUT['ma_gv_moi'])) {
+        if (!isset($_PUT['MaDuAn'], $_PUT['MaGV'], $_PUT['MaGVMoi'])) { // Changed parameter name
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $nhom->ma_ho_so = $_PUT['ma_ho_so'];
-        $nhom->ma_gv = $_PUT['ma_gv'];
-        $maGVMoi = $_PUT['ma_gv_moi'];
+        $nhom->MaDuAn = $_PUT['MaDuAn']; // Changed property name
+        $nhom->MaGV = $_PUT['MaGV']; // Changed property name
+        $MaGVMoi = $_PUT['MaGVMoi']; // Changed parameter name
 
-        if ($nhom->update($maGVMoi)) {
+        if ($nhom->update($MaGVMoi)) {
             echo json_encode(["message" => "Cập nhật thông tin thành viên trong nhóm thành công"]);
         } else {
             echo json_encode(["message" => "Cập nhật thông tin thành viên thất bại"]);
@@ -99,14 +99,14 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_ho_so, $data->ma_gv)) {
+        if (!isset($data->MaDuAn, $data->MaGV)) { // Changed parameter name
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $nhom->ma_ho_so = $data->ma_ho_so;
-        $nhom->ma_gv = $data->ma_gv;
+        $nhom->MaDuAn = $data->MaDuAn; // Changed property name
+        $nhom->MaGV = $data->MaGV; // Changed property name
 
         if ($nhom->delete()) {
             echo json_encode(["message" => "Xóa thành viên khỏi nhóm thành công"]);
@@ -121,4 +121,3 @@ switch ($method) {
         http_response_code(405);
         break;
 }
-?>

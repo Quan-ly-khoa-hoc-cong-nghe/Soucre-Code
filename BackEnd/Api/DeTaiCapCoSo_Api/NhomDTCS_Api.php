@@ -23,15 +23,15 @@ switch ($method) {
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($result);
         } elseif ($action === "getOne") {
-            $maHoSo = isset($_GET['ma_ho_so']) ? $_GET['ma_ho_so'] : null;
-            $maGV = isset($_GET['ma_gv']) ? $_GET['ma_gv'] : null;
+            $maHoSo = isset($_GET['maDTCS']) ? $_GET['maDTCS'] : null;
+            $maGV = isset($_GET['maGV']) ? $_GET['maGV'] : null;
             if (!$maHoSo || !$maGV) {
                 echo json_encode(["message" => "Thiếu mã hồ sơ hoặc mã giảng viên"]);
                 http_response_code(400);
                 exit;
             }
-            $nhom->ma_ho_so = $maHoSo;
-            $nhom->ma_gv = $maGV;
+            $nhom->MaDTCS = $maDTCS;
+            $nhom->MaGV = $maGV;
             $data = $nhom->getOne();
             echo json_encode($data);
         } else {
@@ -48,14 +48,14 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_ho_so, $data->ma_gv)) {
+        if (!isset($data->maDTCS, $data->maGV)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $nhom->ma_ho_so = $data->ma_ho_so;
-        $nhom->ma_gv = $data->ma_gv;
+        $nhom->MaDTCS = $data->maDTCS;
+        $nhom->MaGV = $data->maGV;
 
         if ($nhom->add()) {
             echo json_encode(["message" => "Thêm thành viên vào nhóm thành công"]);
@@ -73,14 +73,14 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->ma_ho_so, $data->ma_gv)) {
+        if (!isset($data->maDTCS, $data->maGV)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $nhom->ma_ho_so = $data->ma_ho_so;
-        $nhom->ma_gv = $data->ma_gv;
+        $nhom->MaDTCS = $data->maDTCS;
+        $nhom->MaGV = $data->maGV;
 
         if ($nhom->delete()) {
             echo json_encode(["message" => "Xóa thành viên khỏi nhóm thành công"]);

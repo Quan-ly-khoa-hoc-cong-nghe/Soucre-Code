@@ -23,15 +23,15 @@ switch ($method) {
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($result);
         } elseif ($action === "getOne") {
-            $tenSanPham = isset($_GET['ten_san_pham']) ? $_GET['ten_san_pham'] : null;
-            $maDTCS = isset($_GET['ma_dtcs']) ? $_GET['ma_dtcs'] : null;
-            if (!$tenSanPham || !$maDTCS) {
+            $TenSanPham = isset($_GET['TenSanPham']) ? $_GET['TenSanPham'] : null;
+            $MaDTCS = isset($_GET['MaDTCS']) ? $_GET['MaDTCS'] : null;
+            if (!$TenSanPham || !$MaDTCS) {
                 echo json_encode(["message" => "Thiếu thông tin sản phẩm hoặc mã đề tài cơ sở"]);
                 http_response_code(400);
                 exit;
             }
-            $sanpham->ten_san_pham = $tenSanPham;
-            $sanpham->ma_dtcs = $maDTCS;
+            $sanpham->TenSanPham = $TenSanPham; // Gán tên sản phẩm
+            $sanpham->MaDTCS = $MaDTCS;         // Gán mã đề tài cơ sở
             $data = $sanpham->getOne();
             echo json_encode($data);
         } else {
@@ -54,10 +54,10 @@ switch ($method) {
             exit;
         }
 
-        $sanpham->ten_san_pham = $data->ten_san_pham;
-        $sanpham->ngay_hoan_thanh = $data->ngay_hoan_thanh;
-        $sanpham->ket_qua = $data->ket_qua;
-        $sanpham->ma_dtcs = $data->ma_dtcs;
+        $sanpham->TenSanPham = $data->ten_san_pham;
+        $sanpham->NgayHoanThanh = $data->ngay_hoan_thanh;
+        $sanpham->KetQua = $data->ket_qua;
+        $sanpham->MaDTCS = $data->ma_dtcs;
 
         if ($sanpham->add()) {
             echo json_encode(["message" => "Sản phẩm được thêm thành công"]);
@@ -81,10 +81,10 @@ switch ($method) {
             exit;
         }
 
-        $sanpham->ten_san_pham = $data->ten_san_pham;
-        $sanpham->ngay_hoan_thanh = $data->ngay_hoan_thanh;
-        $sanpham->ket_qua = $data->ket_qua;
-        $sanpham->ma_dtcs = $data->ma_dtcs;
+        $sanpham->TenSanPham = $data->ten_san_pham;
+        $sanpham->NgayHoanThanh = $data->ngay_hoan_thanh;
+        $sanpham->KetQua = $data->ket_qua;
+        $sanpham->MaDTCS = $data->ma_dtcs;
 
         if ($sanpham->update()) {
             echo json_encode(["message" => "Sản phẩm được cập nhật thành công"]);
@@ -108,8 +108,8 @@ switch ($method) {
             exit;
         }
 
-        $sanpham->ten_san_pham = $data->ten_san_pham;
-        $sanpham->ma_dtcs = $data->ma_dtcs;
+        $sanpham->TenSanPham = $data->ten_san_pham;
+        $sanpham->MaDTCS = $data->ma_dtcs;
 
         if ($sanpham->delete()) {
             echo json_encode(["message" => "Sản phẩm được xóa thành công"]);
@@ -124,4 +124,3 @@ switch ($method) {
         http_response_code(405);
         break;
 }
-?>

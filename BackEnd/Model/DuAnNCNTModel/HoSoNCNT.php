@@ -1,5 +1,6 @@
 <?php
-class HoSoNCNT {
+class HoSoNCNT
+{
     private $conn;
     private $table = "HoSoNCNT";
 
@@ -10,12 +11,14 @@ class HoSoNCNT {
     public $MaDatHang;
     public $MaKhoa;
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->conn = $db;
     }
 
     // Lấy giá trị MaHoSo mới
-    private function generateMaHoSo() {
+    private function generateMaHoSo()
+    {
         // Lấy phần số tự động từ các bản ghi có sẵn trong bảng
         $query = "SELECT MAX(CAST(SUBSTRING(MaHoSo, 7) AS UNSIGNED)) AS max_id FROM " . $this->table;
         $stmt = $this->conn->prepare($query);
@@ -28,7 +31,8 @@ class HoSoNCNT {
     }
 
     // Thêm hồ sơ mới
-    public function add() {
+    public function add()
+    {
         // Tạo MaHoSo mới
         $this->MaHoSo = $this->generateMaHoSo();
 
@@ -47,7 +51,8 @@ class HoSoNCNT {
     }
 
     // Cập nhật hồ sơ
-    public function update() {
+    public function update()
+    {
         $query = "UPDATE " . $this->table . " 
                   SET NgayNop = ?, FileHoSo = ?, TrangThai = ?, MaDatHang = ?, MaKhoa = ? 
                   WHERE MaHoSo = ?";
@@ -64,11 +69,32 @@ class HoSoNCNT {
     }
 
     // Xóa hồ sơ
-    public function delete() {
+    public function delete()
+    {
         $query = "DELETE FROM " . $this->table . " WHERE MaHoSo = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $this->MaHoSo);
 
         return $stmt->execute();
+    }
+
+    // Lấy tất cả hồ sơ
+    public function getAll()
+    {
+        $query = "SELECT MaHoSo, NgayNop, FileHoSo, TrangThai, MaDatHang, MaKhoa FROM " . $this->table;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    // Lấy một hồ sơ theo MaHoSo
+    public function getOne()
+    {
+        $query = "SELECT MaHoSo, NgayNop, FileHoSo, TrangThai, MaDatHang, MaKhoa 
+                  FROM " . $this->table . " WHERE MaHoSo = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->MaHoSo);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
