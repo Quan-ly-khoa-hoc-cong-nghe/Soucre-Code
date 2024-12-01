@@ -54,7 +54,7 @@ class GiangVienNCKHGV {
 
         // Gắn dữ liệu
         $stmt->bindParam(":SoGioQuyDoi", $this->SoGioQuyDoi);
-        $stmt->bindParam(":MaNhomNCKHGV", $this->MaNhomNCKHGV)
+        $stmt->bindParam(":MaNhomNCKHGV", $this->MaNhomNCKHGV);
         $stmt->bindParam("VaiTro", $this->VaiTro);
         $stmt->bindParam(":MaGV", $this->MaGV);
 

@@ -123,7 +123,7 @@ class DeTaiNCKHSV
     {
         try {
             $query = "SELECT 
-                        DT.TenDeTai, 
+                        DT.*, 
                         GV.HoTenGV, 
                         DT.TrangThai
                     FROM " . $this->table_name . " DT
@@ -140,6 +140,42 @@ class DeTaiNCKHSV
                 return $stmt->fetchAll(PDO::FETCH_ASSOC); // Trả về tất cả các đề tài cùng thông tin đi kèm
             } else {
                 return ["message" => "Không có đề tài nào"];
+            }
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+        }
+    }
+
+    // Phương thức lấy tất cả dữ liệu từ 3 bảng dựa trên MaDeTaiSV
+    public function getInfoByMaDeTaiSV($maDeTaiSV)
+    {
+        try {
+            $query = "
+                SELECT 
+                    DT.MaDeTaiSV, DT.TenDeTai, DT.MoTa, DT.TrangThai, DT.FileHopDong, DT.MaHoSo,
+                    KH.NgayBatDau, KH.NgayKetThuc, KH.KinhPhi, KH.FileKeHoach,
+                    SP.TenSanPham, SP.NgayHoanThanh, SP.KetQua, SP.FileSanPham
+                FROM " . $this->table_name . " DT
+                LEFT JOIN KeHoachNCKHSV KH ON DT.MaDeTaiSV = KH.MaDeTaiSV
+                LEFT JOIN SanPhamNCKHSV SP ON DT.MaDeTaiSV = SP.MaDeTaiSV
+                WHERE DT.MaDeTaiSV = :maDeTaiSV
+                ORDER BY DT.TenDeTai ASC
+            ";
+
+            // Prepare statement
+            $stmt = $this->conn->prepare($query);
+
+            // Bind parameter
+            $stmt->bindParam(':maDeTaiSV', $maDeTaiSV);
+
+            // Execute statement
+            $stmt->execute();
+
+            // Kiểm tra nếu có dữ liệu trả về
+            if ($stmt->rowCount() > 0) {
+                return $stmt->fetchAll(PDO::FETCH_ASSOC); // Trả về tất cả dữ liệu
+            } else {
+                return ["message" => "Không có dữ liệu cho mã đề tài này"];
             }
         } catch (PDOException $e) {
             return ["error" => "Lỗi truy vấn: " . $e->getMessage()];

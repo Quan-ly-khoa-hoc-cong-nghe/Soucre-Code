@@ -207,6 +207,33 @@ switch ($action) {
         }
         break;
 
+    case 'getInfoByMaDeTaiSV': // Action mới
+
+        error_log("Mã đề tài:".$_GET['MaDeTaiSV']);
+        // Kiểm tra nếu không có MaDeTaiSV trong query string
+        if (empty($_GET['MaDeTaiSV'])) {
+            echo json_encode(['message' => 'Vui lòng cung cấp mã đề tài.'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
+        }
+
+        // Lấy giá trị MaDeTaiSV từ query string
+        $maDeTaiSV = $_GET['MaDeTaiSV'];
+
+        // Gọi phương thức 'getInfoByMaDeTaiSV' từ model
+        $result = $deTai->getInfoByMaDeTaiSV($maDeTaiSV);
+        error_log("Kết quả trả về từ getInfoByMaDeTaiSV: " . print_r($result, true));
+
+        // Kiểm tra kết quả trả về từ model
+        if (isset($result['error'])) {
+            echo json_encode(['error' => $result['error']], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } elseif (isset($result['message'])) {
+            echo json_encode(['message' => $result['message']], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } else {
+            // Nếu có kết quả, trả về thông tin chi tiết
+            echo json_encode(['DeTaiNCKHSV' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
+        break;
+
     case 'delete':
         if (!empty($data['MaDeTaiSV'])) {
             $deTai->maDeTaiSV = $data['MaDeTaiSV'];

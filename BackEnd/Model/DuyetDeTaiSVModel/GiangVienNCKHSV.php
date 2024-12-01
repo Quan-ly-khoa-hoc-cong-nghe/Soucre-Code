@@ -4,8 +4,6 @@ class GiangVienNCKHSV {
     private $table_name = "GiangVienNCKHSV"; // Sửa tên bảng cho đúng
 
     public $MaNhomNCKHSV;
-
-    public $VaiTro;
     public $MaGV;
     public $VaiTro;  // Thêm VaiTro vào model
 
