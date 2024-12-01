@@ -26,12 +26,13 @@ switch ($action) {
         break;
 
     case 'add': // Thêm giảng viên vào nhóm
-        if (empty($data['MaNhomNCKHSV']) || empty($data['MaGV'])) {
-            echo json_encode(["message" => "Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, MaGV."], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (empty($data['MaNhomNCKHSV']) || empty($data['VaiTro']) || empty($data['MaGV'] )) {
+            echo json_encode(["message" => "Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, VaiTro, MaGV."], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             break;
         }
 
         $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+        $giangVienNCKHSV->VaiTro = $data['VaiTro'];
         $giangVienNCKHSV->MaGV = $data['MaGV'];
 
         if ($giangVienNCKHSV->add()) {
@@ -42,12 +43,13 @@ switch ($action) {
         break;
 
     case 'update':
-        if (empty($data['MaNhomNCKHSV']) || empty($data['MaGV'])) {
-            echo json_encode(['message' => 'Thiếu mã nhóm giảng viên hoặc mã giảng viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (empty($data['MaNhomNCKHSV']) || empty($data['VaiTro']) || empty($data['MaGV'])) {
+            echo json_encode(['message' => 'Thiếu mã nhóm giảng viên, Vai trò hoặc mã giảng viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             break;
         }
 
         $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+        $giangVienNCKHSV->VaiTro = $data['VaiTro'];
         $giangVienNCKHSV->MaGV = $data['MaGV'];
 
         if ($giangVienNCKHSV->update()) {
@@ -58,12 +60,13 @@ switch ($action) {
         break;
 
     case 'delete':
-        if (empty($data['MaNhomNCKHSV']) || empty($data['MaGV'])) {
-            echo json_encode(['message' => 'Thiếu mã nhóm hoặc mã giảng viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (empty($data['MaNhomNCKHSV']) || empty($data['VaiTro']) || empty($data['MaGV'])) {
+            echo json_encode(['message' => 'Thiếu mã nhóm, Vai trò hoặc mã giảng viên'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             break;
         }
 
         $giangVienNCKHSV->MaNhomNCKHSV = $data['MaNhomNCKHSV'];
+        $giangVienNCKHSV->VaiTro = $data['VaiTro'];
         $giangVienNCKHSV->MaGV = $data['MaGV'];
 
         if ($giangVienNCKHSV->delete()) {
