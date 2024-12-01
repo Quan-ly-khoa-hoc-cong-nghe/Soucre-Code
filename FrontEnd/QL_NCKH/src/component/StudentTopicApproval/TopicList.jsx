@@ -73,8 +73,6 @@ const TopicList = () => {
         `${API_BASE}/DeTaiNCKHSV_Api.php?action=getDetailedInfo`
       );
       const deTaiData = deTaiResponse.data.DeTaiNCKHSV || [];
-
-      // Lưu trực tiếp dữ liệu trả về mà không tái cấu trúc
       setTopics(deTaiData);
     } catch (error) {
       console.error("Error fetching topics:", error);
@@ -90,7 +88,6 @@ const TopicList = () => {
     setEditedTopic({ ...topic });
   };
 
-  
   // Delete Topic
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa đề tài này?")) return;
@@ -107,18 +104,25 @@ const TopicList = () => {
   };
 
   const handleViewDetails = (topic) => {
-    setSelectedTopic(topic);
-    fetchTopicDetails(topic.id); // Lấy chi tiết đề tài nếu cần
+    setSelectedTopic(topic); // Cập nhật topic đã chọn
+    fetchTopicDetails(topic.MaDeTaiSV); // Sau đó fetch thông tin chi tiết
   };
-  
-  // Fetch Topic Details (called only when needed)
-  const fetchTopicDetails = async (topicId) => {
+
+  const fetchTopicDetails = async (maDeTaiSV) => {
     try {
       const topicDetailsResponse = await axios.get(
-        `${API_BASE}/DeTaiNCKHSV_Api.php?action=get&id=${topicId}`
+        `${API_BASE}/DeTaiNCKHSV_Api.php?action=getInfoByMaDeTaiSV&MaDeTaiSV=${maDeTaiSV}`
       );
       const topicDetails = topicDetailsResponse.data.DeTaiNCKHSV || {};
-      setSelectedTopic(topicDetails);
+      console.log("Topic Details:", topicDetails); // Debugging line
+      if (topicDetails.TenDeTai) {
+        setSelectedTopic((prevTopic) => ({
+          ...prevTopic, // Giữ lại các dữ liệu cũ của topic
+          ...topicDetails, // Thêm thông tin chi tiết mới vào
+        }));
+      } else {
+        console.warn("Không tìm thấy chi tiết đề tài");
+      }
     } catch (error) {
       console.error("Error fetching topic details:", error);
     }
@@ -206,19 +210,17 @@ const TopicList = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40">
           <div className="bg-white rounded-lg p-6 max-w-4xl w-full shadow-lg overflow-y-auto max-h-[90vh]">
             <h2 className="text-2xl font-bold mb-4 text-center">
-              {selectedTopic.name}
+              {selectedTopic.TenDeTai || "Tên Đề Tài"}
             </h2>
-
-            {/* Description Section */}
+            {/* Description Section */ console.log(selectedTopic.TenDeTai)}
             <div className="mb-4">
               <h3 className="text-xl font-semibold mb-2">Mô Tả Đề Tài</h3>
-              <p>{selectedTopic.description || "Không có mô tả."}</p>
+              <p>{selectedTopic.MoTa || "Không có mô tả."}</p>
             </div>
-
-            {/* Information Grid */}
+            Information Grid
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               {/* Student Details */}
-              <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
+              {/* <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
                 <h3 className="font-semibold mb-2">Thông Tin Sinh Viên</h3>
                 {selectedTopic.students.length > 0 ? (
                   <ul className="list-disc list-inside">
@@ -238,10 +240,10 @@ const TopicList = () => {
                 ) : (
                   <p>Không có sinh viên nào.</p>
                 )}
-              </div>
+              </div> */}
 
               {/* Advisor Details */}
-              <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
+              {/* <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
                 <h3 className="font-semibold mb-2">Thông Tin Giảng Viên</h3>
                 {selectedTopic.advisor.name !== "N/A" ? (
                   <>
@@ -270,32 +272,38 @@ const TopicList = () => {
                 ) : (
                   <p>Không có giảng viên nào.</p>
                 )}
-              </div>
+              </div> */}
 
               {/* Research Plan Details */}
               <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
                 <h3 className="font-semibold mb-2">
                   Thông Tin Kế Hoạch Nghiên Cứu
                 </h3>
-                {selectedTopic.keHoach.NgayBatDau ? (
+                {selectedTopic ? (
                   <>
-                    <p>
-                      <strong>Ngày Bắt Đầu:</strong>{" "}
-                      {selectedTopic.keHoach.NgayBatDau}
-                    </p>
-                    <p>
-                      <strong>Ngày Kết Thúc:</strong>{" "}
-                      {selectedTopic.keHoach.NgayKetThuc}
-                    </p>
-                    <p>
-                      <strong>Kinh Phí:</strong>{" "}
-                      {selectedTopic.keHoach.KinhPhi.toLocaleString()} VND
-                    </p>
-                    {selectedTopic.keHoach.FileKeHoach && (
+                    {selectedTopic.NgayBatDau && (
+                      <p>
+                        <strong>Ngày Bắt Đầu:</strong>{" "}
+                        {selectedTopic.NgayBatDau}
+                      </p>
+                    )}
+                    {selectedTopic.NgayKetThuc && (
+                      <p>
+                        <strong>Ngày Kết Thúc:</strong>{" "}
+                        {selectedTopic.NgayKetThuc}
+                      </p>
+                    )}
+                    {selectedTopic.KinhPhi && (
+                      <p>
+                        <strong>Kinh Phí:</strong>{" "}
+                        {selectedTopic.KinhPhi.toLocaleString()} VND
+                      </p>
+                    )}
+                    {selectedTopic.FileKeHoach && (
                       <p>
                         <strong>File Kế Hoạch:</strong>{" "}
                         <a
-                          href={`path/to/files/${selectedTopic.keHoach.FileKeHoach}`}
+                          href={`path/to/files/${selectedTopic.FileKeHoach}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-500 underline"
@@ -310,11 +318,11 @@ const TopicList = () => {
                 )}
               </div>
             </div>
-
             {/* Research Products Section */}
             <div className="p-4 border rounded-lg shadow-sm bg-gray-50 mb-4">
               <h3 className="font-semibold mb-2">Sản Phẩm Nghiên Cứu</h3>
-              {selectedTopic.sanPham.length > 0 ? (
+              {selectedTopic.DeTaiNCKHSV &&
+              selectedTopic.DeTaiNCKHSV.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full bg-white">
                     <thead>
@@ -325,25 +333,27 @@ const TopicList = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedTopic.sanPham.map((sp, index) => (
+                      {selectedTopic.DeTaiNCKHSV.map((deTai, index) => (
+                        // Kiểm tra trường TenSanPham có null không và thay bằng "Chưa có sản phẩm"
                         <tr key={index} className="text-center">
                           <td className="py-2 px-4 border-b">
-                            {sp.TenSanPham}
+                            {deTai.TenSanPham || "Chưa có sản phẩm"}
                           </td>
                           <td className="py-2 px-4 border-b">
-                            {sp.NgayHoanThanh}
+                            {deTai.NgayHoanThanh || "Chưa hoàn thành"}
                           </td>
-                          <td className="py-2 px-4 border-b">{sp.KetQua}</td>
+                          <td className="py-2 px-4 border-b">
+                            {deTai.KetQua || "Chưa có kết quả"}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               ) : (
-                <p>Không có sản phẩm nghiên cứu.</p>
+                <p>Chưa có sản phẩm nghiên cứu.</p>
               )}
             </div>
-
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4">
               <button
@@ -368,7 +378,6 @@ const TopicList = () => {
           </div>
         </div>
       )}
-
 
       {/* Student Detail Modal */}
       {showStudentDetail && selectedStudent && selectedStudent.length > 0 && (
