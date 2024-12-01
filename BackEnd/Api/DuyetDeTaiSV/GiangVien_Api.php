@@ -27,6 +27,7 @@ switch ($action) {
 
     case 'add':
         if (!empty($data['HoTenGV']) && !empty($data['EmailGV'])) {
+            $giangVien->MaGV = $data['MaGV'];
             $giangVien->HoTenGV = $data['HoTenGV'];
             $giangVien->EmailGV = $data['EmailGV'];
             $giangVien->DiaChiGV = $data['DiaChiGV'];
