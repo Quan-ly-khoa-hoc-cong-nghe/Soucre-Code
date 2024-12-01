@@ -28,7 +28,7 @@ switch ($action) {
     case 'add':
         if (!empty($data['TenKhoa'])) {
             $khoa->TenKhoa = $data['TenKhoa'];
-            $khoa->VanPhongKHoa = $data['VanPhongKHoa'];
+            $khoa->VanPhongKhoa = $data['VanPhongKhoa'];
             if ($khoa->add()) {
                 echo json_encode(['message' => 'Thêm khoa thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             } else {
@@ -43,7 +43,7 @@ switch ($action) {
         if (!empty($data['MaKhoa'])) {
             $khoa->MaKhoa = $data['MaKhoa'];
             $khoa->TenKhoa = $data['TenKhoa'];
-            $khoa->VanPhongKHoa = $data['VanPhongKHoa'];
+            $khoa->VanPhongKhoa = $data['VanPhongKhoa'];
             if ($khoa->update()) {
                 echo json_encode(['message' => 'Cập nhật khoa thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             } else {

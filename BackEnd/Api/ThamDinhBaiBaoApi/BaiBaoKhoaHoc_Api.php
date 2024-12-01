@@ -48,7 +48,7 @@ switch ($method) {
         $baibao->TenBaiBao = $data->TenBaiBao;
         $baibao->urlBaiBao = $data->urlBaiBao;
         $baibao->NgayXuatBan = $data->NgayXuatBan;
-        $baibao->MaThamDinh = $data->MaThamDinh;
+        $baibao->MaHoSo = $data->MaHoSo;
 
         if ($baibao->add()) {
             echo json_encode(["message" => "Bài báo được thêm thành công"]);
@@ -76,7 +76,7 @@ switch ($method) {
         $baibao->TenBaiBao = $data->TenBaiBao;
         $baibao->urlBaiBao = $data->urlBaiBao;
         $baibao->NgayXuatBan = $data->NgayXuatBan;
-        $baibao->MaThamDinh = $data->MaThamDinh;
+        $baibao->MaHoSo = $data->MaHoSo;
 
         if ($baibao->update()) {
             echo json_encode(["message" => "Bài báo được cập nhật thành công"]);
