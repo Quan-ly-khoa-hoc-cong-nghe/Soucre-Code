@@ -80,6 +80,32 @@ switch ($action) {
             echo json_encode(['error' => 'Không lấy được dữ liệu từ bảng Đề Tài'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
+        // Thêm vào trong phần switch($action)
+    case 'getGroupByMaDeTaiSV':
+        if (empty($data['MaDeTaiSV'])) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Vui lòng cung cấp mã đề tài sinh viên.'
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
+        }
+
+        $maDeTaiSV = $data['MaDeTaiSV'];
+        $result = $nhomNCKHSV->getGroupByMaDeTaiSV($maDeTaiSV);
+
+        if (isset($result['error'])) {
+            echo json_encode([
+                'success' => false,
+                'message' => $result['error']
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Lấy mã nhóm thành công.',
+                'MaNhomNCKHSV' => $result
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
+        break;
 
     case 'update':
         if (!empty($data['MaNhomNCKHSV'])) {

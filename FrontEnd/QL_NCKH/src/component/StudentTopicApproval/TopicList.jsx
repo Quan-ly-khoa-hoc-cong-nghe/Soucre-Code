@@ -4,76 +4,54 @@ import { FaCheck, FaTimes, FaEye } from "react-icons/fa";
 // Base API URL
 const API_BASE = "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV";
 
-// API Endpoints
-const API_ENDPOINTS = {
-  deTaiNCKHSV: `${API_BASE}/DeTaiNCKHSV_Api.php?action=get`,
-  giangVien: `${API_BASE}/GiangVien_Api.php?action=get`,
-  giangVienNCKHSV: `${API_BASE}/GiangVienNCKHSV_Api.php?action=get`,
-  hoSoNCKHSV: `${API_BASE}/HoSoNCKHSV_Api.php?action=get`,
-  keHoachNCKHSV: `${API_BASE}/KeHoachNCKHSV_Api.php?action=get`,
-  khoa: `${API_BASE}/Khoa_Api.php?action=get`,
-  nhomNCKHSV: `${API_BASE}/NhomNCKHSV_Api.php?action=get`,
-  sanPhamNCKHSV: `${API_BASE}/SanPhamNCKHSV_Api.php?action=get`,
-  sinhVien: `${API_BASE}/SinhVien_Api.php?action=get`,
-  sinhVienNCKHSV: `${API_BASE}/SinhVienNCKHSV_Api.php?action=get`,
+// Modal Components
+const StudentDetailModal = ({ students, onClose }) => {
+  return (
+    <div className="modal">
+      <button onClick={onClose}>Close</button>
+      <h2>Student Details</h2>
+      {students.map((student, index) => (
+        <div key={index} className="student-detail">
+          <p>
+            <strong>Name:</strong> {student.TenSinhVien}
+          </p>
+          <p>
+            <strong>Student ID:</strong> {student.MaSinhVien}
+          </p>
+          <p>
+            <strong>Email:</strong> {student.EmailSV}
+          </p>
+          <p>
+            <strong>SĐT:</strong> {student.sdtSV}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
 };
 
-// Modal Components
-
-// Student Detail Modal
-const StudentDetailModal = ({ student, onClose }) => (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div className="bg-white rounded-lg p-6 max-w-lg w-full shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">
-        {student.name} (ID: {student.id})
-      </h2>
-      <p>
-        <strong>Phone:</strong> {student.phone}
-      </p>
-      <p>
-        <strong>Email:</strong> {student.email}
-      </p>
-      <div className="mt-4 flex justify-center">
-        <button
-          onClick={onClose}
-          className="mt-4 p-2 bg-blue-500 text-white rounded"
-        >
-          Close
-        </button>
-      </div>
+const AdvisorDetailModal = ({ advisors, onClose }) => {
+  return (
+    <div className="modal">
+      <button onClick={onClose}>Close</button>
+      <h2>Advisor Details</h2>
+      {advisors.map((advisor, index) => (
+        <div key={index} className="advisor-detail">
+          <p>
+            <strong>Name:</strong> {advisor.name}
+          </p>
+          <p>
+            <strong>Department:</strong> {advisor.department}
+          </p>
+          <p>
+            <strong>Email:</strong> {advisor.email}
+          </p>
+        </div>
+      ))}
     </div>
-  </div>
-);
+  );
+};
 
-// Advisor Detail Modal
-const AdvisorDetailModal = ({ advisor, onClose }) => (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div className="bg-white rounded-lg p-6 max-w-lg w-full shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">
-        {advisor.name} (ID: {advisor.id})
-      </h2>
-      <p>
-        <strong>Department:</strong> {advisor.department}
-      </p>
-      <p>
-        <strong>Email:</strong> {advisor.email}
-      </p>
-      <p>
-        <strong>Address:</strong> {advisor.address}
-      </p>
-      <div className="mt-4 flex justify-center">
-        <button
-          onClick={onClose}
-          className="mt-4 p-2 bg-blue-500 text-white rounded"
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-// Main TopicList Component
 const TopicList = () => {
   // State Variables
   const [topics, setTopics] = useState([]);
@@ -86,224 +64,51 @@ const TopicList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch Data from APIs
-  useEffect(() => {
-    const getData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Fetch all data concurrently
-        const [
-          deTaiResponse,
-          giangVienResponse,
-          giangVienNCKHSVResponse,
-          hoSoNCKHSVResponse,
-          keHoachNCKHSVResponse,
-          khoaResponse,
-          nhomNCKHSVResponse,
-          sanPhamNCKHSVResponse,
-          sinhVienResponse,
-          sinhVienNCKHSVResponse,
-        ] = await Promise.all([
-          axios.get(API_ENDPOINTS.deTaiNCKHSV),
-          axios.get(API_ENDPOINTS.giangVien),
-          axios.get(API_ENDPOINTS.giangVienNCKHSV),
-          axios.get(API_ENDPOINTS.hoSoNCKHSV),
-          axios.get(API_ENDPOINTS.keHoachNCKHSV),
-          axios.get(API_ENDPOINTS.khoa),
-          axios.get(API_ENDPOINTS.nhomNCKHSV),
-          axios.get(API_ENDPOINTS.sanPhamNCKHSV),
-          axios.get(API_ENDPOINTS.sinhVien),
-          axios.get(API_ENDPOINTS.sinhVienNCKHSV),
-        ]);
+  // Fetch Data for Topics (changed to use getDetailedInfo)
+  const fetchTopics = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const deTaiResponse = await axios.get(
+        `${API_BASE}/DeTaiNCKHSV_Api.php?action=getDetailedInfo`
+      );
+      const deTaiData = deTaiResponse.data.DeTaiNCKHSV || [];
 
-        // Extract data with safe defaults
-        const deTaiData = deTaiResponse.data.DeTaiNCKHSV || [];
-        const giangVienData = giangVienResponse.data.GiangVien || [];
-        const giangVienNCKHSVData =
-          giangVienNCKHSVResponse.data.GiangVienNCKHSV || [];
-        const hoSoNCKHSVData = hoSoNCKHSVResponse.data.HoSoNCKHSV || [];
-        const keHoachNCKHSVData =
-          keHoachNCKHSVResponse.data.KeHoachNCKHSV || [];
-        const khoaData = khoaResponse.data.Khoa || [];
-        const nhomNCKHSVData = nhomNCKHSVResponse.data.NhomNCKHSV || [];
-        const sanPhamNCKHSVData =
-          sanPhamNCKHSVResponse.data.SanPhamNCKHSV || [];
-        const sinhVienData = sinhVienResponse.data.SinhVien || [];
-        const sinhVienNCKHSVData =
-          sinhVienNCKHSVResponse.data.SinhVienNCKHSV || [];
-
-        // Create Maps for easy lookup
-        const giangVienMap = {};
-        giangVienData.forEach((gv) => {
-          giangVienMap[gv.MaGV] = gv;
-        });
-
-        const sinhVienMap = {};
-        sinhVienData.forEach((sv) => {
-          sinhVienMap[sv.MaSinhVien] = sv;
-        });
-
-        const hoSoMap = {};
-        hoSoNCKHSVData.forEach((hs) => {
-          hoSoMap[hs.MaHoSo] = hs;
-        });
-
-        const khoaMap = {};
-        khoaData.forEach((kh) => {
-          khoaMap[kh.MaKhoa] = kh;
-        });
-
-        const giangVienNhomMap = {};
-        giangVienNCKHSVData.forEach((item) => {
-          giangVienNhomMap[item.MaNhomNCKHSV] = item.MaGV;
-        });
-
-        const sinhVienNhomMap = {};
-        sinhVienNCKHSVData.forEach((item) => {
-          if (!sinhVienNhomMap[item.MaNhomNCKHSV]) {
-            sinhVienNhomMap[item.MaNhomNCKHSV] = [];
-          }
-          const student = sinhVienMap[item.MaSinhVien];
-          if (student) {
-            sinhVienNhomMap[item.MaNhomNCKHSV].push({
-              id: student.MaSinhVien,
-              name: student.TenSinhVien,
-              birthDate: student.NgaySinhSV || student.birthDate,
-              phone: student.sdtSV || student.phone,
-              email: student.EmailSV || student.email,
-              major: khoaMap[student.MaKhoa]?.TenKhoa || student.major, // Map MaKhoa to TenKhoa
-            });
-          }
-        });
-
-        // Combine Data into Topics
-        const combinedTopics = deTaiData.map((deTai) => {
-          const groupId = deTai.MaNhomNCKHSV;
-          const advisorId = giangVienNhomMap[groupId];
-          const advisor = giangVienMap[advisorId] || {};
-          const students = sinhVienNhomMap[groupId] || [];
-
-          // Get corresponding research plan
-          const keHoach =
-            keHoachNCKHSVData.find((kh) => kh.MaDeTaiSV === deTai.MaDeTaiSV) ||
-            {};
-
-          // Get corresponding research products
-          const sanPham = sanPhamNCKHSVData.filter(
-            (sp) => sp.MaDeTaiSV === deTai.MaDeTaiSV
-          );
-
-          // Get corresponding hoSo
-          const hoSo = hoSoMap[deTai.MaHoSo] || {};
-
-          return {
-            id: deTai.MaDeTaiSV, // Use MaDeTaiSV as ID
-            name: deTai.TenDeTai,
-            description: deTai.MoTa, // Ensure description is set
-            status: deTai.TrangThai,
-            groupId: groupId,
-            fileHopDong: deTai.FileHopDong,
-            hoSo: hoSo,
-            keHoach: keHoach,
-            sanPham: sanPham,
-            students: students,
-            advisor: {
-              id: advisor.MaGV || "N/A",
-              name: advisor.HoTenGV || "N/A",
-              department: khoaMap[advisor.MaKhoa]?.TenKhoa || "N/A",
-              email: advisor.EmailGV || "N/A",
-              address: advisor.DiaChiGV || "Chưa có địa chỉ", // Ensure correct field
-            },
-          };
-        });
-
-        setTopics(combinedTopics);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getData();
-  }, []);
+      // Lưu trực tiếp dữ liệu trả về mà không tái cấu trúc
+      setTopics(deTaiData);
+    } catch (error) {
+      console.error("Error fetching topics:", error);
+      setError("Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Handle Edit Topic
   const handleEdit = (topic) => {
     setIsEditing(true);
-    setEditedTopic({ ...topic }); // Clone topic for editing
+    setEditedTopic({ ...topic });
   };
 
   // Handle Input Change for Topic Fields
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditedTopic((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setEditedTopic((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle Input Change for Research Plan Fields
-  const handleKeHoachChange = (e) => {
-    const { name, value } = e.target;
-    setEditedTopic((prev) => ({
-      ...prev,
-      keHoach: {
-        ...prev.keHoach,
-        [name]: value,
-      },
-    }));
-  };
-
-  // Handle Input Change for Research Products
-  const handleSanPhamChange = (e, index) => {
-    const { name, value } = e.target;
-    const updatedSanPham = [...editedTopic.sanPham];
-    updatedSanPham[index] = { ...updatedSanPham[index], [name]: value };
-    setEditedTopic((prev) => ({
-      ...prev,
-      sanPham: updatedSanPham,
-    }));
-  };
-
-  // Handle Input Change for Student Fields
-  const handleStudentInputChange = (e, index) => {
-    const { name, value } = e.target;
-    const updatedStudents = [...editedTopic.students];
-    updatedStudents[index] = { ...updatedStudents[index], [name]: value };
-    setEditedTopic((prev) => ({
-      ...prev,
-      students: updatedStudents,
-    }));
-  };
-
+  // Update Topic
   const handleUpdate = async (e) => {
     e.preventDefault();
 
     try {
-      // Payload cho Đề Tài
       const deTaiPayload = {
         maDeTaiSV: editedTopic.id,
         tenDeTai: editedTopic.name,
         moTa: editedTopic.description,
         trangThai: editedTopic.status,
-        fileHopDong: editedTopic.FileHopDong,
-        maHoSo: editedTopic.hoSo.MaHoSo || null,
-        maNhomNCKHSV: editedTopic.groupId,
       };
 
-      // Payload cho Kế Hoạch Nghiên Cứu
-      const keHoachPayload = {
-        MaDeTaiSV: editedTopic.id,
-        NgayBatDau: editedTopic.keHoach.NgayBatDau,
-        NgayKetThuc: editedTopic.keHoach.NgayKetThuc,
-        KinhPhi: editedTopic.keHoach.KinhPhi,
-        FileKeHoach: editedTopic.keHoach.FileKeHoach,
-      };
-
-      // Gửi yêu cầu cập nhật đề tài
+      // Send update request for the topic
       const deTaiResponse = await axios.post(
         `${API_BASE}/DeTaiNCKHSV_Api.php?action=update`,
         deTaiPayload
@@ -314,23 +119,9 @@ const TopicList = () => {
         return;
       }
 
-      // Gửi yêu cầu cập nhật kế hoạch
-      const keHoachResponse = await axios.post(
-        `${API_BASE}/KeHoachNCKHSV_Api.php?action=update`,
-        keHoachPayload
-      );
-
-      if (!keHoachResponse.data.success) {
-        alert(keHoachResponse.data.message || "Cập nhật kế hoạch thất bại!");
-        return;
-      }
-
-      // Cập nhật danh sách topics trên giao diện
       setTopics((prevTopics) =>
         prevTopics.map((topic) =>
-          topic.id === editedTopic.id
-            ? { ...topic, ...editedTopic, keHoach: editedTopic.keHoach }
-            : topic
+          topic.id === editedTopic.id ? { ...topic, ...editedTopic } : topic
         )
       );
 
@@ -338,7 +129,7 @@ const TopicList = () => {
       setIsEditing(false);
       setSelectedTopic(null);
     } catch (error) {
-      console.error("Error updating topic or research plan:", error);
+      console.error("Error updating topic:", error);
       alert("Lỗi kết nối đến server!");
     }
   };
@@ -348,12 +139,9 @@ const TopicList = () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa đề tài này?")) return;
 
     try {
-      // Send delete request to backend
       await axios.post(`${API_BASE}/DeTaiNCKHSV_Api.php?action=delete`, {
         MaDeTaiSV: id,
       });
-
-      // Update state by removing deleted topic
       setTopics((prev) => prev.filter((topic) => topic.id !== id));
     } catch (error) {
       console.error("Error deleting topic:", error);
@@ -364,6 +152,20 @@ const TopicList = () => {
   // View Topic Details
   const handleViewDetails = (topic) => {
     setSelectedTopic(topic);
+    fetchTopicDetails(topic.id);
+  };
+
+  // Fetch Topic Details (called only when needed)
+  const fetchTopicDetails = async (topicId) => {
+    try {
+      const topicDetailsResponse = await axios.get(
+        `${API_BASE}/DeTaiNCKHSV_Api.php?action=get&id=${topicId}`
+      );
+      const topicDetails = topicDetailsResponse.data.DeTaiNCKHSV || {};
+      setSelectedTopic(topicDetails);
+    } catch (error) {
+      console.error("Error fetching topic details:", error);
+    }
   };
 
   // View Student Details
@@ -385,6 +187,11 @@ const TopicList = () => {
     setSelectedStudent(null);
     setIsEditing(false);
   };
+
+  useEffect(() => {
+    fetchTopics(); // Fetch topics when the component mounts
+  }, []);
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       {/* Loading Indicator */}
@@ -398,8 +205,7 @@ const TopicList = () => {
           <thead>
             <tr className="border-b bg-gray-100">
               <th className="text-left py-4 px-2">Tên Đề Tài</th>
-              <th className="text-left py-4 px-2">Tên Giảng Viên</th>
-              <th className="text-left py-4 px-2">Group ID</th>
+              <th className="text-left py-4 px-2">Tên Chủ Nhiệm Đề Tài</th>
               <th className="text-left py-4 px-2">Trạng Thái</th>
               <th className="text-right py-4 px-2">Actions</th>
             </tr>
@@ -407,42 +213,23 @@ const TopicList = () => {
           <tbody>
             {topics.map((topic) => (
               <tr key={topic.id} className="border-b hover:bg-gray-50">
-                <td className="py-4 px-2">{topic.name}</td>
-                <td className="py-4 px-2">{topic.advisor.name || "N/A"}</td>
-                <td className="py-4 px-2">{topic.groupId || "N/A"}</td>
+                <td className="py-4 px-2">{topic.TenDeTai}</td>
+                <td className="py-4 px-2">{topic.HoTenGV || "N/A"}</td>
                 <td className="py-4 px-2">
                   <span
                     className={`px-2 py-1 rounded-full text-sm ${
-                      topic.status === "Đã duyệt"
+                      topic.TrangThai === "Đã duyệt"
                         ? "bg-green-100 text-green-800"
-                        : topic.status === "Hủy"
+                        : topic.TrangThai === "Hủy"
                         ? "bg-red-100 text-red-800"
                         : "bg-blue-100 text-blue-800"
                     }`}
                   >
-                    {topic.status}
+                    {topic.TrangThai}
                   </span>
                 </td>
                 <td className="py-4 px-2 text-right">
                   <div className="flex justify-end space-x-2">
-                    {topic.status === "Khoa đã duyệt" && (
-                      <>
-                        <button
-                          onClick={() => handleApprove(topic.id)}
-                          className="p-2 text-green-600 hover:bg-green-100 rounded-full"
-                          title="Chấp nhận"
-                        >
-                          <FaCheck className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleReject(topic.id)}
-                          className="p-2 text-red-600 hover:bg-red-100 rounded-full"
-                          title="Hủy"
-                        >
-                          <FaTimes className="w-5 h-5" />
-                        </button>
-                      </>
-                    )}
                     <button
                       onClick={() => handleViewDetails(topic)}
                       className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
@@ -1082,20 +869,23 @@ const TopicList = () => {
       )}
 
       {/* Student Detail Modal */}
-      {showStudentDetail && selectedStudent && (
+      {showStudentDetail && selectedStudent && selectedStudent.length > 0 && (
         <StudentDetailModal
-          student={selectedStudent}
+          students={selectedStudent} // Truyền vào mảng các sinh viên
           onClose={() => setShowStudentDetail(false)}
         />
       )}
 
       {/* Advisor Detail Modal */}
-      {showAdvisorDetail && selectedTopic && (
-        <AdvisorDetailModal
-          advisor={selectedTopic.advisor}
-          onClose={() => setShowAdvisorDetail(false)}
-        />
-      )}
+      {showAdvisorDetail &&
+        selectedTopic &&
+        selectedTopic.advisor &&
+        selectedTopic.advisor.length > 0 && (
+          <AdvisorDetailModal
+            advisors={selectedTopic.advisor} // Truyền vào mảng các giảng viên
+            onClose={() => setShowAdvisorDetail(false)}
+          />
+        )}
     </div>
   );
 };
