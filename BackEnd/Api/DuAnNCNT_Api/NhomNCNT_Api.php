@@ -24,13 +24,15 @@ switch ($method) {
             echo json_encode($result);
         } elseif ($action === "getOne") {
             $MaDuAn = isset($_GET['MaDuAn']) ? $_GET['MaDuAn'] : null; // Changed parameter name
+            $VaiTro = isset($_GET['VaiTro']) ? $_GET['VaiTro'] : null; // Changed parameter name
             $MaGV = isset($_GET['MaGV']) ? $_GET['MaGV'] : null; // Changed parameter name
-            if (!$MaDuAn || !$MaGV) {
+            if (!$MaDuAn || !$VaiTro || !$MaGV) {
                 echo json_encode(["message" => "Thiếu mã dự án hoặc mã giảng viên"]);
                 http_response_code(400);
                 exit;
             }
             $nhom->MaDuAn = $MaDuAn;
+            $nhom->VaiTro = $VaiTro;
             $nhom->MaGV = $MaGV;
             $data = $nhom->getOne();
             echo json_encode($data);
@@ -48,13 +50,14 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaDuAn, $data->MaGV)) { // Changed parameter name
+        if (!isset($data->MaDuAn,$data-> VaiTro, $data->MaGV)) { // Changed parameter name
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
         $nhom->MaDuAn = $data->MaDuAn; // Changed property name
+        $nhom->VaiTro = $data->VaiTro;
         $nhom->MaGV = $data->MaGV; // Changed property name
 
         if ($nhom->add()) {
@@ -73,13 +76,14 @@ switch ($method) {
         }
 
         parse_str(file_get_contents("php://input"), $_PUT);
-        if (!isset($_PUT['MaDuAn'], $_PUT['MaGV'], $_PUT['MaGVMoi'])) { // Changed parameter name
+        if (!isset($_PUT['MaDuAn'], $_PUT['VaiTro'], $_PUT['MaGV'], $_PUT['MaGVMoi'])) { // Changed parameter name
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
         $nhom->MaDuAn = $_PUT['MaDuAn']; // Changed property name
+        $nhom->VaiTro = $_PUT['VaiTro'];
         $nhom->MaGV = $_PUT['MaGV']; // Changed property name
         $MaGVMoi = $_PUT['MaGVMoi']; // Changed parameter name
 
@@ -99,13 +103,14 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaDuAn, $data->MaGV)) { // Changed parameter name
+        if (!isset($data->MaDuAn,$data->VaiTro, $data->MaGV)) { // Changed parameter name
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
         $nhom->MaDuAn = $data->MaDuAn; // Changed property name
+        $nhom->VaiTro = $data->VaiTro; // Changed property name
         $nhom->MaGV = $data->MaGV; // Changed property name
 
         if ($nhom->delete()) {

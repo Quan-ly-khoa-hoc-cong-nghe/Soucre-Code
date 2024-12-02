@@ -42,9 +42,10 @@ switch ($action) {
 
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->SoGioQuyDoi) && !empty($data->MaNhomNCKHGV) && !empty($data->MaGV)) {
+        if (!empty($data->SoGioQuyDoi) && !empty($data->MaNhomNCKHGV) && !empty($data->VaiTro) && !empty($data->MaGV)) {
             $giangvien->SoGioQuyDoi = $data->SoGioQuyDoi;
             $giangvien->MaNhomNCKHGV = $data->MaNhomNCKHGV;
+            $giangvien->VaiTro = $data->VaiTro;
             $giangvien->MaGV = $data->MaGV;
 
             if ($giangvien->create()) {
@@ -62,6 +63,7 @@ switch ($action) {
         if (!empty($data->MaGV)) {
             $giangvien->SoGioQuyDoi = $data->SoGioQuyDoi;
             $giangvien->MaNhomNCKHGV = $data->MaNhomNCKHGV;
+            $giangvien->VaiTro = $data->VaiTro;
             $giangvien->MaGV = $data->MaGV;
 
             if ($giangvien->update()) {
