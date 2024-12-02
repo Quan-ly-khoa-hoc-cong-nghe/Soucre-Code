@@ -243,9 +243,30 @@ const Layout = ({ children }) => {
                 <span className="font-semibold">Duyệt hồ sơ và thêm DTCS</span>
               </Link>
             </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/admin/approval-off-campus-project-department"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ NCNT role khoa
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/admin/approval-off-campus-project-scitech"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">Duyệt hồ sơ và thêm NCNT</span>
+              </Link>
+            </li>
             <hr className="border-gray-400 my-4" />
 
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] p-2 rounded hover:text-[#d95959]"></li>
+            
           </ul>
         </div>
       </div>
