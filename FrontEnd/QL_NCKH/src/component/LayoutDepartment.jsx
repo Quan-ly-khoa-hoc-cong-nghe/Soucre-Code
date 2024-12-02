@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  FaGift,
-  FaUpload,
+  FaUser,
+  FaMusic,
+  FaLaptopCode,
+  FaBox,
+  FaUserFriends,
   FaComment,
   FaChartBar,
   FaBars,
@@ -9,7 +12,15 @@ import {
   FaSignOutAlt,
   FaBook,
   FaClipboardList,
+  FaTachometerAlt,
+  FaUserEdit,
+  FaUserPlus,
+  FaRegHandshake,
+  FaCheckCircle,
+  FaClipboardCheck,
+  FaUserCircle,
 } from "react-icons/fa";
+
 import { GoBell } from "react-icons/go";
 import { CiUser } from "react-icons/ci";
 import { Link } from "react-router-dom";
@@ -18,6 +29,7 @@ import LogoHUIT from "../assets/logohuitt.png";
 const LayoutDepartment = ({ children }) => {
   const [sidebarToggle, setSidebarToggle] = useState(false);
   const [userInfo, setUserInfo] = useState({ name: "", role: "" });
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const sidebarRef = useRef();
@@ -26,14 +38,6 @@ const LayoutDepartment = ({ children }) => {
     if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
       setSidebarToggle(false);
     }
-  };
-  const handleLogout = () => {
-    // Xóa thông tin người dùng từ localStorage
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userRole");
-
-    // Điều hướng đến trang login (nếu sử dụng React Router)
-    window.location.href = "/"; // Hoặc dùng navigate trong react-router-dom
   };
 
   useEffect(() => {
@@ -50,6 +54,14 @@ const LayoutDepartment = ({ children }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  const handleLogout = () => {
+    // Xóa thông tin người dùng từ localStorage
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userRole");
+
+    // Điều hướng đến trang login (nếu sử dụng React Router)
+    window.location.href = "/"; // Hoặc dùng navigate trong react-router-dom
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100">
@@ -74,16 +86,7 @@ const LayoutDepartment = ({ children }) => {
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link to="/" className="flex items-center space-x-3">
                 <FaChartBar />
-                <span className="font-semibold">Dashboard Khoa </span>
-              </Link>
-            </li>
-            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-              <Link
-                to="/department/article-review"
-                className="flex items-center space-x-3"
-              >
-                <FaBook />
-                <span className="font-semibold">Article Review</span>
+                <span className="font-semibold">Dashboard Department</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -92,7 +95,7 @@ const LayoutDepartment = ({ children }) => {
                 className="flex items-center space-x-3"
               >
                 <FaClipboardList />
-                <span className="font-semibold">Lecturer Topic Approva</span>
+                <span className="font-semibold">Chi tiết đề tài GV</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -101,7 +104,7 @@ const LayoutDepartment = ({ children }) => {
                 className="flex items-center space-x-3"
               >
                 <FaClipboardList />
-                <span className="font-semibold">Student Topic Approval</span>
+                <span className="font-semibold">Chi tiết đề tài SV</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -109,8 +112,8 @@ const LayoutDepartment = ({ children }) => {
                 to="/department/science-seminar"
                 className="flex items-center space-x-3"
               >
-                <FaGift />
-                <span className="font-semibold"> Science Seminar</span>
+                <FaLaptopCode />
+                <span className="font-semibold"> hội thảo khoa học</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -118,8 +121,8 @@ const LayoutDepartment = ({ children }) => {
                 to="/department/edit-student"
                 className="flex items-center space-x-3"
               >
-                <FaUpload />
-                <span className="font-semibold">Edir Student</span>
+                <FaUserFriends />
+                <span className="font-semibold">Chỉnh nhóm sinh viên</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -127,8 +130,8 @@ const LayoutDepartment = ({ children }) => {
                 to="/department/product-manager"
                 className="flex items-center space-x-3"
               >
-                <FaComment />
-                <span className="font-semibold">Product Manager</span>
+                <FaBox />
+                <span className="font-semibold">Quan ý sản phẩm sinh viên</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -136,42 +139,75 @@ const LayoutDepartment = ({ children }) => {
                 to="/department/application-approval"
                 className="flex items-center space-x-3"
               >
-                <FaComment />
-                <span className="font-semibold">Duyệt hồ sơ SV Role khoa</span>
-              </Link>
-            </li>
-            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-              <Link
-                to="/department/application-approval-admin"
-                className="flex items-center space-x-3"
-              >
-                <FaComment />
+                <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ thêm đề tài role KHCN
+                  Duyệt hồ sơ NCKHSV Role khoa
                 </span>
               </Link>
             </li>
-            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-              <Link
-                to="/department/lecturer-application-approval-admin"
-                className="flex items-center space-x-3"
-              >
-                <FaComment />
-                <span className="font-semibold">Duyệt hồ sơ GV role khoa</span>
-              </Link>
-            </li>
+         
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
                 to="/department/lecturer-application-approval-list-admin"
                 className="flex items-center space-x-3"
               >
-                <FaComment />
-                <span className="font-semibold">Duyệt hồ sơ GV role KHCN</span>
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ NCKHGV role khoa
+                </span>
               </Link>
             </li>
+
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/department/science-seminar-departments"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ hội thảo role khoa
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/department/article-review-department"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ bài báo role Khoa{" "}
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/department/approval-of-school-topic-department"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ DTCS role khoa
+                </span>
+              </Link>
+            </li>
+        
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/department/approval-off-campus-project-department"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ NCNT role khoa
+                </span>
+              </Link>
+            </li>
+            
             <hr className="border-gray-400 my-4" />
 
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] p-2 rounded hover:text-[#d95959]"></li>
+            
           </ul>
         </div>
       </div>
@@ -243,3 +279,4 @@ const LayoutDepartment = ({ children }) => {
 };
 
 export default LayoutDepartment;
+
