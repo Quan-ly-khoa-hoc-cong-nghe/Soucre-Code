@@ -23,27 +23,40 @@ class HoSoNCKHGV {
             return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
         }
     }
-
-    public function add() {
-        try {
-            $sql = "INSERT INTO " . $this->table_name . " (MaHoSo, NgayNop, FileHoSo, TrangThai, MaKhoa) 
-                    VALUES (:maHoSo, :ngayNop, :fileHoSo, :trangThai, :maKhoa)";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':maHoSo', $this->MaHoSo);
-            $stmt->bindParam(':ngayNop', $this->NgayNop);
-            $stmt->bindParam(':fileHoSo', $this->FileHoSo);
-            $stmt->bindParam(':trangThai', $this->TrangThai);
-            $stmt->bindParam(':maKhoa', $this->MaKhoa);
-    
-            if ($stmt->execute()) {
-                return true;
-            } else {
-                throw new PDOException("Không thể thêm dữ liệu vào cơ sở dữ liệu.");
-            }
-        } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];
+        // Hàm sinh mã hồ sơ tự động
+        private function generateMaHoSo() {
+            // Đếm số dòng hiện tại trong bảng
+            $query = "SELECT COUNT(*) FROM " . $this->table_name;
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $count = $stmt->fetchColumn();
+            
+            // Tạo mã hồ sơ theo định dạng HSNCSV + (count + 1)
+            return "HSNCGV" . ($count + 1);
         }
-    }
+
+        public function add() {
+            try {
+                $this->MaHoSo = $this->generateMaHoSo();
+                $sql = "INSERT INTO " . $this->table_name . " (MaHoSo, NgayNop, FileHoSo, TrangThai, MaKhoa) 
+                        VALUES (:maHoSo, :ngayNop, :fileHoSo, :trangThai, :maKhoa)";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->bindParam(':maHoSo', $this->MaHoSo);
+                $stmt->bindParam(':ngayNop', $this->NgayNop);
+                $stmt->bindParam(':fileHoSo', $this->FileHoSo);
+                $stmt->bindParam(':trangThai', $this->TrangThai);
+                $stmt->bindParam(':maKhoa', $this->MaKhoa);
+        
+                if ($stmt->execute()) {
+                    return true;
+                } else {
+                    // Trả về thông điệp lỗi rõ ràng
+                    return "Không thể thêm dữ liệu vào cơ sở dữ liệu.";
+                }
+            } catch (PDOException $e) {
+                return "Lỗi: " . $e->getMessage();
+            }
+        }
     
     public function updateTrangThai() {
         try {

@@ -40,9 +40,7 @@ class HoSoNCKHSV {
     // Thêm hồ sơ mới
     public function add() {
         try {
-            // Tạo mã hồ sơ tự động
             $this->MaHoSo = $this->generateMaHoSo();
-
             $sql = "INSERT INTO " . $this->table_name . " (MaHoSo, NgayNop, FileHoSo, TrangThai, MaKhoa) 
                     VALUES (:maHoSo, :ngayNop, :fileHoSo, :trangThai, :maKhoa)";
             $stmt = $this->conn->prepare($sql);
@@ -55,12 +53,14 @@ class HoSoNCKHSV {
             if ($stmt->execute()) {
                 return true;
             } else {
-                throw new PDOException("Không thể thêm dữ liệu vào cơ sở dữ liệu.");
+                // Trả về thông điệp lỗi rõ ràng
+                return "Không thể thêm dữ liệu vào cơ sở dữ liệu.";
             }
         } catch (PDOException $e) {
-            return ["error" => "Lỗi: " . $e->getMessage()];
+            return "Lỗi: " . $e->getMessage();
         }
     }
+    
     
     public function updateTrangThai() {
         try {

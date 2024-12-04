@@ -32,15 +32,18 @@ switch ($action) {
                 $hoSo->FileHoSo = $data['FileHoSo'];
                 $hoSo->TrangThai = $data['TrangThai'];
                 $hoSo->MaKhoa = $data['MaKhoa'];
-                if ($hoSo->add()) {
+        
+                $result = $hoSo->add();
+                if ($result === true) {
                     echo json_encode(['message' => 'Thêm hồ sơ thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                 } else {
-                    echo json_encode(['message' => 'Không thể thêm hồ sơ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                    echo json_encode(['message' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE); // Hiển thị thông điệp lỗi
                 }
             } else {
                 echo json_encode(['message' => 'Dữ liệu không đầy đủ hoặc không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             }
             break;
+        
         
             case 'updateTrangThai':
                 if (!empty($data['MaHoSo']) && !empty($data['TrangThai'])) {
