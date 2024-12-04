@@ -52,7 +52,22 @@ const ApplicationApprovalList = () => {
     setIsEditModalOpen(true); // Open edit modal
   };
 
-
+  const handleEditSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post(
+        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/HoSoNCKHSV_Api.php?action=update",
+        editFormData
+      )
+      .then((response) => {
+        alert(response.data.message || "Application updated successfully!");
+        setIsEditModalOpen(false);
+        fetchApplications(); // Refresh the list
+      })
+      .catch((error) => {
+        console.error("Error updating application:", error);
+      });
+  };
 
   const handleDelete = (maHoSo) => {
     if (window.confirm("Are you sure you want to delete this application?")) {
@@ -73,10 +88,18 @@ const ApplicationApprovalList = () => {
 
   const handleCreateSubmit = (e) => {
     e.preventDefault();
+    // Tự động gán MaHoSo là 1 và trạng thái là "Khoa đã duyệt"
+    const formDataWithAutoId = {
+      ...createFormData,
+      MaHoSo: "1",  // Gán MaHoSo là 1
+      TrangThai: "Khoa đã duyệt", // Gán trạng thái mặc định
+      FileHoSo: createFormData.FileHoSo, // Lấy tên file đã chọn từ input
+    };
+  
     axios
       .post(
         "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/HoSoNCKHSV_Api.php?action=add",
-        createFormData
+        formDataWithAutoId
       )
       .then((response) => {
         alert(response.data.message || "New application added successfully!");
@@ -87,7 +110,7 @@ const ApplicationApprovalList = () => {
         console.error("Error adding application:", error);
       });
   };
-
+  
   // Helper function to get department name by MaKhoa
   const getDepartmentName = (maKhoa) => {
     const department = departments.find((dept) => dept.MaKhoa === maKhoa);
@@ -109,7 +132,8 @@ const ApplicationApprovalList = () => {
             <th className="px-4 py-2 border">Submission Date</th>
             <th className="px-4 py-2 border">File</th>
             <th className="px-4 py-2 border">Status</th>
-            <th className="px-4 py-2 border">Department</th> {/* Changed to display department name */}
+            <th className="px-4 py-2 border">Department</th>{" "}
+            {/* Changed to display department name */}
             <th className="px-4 py-2 border">Actions</th>
           </tr>
         </thead>
@@ -143,7 +167,8 @@ const ApplicationApprovalList = () => {
                   </span>
                 </td>
                 <td className="px-4 py-2 border">
-                  {getDepartmentName(app.MaKhoa)} {/* Display department name */}
+                  {getDepartmentName(app.MaKhoa)}{" "}
+                  {/* Display department name */}
                 </td>
                 <td className="px-4 py-2 border">
                   <button
@@ -163,13 +188,119 @@ const ApplicationApprovalList = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="6" className="px-4 py-2 border text-center text-gray-500">
+              <td
+                colSpan="6"
+                className="px-4 py-2 border text-center text-gray-500"
+              >
                 No applications found.
               </td>
             </tr>
           )}
         </tbody>
       </table>
+
+      {/* Edit Modal */}
+      {isEditModalOpen && editFormData && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">Edit Application</h2>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Application ID
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.MaHoSo}
+                    readOnly
+                    className="w-full px-4 py-2 border rounded-lg bg-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Submission Date
+                  </label>
+                  <input
+                    type="date"
+                    value={editFormData.NgayNop}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        NgayNop: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
+
+                <div>
+  <label className="block text-sm font-medium mb-1">File</label>
+  <input
+    type="file"
+    onChange={(e) => {
+      const fileName = e.target.files[0]?.name || ""; // Lấy tên file
+      setCreateFormData((prev) => ({
+        ...prev,
+        FileHoSo: fileName, // Lưu tên file vào state
+      }));
+    }}
+    className="w-full px-4 py-2 border rounded-lg"
+  />
+</div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Status
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.TrangThai}
+                    readOnly
+                    className="w-full px-4 py-2 border rounded-lg bg-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Department
+                  </label>
+                  <select
+                    value={editFormData.MaKhoa}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        MaKhoa: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-2 border rounded-lg"
+                  >
+                    {departments.map((dept) => (
+                      <option key={dept.MaKhoa} value={dept.MaKhoa}>
+                        {dept.TenKhoa}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-4 mt-4">
+                <button
+                  type="button"
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                  onClick={() => setIsEditModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Create Modal */}
       {isCreateModalOpen && (
@@ -179,21 +310,20 @@ const ApplicationApprovalList = () => {
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Application ID</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Application ID
+                  </label>
                   <input
                     type="text"
                     value={createFormData.MaHoSo}
-                    onChange={(e) =>
-                      setCreateFormData((prev) => ({
-                        ...prev,
-                        MaHoSo: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg"
+                    readOnly
+                    className="w-full px-4 py-2 border rounded-lg bg-gray-100"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Submission Date</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Submission Date
+                  </label>
                   <input
                     type="date"
                     value={createFormData.NgayNop}
@@ -207,21 +337,35 @@ const ApplicationApprovalList = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Status</label>
+  <label className="block text-sm font-medium mb-1">File</label>
+  <input
+    type="file"
+    onChange={(e) => {
+      const fileName = e.target.files[0]?.name || ""; // Lấy tên file
+      setCreateFormData((prev) => ({
+        ...prev,
+        FileHoSo: fileName, // Lưu tên file vào state
+      }));
+    }}
+    className="w-full px-4 py-2 border rounded-lg"
+  />
+</div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Status
+                  </label>
                   <input
                     type="text"
                     value={createFormData.TrangThai}
-                    onChange={(e) =>
-                      setCreateFormData((prev) => ({
-                        ...prev,
-                        TrangThai: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg"
+                    readOnly
+                    className="w-full px-4 py-2 border rounded-lg bg-gray-100"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Department</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Department
+                  </label>
                   <select
                     value={createFormData.MaKhoa}
                     onChange={(e) =>
@@ -232,41 +376,27 @@ const ApplicationApprovalList = () => {
                     }
                     className="w-full px-4 py-2 border rounded-lg"
                   >
-                    <option value="">Select Department</option>
-                    {departments.map((department) => (
-                      <option key={department.MaKhoa} value={department.MaKhoa}>
-                        {department.TenKhoa}
+                    {departments.map((dept) => (
+                      <option key={dept.MaKhoa} value={dept.MaKhoa}>
+                        {dept.TenKhoa}
                       </option>
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">File</label>
-                  <input
-                    type="file"
-                    onChange={(e) =>
-                      setCreateFormData((prev) => ({
-                        ...prev,
-                        FileHoSo: e.target.files[0].name,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg"
-                  />
-                </div>
               </div>
-              <div className="flex justify-end mt-4">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-6 py-2 rounded-lg"
-                >
-                  Add Application
-                </button>
+              <div className="flex justify-end gap-4 mt-4">
                 <button
                   type="button"
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="ml-4 bg-gray-200 text-gray-700 px-6 py-2 rounded-lg"
                 >
                   Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                >
+                  Save
                 </button>
               </div>
             </form>
