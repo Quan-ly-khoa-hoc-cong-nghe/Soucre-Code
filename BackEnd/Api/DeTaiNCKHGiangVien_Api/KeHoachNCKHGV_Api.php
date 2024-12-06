@@ -42,20 +42,20 @@ switch ($action) {
         }
         break;
 
-    case 'POST':
-        // Thêm kế hoạch mới
-        $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'], $data['MaDeTaiNCKHGV'])) {
-            if ($keHoach->addPlan($data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'], $data['MaDeTaiNCKHGV'])) {
-                echo json_encode(["message" => "Thêm kế hoạch thành công."]);
+        case 'POST':
+            // Thêm kế hoạch mới
+            $data = json_decode(file_get_contents("php://input"), true);
+            if (isset($data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'])) {
+                if ($keHoach->addPlan($data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'])) {
+                    echo json_encode(["message" => "Thêm kế hoạch thành công."]);
+                } else {
+                    echo json_encode(["message" => "Thêm kế hoạch thất bại."]);
+                }
             } else {
-                echo json_encode(["message" => "Thêm kế hoạch thất bại."]);
+                echo json_encode(["message" => "Thiếu thông tin kế hoạch để tạo."]);
             }
-        } else {
-            echo json_encode(["message" => "Thiếu thông tin kế hoạch để tạo."]);
-        }
-        break;
-
+            break;
+        
     case 'PUT':
         // Cập nhật kế hoạch theo MaDeTaiNCKHGV
         $data = json_decode(file_get_contents("php://input"), true);

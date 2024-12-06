@@ -21,6 +21,7 @@ class DeTaiNCKHGV {
         $stmt->execute();
         return $stmt;
     }
+    
 
     // Lấy một đề tài NCKH
     public function readOne() {
@@ -41,16 +42,18 @@ class DeTaiNCKHGV {
     }
 
     // Tạo mới mã đề tài tự động
-    private function generateMaDeTaiNCKHGV() {
-        // Đếm số dòng hiện tại trong bảng
-        $query = "SELECT COUNT(*) FROM " . $this->table_name;
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        $count = $stmt->fetchColumn();
-        
-        // Tạo mã đề tài mới theo định dạng DTNCGV + (count + 1)
-        return "DTNCGV" . ($count + 1);
-    }
+   // Tạo mã đề tài tự động theo định dạng DTNCGV + (số dòng hiện tại + 1)
+private function generateMaDeTaiNCKHGV() {
+    // Đếm số dòng hiện tại trong bảng
+    $query = "SELECT COUNT(*) FROM " . $this->table_name;
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    $count = $stmt->fetchColumn();
+    
+    // Tạo mã đề tài mới theo định dạng DTNCGV + (count + 1)
+    return "DTNCGV" . ($count + 1);
+}
+
 
     // Tạo mới đề tài NCKH
     public function create() {
