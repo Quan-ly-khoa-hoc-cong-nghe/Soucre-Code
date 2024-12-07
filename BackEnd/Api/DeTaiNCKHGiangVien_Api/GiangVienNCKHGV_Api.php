@@ -40,30 +40,43 @@ switch ($action) {
         }
         break;
 
-    case 'POST':
-        $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->SoGioQuyDoi) && !empty($data->MaNhomNCKHGV) && !empty($data->VaiTro) && !empty($data->MaGV)) {
+        case 'POST':
+            $data = json_decode(file_get_contents("php://input"));
+            
+            // Kiểm tra các trường dữ liệu
+            if (empty($data->SoGioQuyDoi)) {
+                echo json_encode(["message" => "Trường SoGioQuyDoi không hợp lệ."]);
+                break;
+            }
+            
+            if (empty($data->MaNhomNCKHGV)) {
+                echo json_encode(["message" => "Trường MaNhomNCKHGV không hợp lệ."]);
+                break;
+            }
+            
+            if (empty($data->MaGV)) {
+                echo json_encode(["message" => "Trường MaGV không hợp lệ."]);
+                break;
+            }
+            
+            // Nếu tất cả dữ liệu hợp lệ, tiếp tục xử lý
             $giangvien->SoGioQuyDoi = $data->SoGioQuyDoi;
             $giangvien->MaNhomNCKHGV = $data->MaNhomNCKHGV;
-            $giangvien->VaiTro = $data->VaiTro;
             $giangvien->MaGV = $data->MaGV;
-
+        
             if ($giangvien->create()) {
                 echo json_encode(["message" => "Dữ liệu giảng viên được thêm mới thành công."]);
             } else {
                 echo json_encode(["message" => "Không thể thêm dữ liệu giảng viên."]);
             }
-        } else {
-            echo json_encode(["message" => "Dữ liệu không hợp lệ."]);
-        }
-        break;
+            break;
+        
 
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
         if (!empty($data->MaGV)) {
             $giangvien->SoGioQuyDoi = $data->SoGioQuyDoi;
             $giangvien->MaNhomNCKHGV = $data->MaNhomNCKHGV;
-            $giangvien->VaiTro = $data->VaiTro;
             $giangvien->MaGV = $data->MaGV;
 
             if ($giangvien->update()) {
@@ -76,23 +89,21 @@ switch ($action) {
         }
         break;
 
-    case 'DELETE':
-        $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->MaGV)) {
-            $giangvien->MaGV = $data->MaGV;
-
-            if ($giangvien->delete()) {
-                echo json_encode(["message" => "Dữ liệu giảng viên đã được xóa."]);
+        case 'DELETE':
+            $data = json_decode(file_get_contents("php://input"));
+            if (!empty($data->MaGV) && !empty($data->MaNhomNCKHGV)) {
+                $giangvien->MaGV = $data->MaGV;
+                $giangvien->MaNhomNCKHGV = $data->MaNhomNCKHGV;
+        
+                if ($giangvien->delete()) {
+                    echo json_encode(["message" => "Dữ liệu giảng viên đã được xóa."]);
+                } else {
+                    echo json_encode(["message" => "Không thể xóa dữ liệu giảng viên."]);
+                }
             } else {
-                echo json_encode(["message" => "Không thể xóa dữ liệu giảng viên."]);
+                echo json_encode(["message" => "Tham số MaGV và MaNhomNCKHGV không được cung cấp."]);
             }
-        } else {
-            echo json_encode(["message" => "Tham số MaGV không được cung cấp."]);
-        }
-        break;
-
-    default:
-        echo json_encode(["message" => "Hành động không được hỗ trợ: $action."]);
-        break;
+            break;
+        
 }
 ?>

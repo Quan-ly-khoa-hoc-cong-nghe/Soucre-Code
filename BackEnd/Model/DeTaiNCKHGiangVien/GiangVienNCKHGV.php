@@ -5,8 +5,6 @@ class GiangVienNCKHGV {
 
     public $SoGioQuyDoi;
     public $MaNhomNCKHGV;
-
-    public $VaiTro;
     public $MaGV;
 
     public function __construct($db) {
@@ -32,15 +30,19 @@ class GiangVienNCKHGV {
 
     // Tạo mới dữ liệu
     public function create() {
-        $query = "INSERT INTO " . $this->table_name . " SET SoGioQuyDoi=:SoGioQuyDoi, MaNhomNCKHGV=:MaNhomNCKHGV,VaiTro =:VaiTro, MaGV=:MaGV";
+        $query = "INSERT INTO " . $this->table_name . " SET SoGioQuyDoi=:SoGioQuyDoi, MaNhomNCKHGV=:MaNhomNCKHGV, MaGV=:MaGV";
         $stmt = $this->conn->prepare($query);
-
+    
+        // Kiểm tra nếu SoGioQuyDoi là rỗng, gán giá trị NULL
+        if (empty($this->SoGioQuyDoi)) {
+            $this->SoGioQuyDoi = NULL;
+        }
+    
         // Gắn dữ liệu
         $stmt->bindParam(":SoGioQuyDoi", $this->SoGioQuyDoi);
         $stmt->bindParam(":MaNhomNCKHGV", $this->MaNhomNCKHGV);
-        $stmt->bindParam("VaiTro", $this->VaiTro);
         $stmt->bindParam(":MaGV", $this->MaGV);
-
+    
         if ($stmt->execute()) {
             return true;
         }
@@ -49,13 +51,12 @@ class GiangVienNCKHGV {
 
     // Cập nhật dữ liệu
     public function update() {
-        $query = "UPDATE " . $this->table_name . " SET SoGioQuyDoi=:SoGioQuyDoi, MaNhomNCKHGV=:MaNhomNCKHGV, VaiTro =: VaiTro WHERE MaGV=:MaGV";
+        $query = "UPDATE " . $this->table_name . " SET SoGioQuyDoi=:SoGioQuyDoi, MaNhomNCKHGV=:MaNhomNCKHGV WHERE MaGV=:MaGV";
         $stmt = $this->conn->prepare($query);
 
         // Gắn dữ liệu
         $stmt->bindParam(":SoGioQuyDoi", $this->SoGioQuyDoi);
         $stmt->bindParam(":MaNhomNCKHGV", $this->MaNhomNCKHGV);
-        $stmt->bindParam("VaiTro", $this->VaiTro);
         $stmt->bindParam(":MaGV", $this->MaGV);
 
         if ($stmt->execute()) {
@@ -65,15 +66,18 @@ class GiangVienNCKHGV {
     }
 
     // Xóa dữ liệu
-    public function delete() {
-        $query = "DELETE FROM " . $this->table_name . " WHERE MaGV = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->MaGV);
+   // Xóa dữ liệu theo MaGV và MaNhomNCKHGV
+public function delete() {
+    $query = "DELETE FROM " . $this->table_name . " WHERE MaGV = ? AND MaNhomNCKHGV = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(1, $this->MaGV);
+    $stmt->bindParam(2, $this->MaNhomNCKHGV);
 
-        if ($stmt->execute()) {
-            return true;
-        }
-        return false;
+    if ($stmt->execute()) {
+        return true;
     }
+    return false;
+}
+
 }
 ?>

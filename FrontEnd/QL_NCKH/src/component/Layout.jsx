@@ -118,6 +118,15 @@ const Layout = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
+                to="/admin/edit-Lecturer"
+                className="flex items-center space-x-3"
+              >
+                <FaUserFriends />
+                <span className="font-semibold">Chỉnh nhóm giảng viên</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
                 to="/admin/edit-student"
                 className="flex items-center space-x-3"
               >

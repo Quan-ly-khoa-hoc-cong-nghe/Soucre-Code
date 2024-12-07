@@ -26,7 +26,7 @@ import ListArticleReviewSciTech from './component/ArticleReview/ListArticleRevie
 import ApprovalOfSchoolTopicDepartment from './component/School-LevelTopic/ApprovalOfSchoolTopicDepartment';
 import ApprovalOfSchoolTopicSciTech from './component/School-LevelTopic/ApprovalOfSchoolTopicSciTech';
 import ApprovalOffCampusProjectDepartment from './component/OffCampusProject/ApprovalOffCampusProjectDepartment';
-
+import EditLecturer from './component/LecturerTopicApproval/EditLecturer';
 import ApprovalOffCampusProjectSciTech from './component/OffCampusProject/ApprovalOffCampusProjectSciTech';
 // Component bảo vệ route
 const PrivateRoute = ({ element, layout: LayoutComponent }) => {
@@ -60,6 +60,8 @@ function App() {
         <Route path="/admin/approval-of-school-topic-sciTech" element={<PrivateRoute element={< ApprovalOfSchoolTopicSciTech/>} layout={Layout} />} />
         <Route path="/admin/approval-off-campus-project-department" element={<PrivateRoute element={< ApprovalOffCampusProjectDepartment/>} layout={Layout} />} />
         <Route path="/admin/approval-off-campus-project-scitech" element={<PrivateRoute element={< ApprovalOffCampusProjectSciTech/>} layout={Layout} />} />
+        <Route path="/admin/edit-lecturer" element={<PrivateRoute element={<EditLecturer />} layout={Layout} />} />
+
 
         
         {/* Các route cho LayoutDepartment */}
