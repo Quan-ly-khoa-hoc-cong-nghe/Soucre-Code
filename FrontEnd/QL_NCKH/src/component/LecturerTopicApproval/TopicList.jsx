@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaEye, FaEdit } from "react-icons/fa";
+import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 
 const TopicList = () => {
   const [topics, setTopics] = useState([]);
@@ -9,7 +9,6 @@ const TopicList = () => {
   const [nhomNCKHDetails, setNhomNCKHDetails] = useState([]);
   const [giangVienDetails, setGiangVienDetails] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTopic, setEditedTopic] = useState(null);
 
   // Tải dữ liệu đề tài và loại hình
   useEffect(() => {
@@ -27,6 +26,51 @@ const TopicList = () => {
     setSelectedTopic(null); // Hoặc cách khác để ẩn modal, tùy thuộc vào trạng thái bạn đang dùng
     setIsEditing(false); // Nếu bạn muốn tắt chế độ chỉnh sửa khi đóng modal
   };
+ const handleAddNhomNCKH = async () => {
+  if (!selectedTopic) {
+    alert("Vui lòng chọn đề tài trước");
+    return;
+  }
+
+  const newNhom = {
+    MaDeTaiNCKHGV: selectedTopic.MaDeTaiNCKHGV, // Tạo đối tượng JSON từ selectedTopic
+  };
+
+  try {
+    const response = await fetch(
+      "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/NhomNCKHGV_Api.php?action=POST",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Đảm bảo header là JSON
+        },
+        body: JSON.stringify(newNhom), // Chuyển đối tượng thành JSON
+      }
+    );
+
+    const result = await response.json(); // Giải mã dữ liệu JSON từ response
+    console.log("API Response:", result); // Log toàn bộ phản hồi từ API
+
+    if (response.ok) {
+      if (result.message === "Nhóm NCKH đã được tạo thành công.") {
+        const addedNhom = result.data;
+        setNhomNCKHDetails([...nhomNCKHDetails, addedNhom]); // Cập nhật danh sách nhóm
+        alert("Nhóm NCKH đã được thêm thành công!");
+      } else {
+        alert(`Lỗi từ API: ${result.message}`);
+      }
+    } else {
+      console.error("HTTP Error:", response.status, response.statusText); // Log lỗi HTTP nếu có
+      alert("Có lỗi xảy ra khi thêm nhóm!");
+    }
+  } catch (error) {
+    console.error("Error adding new Nhom:", error); // Log lỗi khi gọi API
+    alert(`Có lỗi xảy ra khi thêm nhóm. Chi tiết: ${error.message}`);
+  }
+};
+
+  
+  
   
   // Lấy danh sách đề tài
   const fetchTopics = async () => {
@@ -35,6 +79,42 @@ const TopicList = () => {
     );
     const data = await response.json();
     return data;
+  };
+  // Hàm xóa đề tài
+  const handleDeleteTopic = async (maDeTai) => {
+    const confirmDelete = window.confirm(
+      "Bạn có chắc chắn muốn xóa đề tài này?"
+    );
+    if (confirmDelete) {
+      try {
+        // Dữ liệu cần gửi
+        const data = {
+          MaDeTaiNCKHGV: maDeTai,
+        };
+
+        const response = await fetch(
+          "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/DeTaiNCKHGiangVien_Api.php?action=DELETE",
+          {
+            method: "POST", // Sử dụng POST thay vì DELETE
+            headers: {
+              "Content-Type": "application/json", // Định dạng là JSON
+            },
+            body: JSON.stringify(data), // Chuyển đối tượng data thành chuỗi JSON
+          }
+        );
+
+        if (response.ok) {
+          // Cập nhật lại danh sách đề tài sau khi xóa
+          setTopics(topics.filter((topic) => topic.MaDeTaiNCKHGV !== maDeTai));
+          alert("Đề tài đã được xóa!");
+        } else {
+          alert("Có lỗi xảy ra khi xóa đề tài.");
+        }
+      } catch (error) {
+        console.error("Error deleting topic:", error);
+        alert("Có lỗi xảy ra khi xóa đề tài.");
+      }
+    }
   };
 
   // Lấy thông tin hồ sơ
@@ -96,17 +176,6 @@ const TopicList = () => {
     return loaiHinh ? loaiHinh.TenLoaiHinh : "Không xác định";
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
-    setEditedTopic({ ...selectedTopic }); // Sao chép đề tài hiện tại để chỉnh sửa
-  };
-
-  // Hủy bỏ chế độ chỉnh sửa
-  const handleCancel = () => {
-    setIsEditing(false);
-    setEditedTopic(null);
-  };
-
   // Lấy thông tin giảng viên chi tiết khi xem chi tiết đề tài
   const handleViewDetails = async (topic) => {
     setSelectedTopic(topic);
@@ -137,7 +206,6 @@ const TopicList = () => {
       <div className="bg-white rounded-lg shadow-lg p-6">
         <table className="w-full table-auto">
           <thead>
-            
             <tr className="bg-gray-100 border-b">
               <th className="text-left py-3 px-4 font-semibold">Tên Đề Tài</th>
               <th className="text-left py-3 px-4 font-semibold">Mã Hồ Sơ</th>
@@ -172,7 +240,15 @@ const TopicList = () => {
                     >
                       <FaEye className="w-5 h-5" />
                     </button>
-                    
+
+                    {/* Icon xóa để xóa đề tài */}
+                    <button
+                      onClick={() => handleDeleteTopic(topic.MaDeTaiNCKHGV)} // Hàm xóa sẽ gọi với mã đề tài
+                      className="p-2 text-red-600 hover:bg-red-100 rounded-full"
+                      title="Xóa"
+                    >
+                      <FaTrash className="w-5 h-5" />
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -320,7 +396,7 @@ const TopicList = () => {
                 )}
 
                 {/* Hiển thị thông tin nhóm nghiên cứu */}
-                {nhomNCKHDetails &&
+                {nhomNCKHDetails && nhomNCKHDetails.length > 0 ? (
                   nhomNCKHDetails.map((nhom) => (
                     <div key={nhom.MaNhomNCKHGV}>
                       <div>
@@ -343,150 +419,104 @@ const TopicList = () => {
                         />
                       </div>
                     </div>
-                  ))}
+                  ))
+                ) : (
+                  // Nếu không có nhóm, hiển thị nút "Thêm Nhóm"
+                  <div className="text-center mt-4">
+                  <button
+                    onClick={handleAddNhomNCKH} // Gọi hàm khi nhấn nút
+                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                  >
+                    Thêm Nhóm NCKH
+                  </button>
+                </div>
+                )}
+
                 {/* Hiển thị thông tin giảng viên */}
                 {giangVienDetails &&
-                  giangVienDetails.map((giangVien) => (
-                    <div key={giangVien.MaGV}>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600">
-                          Giảng Viên
-                        </label>
-                        <input
-                          type="text"
-                          value={giangVien.HoTenGV}
-                          onChange={(e) => {
-                            const updatedGiangVien = [...giangVienDetails];
-                            updatedGiangVien[
-                              giangVienDetails.indexOf(giangVien)
-                            ] = { ...giangVien, HoTenGV: e.target.value };
-                            setGiangVienDetails(updatedGiangVien);
-                          }}
-                          className="w-full px-4 py-2 border rounded-md"
-                          disabled={!isEditing}
-                        />
-                      </div>
+  giangVienDetails.map((giangVien) => (
+    <div key={giangVien.MaGV} className="bg-gray-50 p-6 rounded-lg shadow-md mb-6">
+      <h3 className="text-xl font-semibold text-gray-700 mb-4">{giangVien.HoTenGV}</h3>
+      
+      {/* Thông tin cá nhân */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-600">Ngày Sinh</label>
+          <input
+            type="date"
+            value={giangVien.NgaySinhGV}
+            onChange={(e) => {
+              const updatedGiangVien = [...giangVienDetails];
+              updatedGiangVien[giangVienDetails.indexOf(giangVien)] = { ...giangVien, NgaySinhGV: e.target.value };
+              setGiangVienDetails(updatedGiangVien);
+            }}
+            className="w-full px-4 py-2 border rounded-md"
+            disabled={!isEditing}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-600">Địa Chỉ</label>
+          <input
+            type="text"
+            value={giangVien.DiaChiGV}
+            onChange={(e) => {
+              const updatedGiangVien = [...giangVienDetails];
+              updatedGiangVien[giangVienDetails.indexOf(giangVien)] = { ...giangVien, DiaChiGV: e.target.value };
+              setGiangVienDetails(updatedGiangVien);
+            }}
+            className="w-full px-4 py-2 border rounded-md"
+            disabled={!isEditing}
+          />
+        </div>
+      </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600">
-                          Email
-                        </label>
-                        <input
-                          type="email"
-                          value={giangVien.EmailGV}
-                          onChange={(e) => {
-                            const updatedGiangVien = [...giangVienDetails];
-                            updatedGiangVien[
-                              giangVienDetails.indexOf(giangVien)
-                            ] = { ...giangVien, EmailGV: e.target.value };
-                            setGiangVienDetails(updatedGiangVien);
-                          }}
-                          className="w-full px-4 py-2 border rounded-md"
-                          disabled={!isEditing}
-                        />
-                      </div>
+      {/* Thông tin liên lạc */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-600">Email</label>
+        <input
+          type="email"
+          value={giangVien.EmailGV}
+          onChange={(e) => {
+            const updatedGiangVien = [...giangVienDetails];
+            updatedGiangVien[giangVienDetails.indexOf(giangVien)] = { ...giangVien, EmailGV: e.target.value };
+            setGiangVienDetails(updatedGiangVien);
+          }}
+          className="w-full px-4 py-2 border rounded-md"
+          disabled={!isEditing}
+        />
+      </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600">
-                          Địa chỉ
-                        </label>
-                        <input
-                          type="text"
-                          value={giangVien.DiaChiGV}
-                          onChange={(e) => {
-                            const updatedGiangVien = [...giangVienDetails];
-                            updatedGiangVien[
-                              giangVienDetails.indexOf(giangVien)
-                            ] = { ...giangVien, DiaChiGV: e.target.value };
-                            setGiangVienDetails(updatedGiangVien);
-                          }}
-                          className="w-full px-4 py-2 border rounded-md"
-                          disabled={!isEditing}
-                        />
-                      </div>
+      {/* Thông tin điểm NCKH */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-600">Điểm NCKH</label>
+        <input
+          type="number"
+          value={giangVien.DiemNCKH}
+          onChange={(e) => {
+            const updatedGiangVien = [...giangVienDetails];
+            updatedGiangVien[giangVienDetails.indexOf(giangVien)] = { ...giangVien, DiemNCKH: e.target.value };
+            setGiangVienDetails(updatedGiangVien);
+          }}
+          className="w-full px-4 py-2 border rounded-md"
+          disabled={!isEditing}
+        />
+      </div>
+    </div>
+  ))}
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600">
-                          Ngày sinh
-                        </label>
-                        <input
-                          type="date"
-                          value={giangVien.NgaySinhGV}
-                          onChange={(e) => {
-                            const updatedGiangVien = [...giangVienDetails];
-                            updatedGiangVien[
-                              giangVienDetails.indexOf(giangVien)
-                            ] = { ...giangVien, NgaySinhGV: e.target.value };
-                            setGiangVienDetails(updatedGiangVien);
-                          }}
-                          className="w-full px-4 py-2 border rounded-md"
-                          disabled={!isEditing}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600">
-                          Điểm NCKH
-                        </label>
-                        <input
-                          type="number"
-                          value={giangVien.DiemNCKH}
-                          onChange={(e) => {
-                            const updatedGiangVien = [...giangVienDetails];
-                            updatedGiangVien[
-                              giangVienDetails.indexOf(giangVien)
-                            ] = { ...giangVien, DiemNCKH: e.target.value };
-                            setGiangVienDetails(updatedGiangVien);
-                          }}
-                          className="w-full px-4 py-2 border rounded-md"
-                          disabled={!isEditing}
-                        />
-                      </div>
-                    </div>
-                  ))}
 
                 {/* Nút chỉnh sửa */}
                 <div className="text-center">
-                  {!isEditing && (
-                    <button
-                      onClick={handleEdit}
-                      className="p-2 mt-4 bg-blue-500 text-white rounded"
-                      title="Chỉnh sửa thông tin"
-                    >
-                      <FaEdit className="inline-block mr-2" />
-                      Chỉnh Sửa
-                    </button>
-                    
-                  )}
+                  
                   <button
-    onClick={handleClose}  // Hàm này sẽ gọi để đóng modal
-    className="p-2 mt-4 bg-gray-500 text-white rounded ml-4"
-    title="Đóng"
-  >
-    Đóng
-  </button>
+                    onClick={handleClose} // Hàm này sẽ gọi để đóng modal
+                    className="p-2 mt-4 bg-gray-500 text-white rounded ml-4"
+                    title="Đóng"
+                  >
+                    Đóng
+                  </button>
                 </div>
               </div>
-
-              {/* Modal chỉnh sửa */}
-              {isEditing && editedTopic && (
-                <div className="mt-6">
-                  <div className="space-y-4">
-                    {/* Lưu và hủy */}
-                    <div className="flex justify-end space-x-4 mt-4">
-                      <button
-                        onClick={handleCancel}
-                        className="p-2 bg-gray-500 text-white rounded"
-                      >
-                        Hủy
-                      </button>
-                      <button className="p-2 bg-blue-600 text-white rounded">
-                        Lưu
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}

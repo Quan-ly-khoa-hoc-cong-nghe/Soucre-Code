@@ -39,21 +39,37 @@ switch ($action) {
         }
         break;
 
-    case 'POST':
-        $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->MaNhomNCKHGV) && !empty($data->MaDeTaiNCKHGV)) {
-            $nhom->MaNhomNCKHGV = $data->MaNhomNCKHGV;
-            $nhom->MaDeTaiNCKHGV = $data->MaDeTaiNCKHGV;
-
-            if ($nhom->create()) {
-                echo json_encode(["message" => "Nhóm NCKH được tạo thành công."]);
+        case 'POST':
+            // Lấy dữ liệu từ request body
+            $data = json_decode(file_get_contents("php://input"));
+            
+            // Kiểm tra xem MaDeTaiNCKHGV có được cung cấp không
+            if (!empty($data->MaDeTaiNCKHGV)) {
+                $nhom->MaDeTaiNCKHGV = $data->MaDeTaiNCKHGV; // Gán MaDeTaiNCKHGV từ request
+        
+                // Gọi phương thức create để tạo nhóm mới
+                if ($nhom->create()) {
+                    // Trả về thông báo thành công kèm thông tin nhóm mới
+                    $newNhom = [
+                        "MaNhomNCKHGV" => $nhom->MaNhomNCKHGV,
+                        "MaDeTaiNCKHGV" => $nhom->MaDeTaiNCKHGV
+                    ];
+                    echo json_encode([
+                        "message" => "Nhóm NCKH đã được tạo thành công.",
+                        "data" => $newNhom // Trả về dữ liệu nhóm mới
+                    ]);
+                } else {
+                    // Nếu không thể tạo nhóm, trả về thông báo lỗi
+                    echo json_encode(["message" => "Không thể tạo nhóm NCKH."]);
+                }
             } else {
-                echo json_encode(["message" => "Không thể tạo nhóm NCKH."]);
+                // Nếu MaDeTaiNCKHGV không được cung cấp, trả về thông báo lỗi
+                echo json_encode(["message" => "Tham số MaDeTaiNCKHGV không được cung cấp."]);
             }
-        } else {
-            echo json_encode(["message" => "Dữ liệu không hợp lệ."]);
-        }
-        break;
+            break;
+        
+        
+    
 
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));

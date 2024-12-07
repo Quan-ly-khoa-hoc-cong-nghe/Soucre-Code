@@ -18,15 +18,17 @@ class NhomNCKHGV {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     private function generateMaNhomNCKHGV() {
-    // Đếm số dòng hiện tại trong bảng NhomNCKHGV
-    $query = "SELECT COUNT(*) FROM " . $this->table_name;
-    $stmt = $this->conn->prepare($query);
-    $stmt->execute();
-    $count = $stmt->fetchColumn();
+        // Đếm số dòng hiện tại trong bảng NhomNCKHGV
+        $query = "SELECT COUNT(*) FROM " . $this->table_name;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
+        
+        // Tạo mã nhóm mới theo kiểu số nguyên, ví dụ: 1, 2, 3
+        return $count + 1; // Trả về số nguyên
+    }
     
-    // Tạo mã nhóm mới theo định dạng MaNhomNCKHGV + (count + 1)
-    return "MaNhomNCKHGV" . str_pad($count + 1, 3, '0', STR_PAD_LEFT); // Ví dụ: MaNhomNCKHGV001, MaNhomNCKHGV002
-}
+    
 
 
     // Lấy một nhóm NCKH
@@ -59,12 +61,20 @@ class NhomNCKHGV {
         $stmt->bindParam(":MaDeTaiNCKHGV", $this->MaDeTaiNCKHGV);
     
         if ($stmt->execute()) {
-            return true;
+            // Trả về thông báo thành công và nhóm mới
+            return [
+                'message' => 'Nhóm NCKH đã được tạo thành công.',
+                'data' => [
+                    'MaNhomNCKHGV' => $this->MaNhomNCKHGV,
+                    'MaDeTaiNCKHGV' => $this->MaDeTaiNCKHGV
+                ]
+            ];
         }
     
         // Nếu có lỗi trong quá trình thực thi câu lệnh, trả về false
         return false;
     }
+    
     
 
     // Cập nhật nhóm NCKH
