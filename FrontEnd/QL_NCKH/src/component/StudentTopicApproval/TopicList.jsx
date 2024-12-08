@@ -4,54 +4,6 @@ import { FaCheck, FaTimes, FaEye } from "react-icons/fa";
 // Base API URL
 const API_BASE = "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV";
 
-// Modal Components
-const StudentDetailModal = ({ students, onClose }) => {
-  return (
-    <div className="modal">
-      <button onClick={onClose}>Close</button>
-      <h2>Student Details</h2>
-      {students.map((student, index) => (
-        <div key={index} className="student-detail">
-          <p>
-            <strong>Name:</strong> {student.TenSinhVien}
-          </p>
-          <p>
-            <strong>Student ID:</strong> {student.MaSinhVien}
-          </p>
-          <p>
-            <strong>Email:</strong> {student.EmailSV}
-          </p>
-          <p>
-            <strong>SĐT:</strong> {student.sdtSV}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const AdvisorDetailModal = ({ advisors, onClose }) => {
-  return (
-    <div className="modal">
-      <button onClick={onClose}>Close</button>
-      <h2>Advisor Details</h2>
-      {advisors.map((advisor, index) => (
-        <div key={index} className="advisor-detail">
-          <p>
-            <strong>Name:</strong> {advisor.name}
-          </p>
-          <p>
-            <strong>Department:</strong> {advisor.department}
-          </p>
-          <p>
-            <strong>Email:</strong> {advisor.email}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 const TopicList = () => {
   // State Variables
   const [topics, setTopics] = useState([]);
@@ -59,6 +11,7 @@ const TopicList = () => {
   const [showStudentDetail, setShowStudentDetail] = useState(false);
   const [showAdvisorDetail, setShowAdvisorDetail] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedAdvisor, setSelectedAdvisor] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTopic, setEditedTopic] = useState({});
   const [loading, setLoading] = useState(false);
@@ -110,21 +63,45 @@ const TopicList = () => {
 
   const fetchTopicDetails = async (maDeTaiSV) => {
     try {
+      // Fetch thông tin đề tài
       const topicDetailsResponse = await axios.get(
         `${API_BASE}/DeTaiNCKHSV_Api.php?action=getInfoByMaDeTaiSV&MaDeTaiSV=${maDeTaiSV}`
       );
-      const topicDetails = topicDetailsResponse.data.DeTaiNCKHSV || {};
-      console.log("Topic Details:", topicDetails); // Debugging line
-      if (topicDetails.TenDeTai) {
-        setSelectedTopic((prevTopic) => ({
-          ...prevTopic, // Giữ lại các dữ liệu cũ của topic
-          ...topicDetails, // Thêm thông tin chi tiết mới vào
-        }));
+      const topicDetails = topicDetailsResponse.data.DeTaiNCKHSV || [];
+      console.log("Thông tin đề tài:", topicDetails); // Debugging line
+      if (topicDetails.length > 0) {
+        setSelectedTopic(topicDetails); // Cập nhật thông tin đề tài
       } else {
-        console.warn("Không tìm thấy chi tiết đề tài");
+        alert("Không tìm thấy chi tiết đề tài");
+        return;
+      }
+
+      // Fetch thông tin sinh viên
+      const studentResponse = await axios.get(
+        `${API_BASE}/SinhVienNCKHSV_Api.php?action=readByDeTai&MaDeTaiSV=${maDeTaiSV}`
+      );
+      const studentData = studentResponse.data.SinhVienNCKHSV || [];
+      console.log("Dữ liệu sinh viên:", studentData); // Debugging line
+      if (studentData.length > 0) {
+        setSelectedStudent(studentData); // Lưu thông tin sinh viên vào state (mảng)
+      } else {
+        setSelectedStudent([]); // Set mảng trống nếu không có sinh viên
+      }
+
+      // Fetch thông tin giảng viên
+      const advisorResponse = await axios.get(
+        `${API_BASE}/GiangVienNCKHSV_Api.php?action=readByDeTai&MaDeTaiSV=${maDeTaiSV}`
+      );
+      const advisorData = advisorResponse.data.GiangVienNCKHSV || [];
+      console.log("Dữ liệu giảng viên:", advisorData); // Debugging line
+      if (advisorData.length > 0) {
+        setSelectedAdvisor(advisorData); // Lưu thông tin giảng viên vào state (mảng)
+      } else {
+        setSelectedAdvisor([]); // Set mảng trống nếu không có giảng viên
       }
     } catch (error) {
-      console.error("Error fetching topic details:", error);
+      console.error("Lỗi khi gọi API chi tiết đề tài:", error);
+      alert("Đã xảy ra lỗi khi tải chi tiết đề tài.");
     }
   };
 
@@ -210,100 +187,112 @@ const TopicList = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40">
           <div className="bg-white rounded-lg p-6 max-w-4xl w-full shadow-lg overflow-y-auto max-h-[90vh]">
             <h2 className="text-2xl font-bold mb-4 text-center">
-              {selectedTopic.TenDeTai || "Tên Đề Tài"}
+              {selectedTopic && selectedTopic[0]
+                ? selectedTopic[0].TenDeTai
+                : "Tên Đề Tài"}
             </h2>
-            {/* Description Section */ console.log(selectedTopic.TenDeTai)}
+            {/* Description Section */}
             <div className="mb-4">
               <h3 className="text-xl font-semibold mb-2">Mô Tả Đề Tài</h3>
-              <p>{selectedTopic.MoTa || "Không có mô tả."}</p>
+              <p>
+                {selectedTopic && selectedTopic[0]
+                  ? selectedTopic[0].MoTa
+                  : "Không có mô tả."}
+              </p>
             </div>
             Information Grid
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              {/* Student Details */}
-              {/* <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
+              {/* Thông Tin Sinh Viên */}
+              <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
                 <h3 className="font-semibold mb-2">Thông Tin Sinh Viên</h3>
-                {selectedTopic.students.length > 0 ? (
-                  <ul className="list-disc list-inside">
-                    {selectedTopic.students.map((student) => (
-                      <li key={student.id}>
-                        <span className="font-medium">{student.name}</span> (ID:{" "}
-                        {student.id}){" "}
-                        <button
-                          onClick={() => handleStudentDetail(student)}
-                          className="text-blue-500 underline ml-2"
-                        >
-                          Xem Chi Tiết
-                        </button>
+                {selectedStudent && selectedStudent.length > 0 ? (
+                  <ul className="list-none p-0">
+                    {selectedStudent.map((student) => (
+                      <li
+                        key={student.MaGiangVien}
+                        className="flex justify-between items-center p-4 mb-4 border rounded-lg bg-white shadow-sm"
+                      >
+                        <div>
+                          <strong>Mã GV:</strong> {student.MaSinhVien}
+                          <p>
+                            <strong>Tên:</strong> {student.TenSinhVien}
+                          </p>
+                          <p>
+                            <strong>Email:</strong> {student.EmailSV}
+                          </p>
+                          <p>
+                            <strong>SĐT:</strong> {student.sdtSV}
+                          </p>
+                        </div>
                       </li>
                     ))}
                   </ul>
                 ) : (
                   <p>Không có sinh viên nào.</p>
                 )}
-              </div> */}
+              </div>
 
-              {/* Advisor Details */}
-              {/* <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
+              {/* Thông Tin Giảng Viên */}
+              <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
                 <h3 className="font-semibold mb-2">Thông Tin Giảng Viên</h3>
-                {selectedTopic.advisor.name !== "N/A" ? (
-                  <>
-                    <p>
-                      <strong>ID:</strong> {selectedTopic.advisor.id}
-                    </p>
-                    <p>
-                      <strong>Tên:</strong> {selectedTopic.advisor.name}
-                    </p>
-                    <p>
-                      <strong>Khoa:</strong> {selectedTopic.advisor.department}
-                    </p>
-                    <p>
-                      <strong>Email:</strong> {selectedTopic.advisor.email}
-                    </p>
-                    <p>
-                      <strong>Địa Chỉ:</strong> {selectedTopic.advisor.address}
-                    </p>
-                    <button
-                      onClick={handleAdvisorDetail}
-                      className="text-blue-500 underline mt-2"
-                    >
-                      Xem Chi Tiết
-                    </button>
-                  </>
+                {selectedAdvisor && selectedAdvisor.length > 0 ? (
+                  <ul className="list-none p-0">
+                    {selectedAdvisor.map((advisor) => (
+                      <li
+                        key={advisor.MaGiangVien}
+                        className="flex justify-between items-center p-4 mb-4 border rounded-lg bg-white shadow-sm"
+                      >
+                        <div>
+                          <strong>Mã GV:</strong> {advisor.MaGV}
+                          <p>
+                            <strong>Tên:</strong> {advisor.HoTenGV}
+                          </p>
+                          <p>
+                            <strong>Vai trò:</strong> {advisor.VaiTro}
+                          </p>
+                          <p>
+                            <strong>Email:</strong> {advisor.EmailGV}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 ) : (
                   <p>Không có giảng viên nào.</p>
                 )}
-              </div> */}
+              </div>
 
               {/* Research Plan Details */}
               <div className="p-4 border rounded-lg shadow-sm bg-gray-50">
                 <h3 className="font-semibold mb-2">
                   Thông Tin Kế Hoạch Nghiên Cứu
                 </h3>
-                {selectedTopic ? (
+
+                {selectedTopic[0] ? (
                   <>
-                    {selectedTopic.NgayBatDau && (
+                    {selectedTopic[0].NgayBatDau && (
                       <p>
                         <strong>Ngày Bắt Đầu:</strong>{" "}
-                        {selectedTopic.NgayBatDau}
+                        {selectedTopic[0].NgayBatDau}
                       </p>
                     )}
-                    {selectedTopic.NgayKetThuc && (
+                    {selectedTopic[0].NgayKetThuc && (
                       <p>
                         <strong>Ngày Kết Thúc:</strong>{" "}
-                        {selectedTopic.NgayKetThuc}
+                        {selectedTopic[0].NgayKetThuc}
                       </p>
                     )}
-                    {selectedTopic.KinhPhi && (
+                    {selectedTopic[0].KinhPhi && (
                       <p>
                         <strong>Kinh Phí:</strong>{" "}
-                        {selectedTopic.KinhPhi.toLocaleString()} VND
+                        {selectedTopic[0].KinhPhi.toLocaleString()} VND
                       </p>
                     )}
-                    {selectedTopic.FileKeHoach && (
+                    {selectedTopic[0].FileKeHoach && (
                       <p>
                         <strong>File Kế Hoạch:</strong>{" "}
                         <a
-                          href={`path/to/files/${selectedTopic.FileKeHoach}`}
+                          href={`path/to/files/${selectedTopic[0].FileKeHoach}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-500 underline"
@@ -321,35 +310,37 @@ const TopicList = () => {
             {/* Research Products Section */}
             <div className="p-4 border rounded-lg shadow-sm bg-gray-50 mb-4">
               <h3 className="font-semibold mb-2">Sản Phẩm Nghiên Cứu</h3>
-              {selectedTopic.DeTaiNCKHSV &&
-              selectedTopic.DeTaiNCKHSV.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white">
-                    <thead>
-                      <tr>
-                        <th className="py-2 px-4 border-b">Tên Sản Phẩm</th>
-                        <th className="py-2 px-4 border-b">Ngày Hoàn Thành</th>
-                        <th className="py-2 px-4 border-b">Trạng Thái</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedTopic.DeTaiNCKHSV.map((deTai, index) => (
-                        // Kiểm tra trường TenSanPham có null không và thay bằng "Chưa có sản phẩm"
-                        <tr key={index} className="text-center">
-                          <td className="py-2 px-4 border-b">
-                            {deTai.TenSanPham || "Chưa có sản phẩm"}
-                          </td>
-                          <td className="py-2 px-4 border-b">
-                            {deTai.NgayHoanThanh || "Chưa hoàn thành"}
-                          </td>
-                          <td className="py-2 px-4 border-b">
-                            {deTai.KetQua || "Chưa có kết quả"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+
+              {selectedTopic[0]?.TenSanPham ? (
+                <>
+                  <p>
+                    <strong>Tên Sản Phẩm:</strong> {selectedTopic[0].TenSanPham}
+                  </p>
+                  {selectedTopic[0].NgayHoanThanh && (
+                    <p>
+                      <strong>Ngày Hoàn Thành:</strong>{" "}
+                      {selectedTopic[0].NgayHoanThanh}
+                    </p>
+                  )}
+                  {selectedTopic[0].KetQua && (
+                    <p>
+                      <strong>Kết Quả:</strong> {selectedTopic[0].KetQua}
+                    </p>
+                  )}
+                  {selectedTopic[0].FileSanPham && (
+                    <p>
+                      <strong>File Sản Phẩm:</strong>{" "}
+                      <a
+                        href={`path/to/files/${selectedTopic[0].FileSanPham}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 underline"
+                      >
+                        Download
+                      </a>
+                    </p>
+                  )}
+                </>
               ) : (
                 <p>Chưa có sản phẩm nghiên cứu.</p>
               )}

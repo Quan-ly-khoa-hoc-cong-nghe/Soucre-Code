@@ -1,16 +1,19 @@
 <?php
-class SinhVienNCKHSV {
+class SinhVienNCKHSV
+{
     private $conn;
     private $table_name = "SinhVienNCKHSV";
 
     public $MaNhomNCKHSV;
     public $MaSinhVien;
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->conn = $db;
     }
 
-    public function readAll() {
+    public function readAll()
+    {
         try {
             $sql = "SELECT * FROM " . $this->table_name . " ORDER BY MaSinhVien ASC";
             $stmt = $this->conn->prepare($sql);
@@ -21,7 +24,8 @@ class SinhVienNCKHSV {
         }
     }
 
-    public function add() {
+    public function add()
+    {
         try {
             // Thêm dữ liệu cho MaNhomNCKHSV và MaSinhVien
             $sql = "INSERT INTO " . $this->table_name . " (MaNhomNCKHSV, MaSinhVien) VALUES (:maNhomNCKHSV, :maSinhVien)";
@@ -34,7 +38,8 @@ class SinhVienNCKHSV {
         }
     }
 
-    public function update() {
+    public function update()
+    {
         try {
             // Cập nhật thông tin MaSinhVien theo MaNhomNCKHSV
             $sql = "UPDATE " . $this->table_name . " SET MaSinhVien = :maSinhVien WHERE MaNhomNCKHSV = :maNhomNCKHSV";
@@ -47,12 +52,13 @@ class SinhVienNCKHSV {
         }
     }
 
-    public function autoUpdateFromAPI($apiUrl) {
+    public function autoUpdateFromAPI($apiUrl)
+    {
         try {
             // Lấy dữ liệu từ API
             $jsonData = file_get_contents($apiUrl);
             $data = json_decode($jsonData, true);
-    
+
             if (isset($data['NhomNCKHSV'])) {
                 foreach ($data['NhomNCKHSV'] as $item) {
                     if (!empty($item['MaNhomNCKHSV'])) {
@@ -62,7 +68,7 @@ class SinhVienNCKHSV {
                         $checkStmt->bindParam(':maNhomNCKHSV', $item['MaNhomNCKHSV']);
                         $checkStmt->execute();
                         $count = $checkStmt->fetchColumn();
-    
+
                         if ($count == 0) {
                             // Nếu chưa tồn tại, thêm mới
                             $sql = "INSERT INTO " . $this->table_name . " (MaNhomNCKHSV, MaSinhVien) VALUES (:maNhomNCKHSV, NULL)";
@@ -81,7 +87,8 @@ class SinhVienNCKHSV {
         }
     }
 
-    public function delete() {
+    public function delete()
+    {
         try {
             // Xóa thông tin theo MaNhomNCKHSV
             $sql = "DELETE FROM " . $this->table_name . " WHERE MaNhomNCKHSV = :maNhomNCKHSV";
@@ -92,5 +99,24 @@ class SinhVienNCKHSV {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
+
+    public function readByDeTai($maDeTaiSV)
+    {
+        try {
+            $sql = "SELECT sv.MaSinhVien, sv.TenSinhVien, sv.EmailSV, sv.sdtSV
+                    FROM SinhVienNCKHSV svnck
+                    JOIN NhomNCKHSV nh ON svnck.MaNhomNCKHSV = nh.MaNhomNCKHSV
+                    JOIN DeTaiNCKHSV dt ON nh.MaDeTaiSV = dt.MaDeTaiSV
+                    JOIN SinhVien sv ON svnck.MaSinhVien = sv.MaSinhVien
+                    WHERE dt.MaDeTaiSV = :maDeTaiSV";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':maDeTaiSV', $maDeTaiSV);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+        }
+    }
 }
-?>

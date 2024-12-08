@@ -208,8 +208,6 @@ switch ($action) {
         break;
 
     case 'getInfoByMaDeTaiSV': // Action mới
-
-        error_log("Mã đề tài:".$_GET['MaDeTaiSV']);
         // Kiểm tra nếu không có MaDeTaiSV trong query string
         if (empty($_GET['MaDeTaiSV'])) {
             echo json_encode(['message' => 'Vui lòng cung cấp mã đề tài.'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

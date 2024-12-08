@@ -26,7 +26,7 @@ switch ($action) {
         break;
 
     case 'add': // Thêm giảng viên vào nhóm
-        if (empty($data['MaNhomNCKHSV']) || empty($data['VaiTro']) || empty($data['MaGV'] )) {
+        if (empty($data['MaNhomNCKHSV']) || empty($data['VaiTro']) || empty($data['MaGV'])) {
             echo json_encode(["message" => "Vui lòng cung cấp đầy đủ thông tin: MaNhomNCKHSV, VaiTro, MaGV."], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             break;
         }
@@ -73,6 +73,22 @@ switch ($action) {
             echo json_encode(['message' => 'Xóa giảng viên khỏi nhóm thành công'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
             echo json_encode(['message' => 'Không thể xóa giảng viên khỏi nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
+        break;
+
+    case 'readByDeTai':
+        if (empty($_GET['MaDeTaiSV'])) {
+            echo json_encode(['message' => 'Thiếu mã đề tài'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
+        }
+
+        $maDeTaiSV = $_GET['MaDeTaiSV'];
+        $result = $giangVienNCKHSV->readByDeTai($maDeTaiSV);
+
+        if (isset($result['error'])) {
+            echo json_encode(['message' => $result['error']], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode(['GiangVienNCKHSV' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
 

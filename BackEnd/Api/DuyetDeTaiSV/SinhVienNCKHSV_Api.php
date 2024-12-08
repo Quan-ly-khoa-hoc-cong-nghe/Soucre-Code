@@ -67,7 +67,7 @@ switch ($action) {
             echo json_encode(['message' => 'Thiếu mã sinh viên hoặc mã nhóm'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             break;
         }
-        
+
         $maSinhVien = $data['MaSinhVien'];
         $maNhomNCKHSV = $data['MaNhomNCKHSV'];
 
@@ -82,6 +82,21 @@ switch ($action) {
         }
         break;
 
+    case 'readByDeTai':
+        if (empty($_GET['MaDeTaiSV'])) {
+            echo json_encode(['message' => 'Thiếu mã đề tài'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
+        }
+
+        $maDeTaiSV = $_GET['MaDeTaiSV'];
+        $result = $sinhVienNCKHSV->readByDeTai($maDeTaiSV);
+
+        if (isset($result['error'])) {
+            echo json_encode(['message' => $result['error']], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode(['SinhVienNCKHSV' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
+        break;
     default:
         echo json_encode(['message' => 'Action không hợp lệ'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         break;
