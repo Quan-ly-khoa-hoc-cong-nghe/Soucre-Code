@@ -1,5 +1,6 @@
 <?php
-class GiangVienNCKHSV {
+class GiangVienNCKHSV
+{
     private $conn;
     private $table_name = "GiangVienNCKHSV"; // Sửa tên bảng cho đúng
 
@@ -7,12 +8,14 @@ class GiangVienNCKHSV {
     public $MaGV;
     public $VaiTro;  // Thêm VaiTro vào model
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->conn = $db;
     }
 
     // Lấy tất cả dữ liệu
-    public function readAll() {
+    public function readAll()
+    {
         try {
             $sql = "SELECT * FROM " . $this->table_name . " ORDER BY MaGV ASC";
             $stmt = $this->conn->prepare($sql);
@@ -24,7 +27,8 @@ class GiangVienNCKHSV {
     }
 
     // Thêm dữ liệu mới
-    public function add() {
+    public function add()
+    {
         try {
             // Không cần MaNhomNCKHSV vì nó là khóa phụ
             $sql = "INSERT INTO " . $this->table_name . " (MaNhomNCKHSV,VaiTro, MaGV) VALUES (:maNhomNCKHSV, :maGV)";
@@ -40,7 +44,8 @@ class GiangVienNCKHSV {
     }
 
     // Cập nhật dữ liệu
-    public function update() {
+    public function update()
+    {
         try {
             $sql = "UPDATE " . $this->table_name . " SET VaiTro =: VaiTro, MaGV = :maGV WHERE MaNhomNCKHSV = :maNhomNCKHSV";
             $stmt = $this->conn->prepare($sql);
@@ -55,7 +60,8 @@ class GiangVienNCKHSV {
     }
 
     // Xóa dữ liệu
-    public function delete() {
+    public function delete()
+    {
         try {
             $sql = "DELETE FROM " . $this->table_name . " WHERE MaNhomNCKHSV = :maNhomNCKHSV";
             $stmt = $this->conn->prepare($sql);
@@ -65,5 +71,24 @@ class GiangVienNCKHSV {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
+
+    public function readByDeTai($maDeTaiSV)
+    {
+        try {
+            $sql = "SELECT gv.MaGV, gv.HoTenGV, gv.EmailGV, gvnck.VaiTro
+                    FROM GiangVienNCKHSV gvnck
+                    JOIN NhomNCKHSV nh ON gvnck.MaNhomNCKHSV = nh.MaNhomNCKHSV
+                    JOIN DeTaiNCKHSV dt ON nh.MaDeTaiSV = dt.MaDeTaiSV
+                    JOIN GiangVien gv ON gvnck.MaGV = gv.MaGV
+                    WHERE dt.MaDeTaiSV = :maDeTaiSV";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':maDeTaiSV', $maDeTaiSV);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+        }
+    }
 }
-?>
