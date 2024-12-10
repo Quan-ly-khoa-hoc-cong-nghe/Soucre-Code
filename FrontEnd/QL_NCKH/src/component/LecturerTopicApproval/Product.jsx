@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const EditLecturer = () => {
+const ProductLecturer = () => {
   const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
   const [isAddLecturerModalOpen, setIsAddLecturerModalOpen] = useState(false); // State for adding lecturer
   const [selectedGroup, setSelectedGroup] = useState(null); // Track the selected group
@@ -207,7 +207,7 @@ const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên c
       {/* Nhóm giảng viên */}
       <div className="mb-6 p-4 border border-blue-500 rounded-lg shadow-md bg-white">
         <h2 className="text-xl font-semibold mb-2 text-blue-600">
-          Nhóm Giảng Viên
+         Sản phẩm NCKHGV
         </h2>
 
         {/* Bảng thông tin đề tài và nhóm giảng viên */}
@@ -352,4 +352,4 @@ const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên c
   );
 };
 
-export default EditLecturer;
+export default ProductLecturer;

@@ -28,6 +28,9 @@ import ApprovalOfSchoolTopicSciTech from './component/School-LevelTopic/Approval
 import ApprovalOffCampusProjectDepartment from './component/OffCampusProject/ApprovalOffCampusProjectDepartment';
 import EditLecturer from './component/LecturerTopicApproval/EditLecturer';
 import ApprovalOffCampusProjectSciTech from './component/OffCampusProject/ApprovalOffCampusProjectSciTech';
+import ProductLecturer from './component/LecturerTopicApproval/Product';
+import PlanManagement from './component/LecturerTopicApproval/PlanManagement';
+
 // Component bảo vệ route
 const PrivateRoute = ({ element, layout: LayoutComponent }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -61,6 +64,8 @@ function App() {
         <Route path="/admin/approval-off-campus-project-department" element={<PrivateRoute element={< ApprovalOffCampusProjectDepartment/>} layout={Layout} />} />
         <Route path="/admin/approval-off-campus-project-scitech" element={<PrivateRoute element={< ApprovalOffCampusProjectSciTech/>} layout={Layout} />} />
         <Route path="/admin/edit-lecturer" element={<PrivateRoute element={<EditLecturer />} layout={Layout} />} />
+        <Route path="/admin/product-lecturer" element={<PrivateRoute element={<ProductLecturer />} layout={Layout} />} />
+        <Route path="/admin/plan-management" element={<PrivateRoute element={<PlanManagement />} layout={Layout} />} />
 
 
         

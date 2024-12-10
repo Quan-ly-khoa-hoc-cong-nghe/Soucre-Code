@@ -16,17 +16,7 @@ class KeHoachNCKHGV
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    private function generateMaDeTaiNCKHGV() {
-        // Đếm số dòng hiện tại trong bảng KeHoachNCKHGV
-        $query = "SELECT COUNT(*) FROM KeHoachNCKHGV";
-        $stmt = $this->db->prepare($query);
-        $stmt->execute();
-        $count = $stmt->fetchColumn();
-        
-        // Tạo mã đề tài mới theo định dạng DTNCGV + (count + 1)
-        return "DTNCGV" . str_pad($count + 1, 3, '0', STR_PAD_LEFT); // Ví dụ: DTNCGV001, DTNCGV002
-    }
-    
+
 
     // Lấy kế hoạch theo mã đề tài
     public function getPlanByMaDeTai($maDeTai)
@@ -43,31 +33,39 @@ class KeHoachNCKHGV
         $stmt->execute();
         $count = $stmt->fetchColumn();
         
-        // Tạo mã kế hoạch mới theo định dạng KH + (count + 1)
-        return "KH" . str_pad($count + 1, 3, '0', STR_PAD_LEFT); // Ví dụ: KH001, KH002
+        // Tạo mã kế hoạch mới theo định dạng số tự động (kiểu int)
+        return (int)($count + 1); // Ví dụ: 1, 2, 3
     }
+    
     
 
-    // Thêm kế hoạch mới
-    public function addPlan($ngayBatDau, $ngayKetThuc, $kinhPhi, $fileKeHoach)
-    {
-        // Tạo mã kế hoạch tự động
-        $maKeHoach = $this->generateMaKeHoachNCKHGV();
-        
-        // Thêm kế hoạch mới vào cơ sở dữ liệu
-        $stmt = $this->db->prepare("INSERT INTO KeHoachNCKHGV (NgayBatDau, NgayKetThuc, KinhPhi, FileKeHoach, MaKeHoachNCKHGV) 
-                                    VALUES (:ngayBatDau, :ngayKetThuc, :kinhPhi, :fileKeHoach, :maKeHoach)");
-        $stmt->bindParam(':ngayBatDau', $ngayBatDau);
-        $stmt->bindParam(':ngayKetThuc', $ngayKetThuc);
-        $stmt->bindParam(':kinhPhi', $kinhPhi);
-        $stmt->bindParam(':fileKeHoach', $fileKeHoach);
-        $stmt->bindParam(':maKeHoach', $maKeHoach);
-        
-        // Thực thi và kiểm tra nếu thành công
-        return $stmt->execute();
+
+// Sinh mã kế hoạch mới
+public function addPlan($maDeTaiNCKHGV, $ngayBatDau, $ngayKetThuc, $kinhPhi, $fileKeHoach)
+{
+    // Kiểm tra mã đề tài có tồn tại không
+    if ($this->checkMaDeTaiExists($maDeTaiNCKHGV)) {
+        return false;  // Nếu mã đề tài đã tồn tại, không thể thêm mới
     }
-    
-    
+
+    // Sinh mã kế hoạch mới
+    $maKeHoach = $this->generateMaKeHoachNCKHGV();  // Tạo mã kế hoạch tự động
+
+    // Thêm kế hoạch mới vào cơ sở dữ liệu
+    $stmt = $this->db->prepare("INSERT INTO KeHoachNCKHGV (NgayBatDau, NgayKetThuc, KinhPhi, FileKeHoach, MaKeHoachNCKHGV, MaDeTaiNCKHGV) 
+                                VALUES (:ngayBatDau, :ngayKetThuc, :kinhPhi, :fileKeHoach, :maKeHoach, :maDeTaiNCKHGV)");
+    $stmt->bindParam(':ngayBatDau', $ngayBatDau);
+    $stmt->bindParam(':ngayKetThuc', $ngayKetThuc);
+    $stmt->bindParam(':kinhPhi', $kinhPhi);
+    $stmt->bindParam(':fileKeHoach', $fileKeHoach);
+    $stmt->bindParam(':maKeHoach', $maKeHoach);  // Mã kế hoạch tự động được sinh
+    $stmt->bindParam(':maDeTaiNCKHGV', $maDeTaiNCKHGV);  // Truyền mã đề tài
+
+    // Thực thi và kiểm tra nếu thành công
+    return $stmt->execute();
+}
+
+
 
     // Kiểm tra mã đề tài có tồn tại không
     public function checkMaDeTaiExists($maDeTai)

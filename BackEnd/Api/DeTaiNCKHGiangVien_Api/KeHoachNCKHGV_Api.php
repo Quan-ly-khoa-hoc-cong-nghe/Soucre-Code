@@ -43,18 +43,29 @@ switch ($action) {
         break;
 
         case 'POST':
-            // Thêm kế hoạch mới
+            // Nhận dữ liệu từ client
             $data = json_decode(file_get_contents("php://input"), true);
-            if (isset($data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'])) {
-                if ($keHoach->addPlan($data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'])) {
+            
+            // Kiểm tra các trường thông tin cần thiết
+            if (isset($data['MaDeTaiNCKHGV'], $data['NgayBatDau'], $data['NgayKetThuc'], $data['KinhPhi'], $data['FileKeHoach'])) {
+                $maDeTaiNCKHGV = $data['MaDeTaiNCKHGV'];
+                $ngayBatDau = $data['NgayBatDau'];
+                $ngayKetThuc = $data['NgayKetThuc'];
+                $kinhPhi = $data['KinhPhi'];
+                $fileKeHoach = $data['FileKeHoach'];
+                
+                // Thực hiện thêm kế hoạch mới
+                // Truyền các thông tin cần thiết, trong đó MaKeHoachNCKHGV sẽ được sinh tự động trong hàm addPlan
+                if ($keHoach->addPlan($maDeTaiNCKHGV, $ngayBatDau, $ngayKetThuc, $kinhPhi, $fileKeHoach)) {
                     echo json_encode(["message" => "Thêm kế hoạch thành công."]);
                 } else {
-                    echo json_encode(["message" => "Thêm kế hoạch thất bại."]);
+                    echo json_encode(["message" => "Thêm kế hoạch thất bại, có thể mã đề tài đã tồn tại."]);
                 }
             } else {
-                echo json_encode(["message" => "Thiếu thông tin kế hoạch để tạo."]);
+                echo json_encode(["message" => "Thiếu thông tin cần thiết để thêm kế hoạch."]);
             }
             break;
+        
         
     case 'PUT':
         // Cập nhật kế hoạch theo MaDeTaiNCKHGV

@@ -145,6 +145,24 @@ const Layout = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
+                to="/admin/product-lecturer"
+                className="flex items-center space-x-3"
+              >
+                <FaBox />
+                <span className="font-semibold">Quan ý sản phẩm giảng viên</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/admin/plan-management"
+                className="flex items-center space-x-3"
+              >
+                <FaBox />
+                <span className="font-semibold">Quan lý kế hoạch</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
                 to="/admin/application-approval"
                 className="flex items-center space-x-3"
               >
