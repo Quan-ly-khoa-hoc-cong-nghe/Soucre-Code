@@ -12,6 +12,14 @@ class NhaTaiTroHoiThao {
         $this->conn = $db;
     }
 
+    public function getAll() {
+        $query = "SELECT * FROM " . $this->table;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+
     // Thêm mới tài trợ hội thảo
     public function add() {
         $query = "INSERT INTO " . $this->table . " 
