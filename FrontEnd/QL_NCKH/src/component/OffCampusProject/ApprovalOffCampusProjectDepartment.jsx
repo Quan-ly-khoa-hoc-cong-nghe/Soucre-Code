@@ -107,19 +107,22 @@ const ApprovalOffCampusProjectDepartment = () => {
         onClick={() => setIsCreateModalOpen(true)}
         className="bg-green-500 text-white px-4 py-2 rounded-lg mb-4"
       >
-        Add New Article
+        Thêm hồ sơ
       </button>
       <table className="min-w-full">
         <thead>
           <tr className="border-b">
             <th className="text-left py-4 px-2">Mã hồ sơ</th>
             <th className="text-left py-4 px-2">Ngày Nộp</th>
-            <th className="text-left py-4 px-2">File Hồ SƠ</th>
-            <th className="text-left py-4 px-2">Khoa</th> {/* Add Khoa column */}
+            <th className="text-left py-4 px-2">File Hồ Sơ</th>
+            <th className="text-left py-4 px-2">Khoa</th>
+            <th className="text-left py-4 px-2">Mã Đặt Hàng</th>{" "}
+            {/* Add Mã Đặt Hàng column */}
             <th className="text-left py-4 px-2">Trạng Thái</th>
             <th className="text-right py-4 px-2">Thao Tác</th>
           </tr>
         </thead>
+
         <tbody>
           {articles.map((article, index) => (
             <tr key={index} className="border-b">
@@ -135,7 +138,9 @@ const ApprovalOffCampusProjectDepartment = () => {
                   {article.FileHoSo}
                 </a>
               </td>
-              <td className="py-4 px-2">{getDepartmentName(article.MaKhoa)}</td> {/* Display Khoa name */}
+              <td className="py-4 px-2">{getDepartmentName(article.MaKhoa)}</td>
+              <td className="py-4 px-2">{article.MaDatHang}</td>{" "}
+              {/* Display MaDatHang */}
               <td className="px-4 py-2 border">
                 <span
                   className={`px-2 py-1 rounded-full text-sm ${
@@ -151,19 +156,18 @@ const ApprovalOffCampusProjectDepartment = () => {
                   {article.TrangThai}
                 </span>
               </td>
-
               <td className="py-4 px-2 text-right">
                 <button
                   onClick={() => handleEdit(article)}
                   className="text-blue-500 hover:underline mr-2"
                 >
-                  Edit
+                  Sửa hồ sơ
                 </button>
                 <button
                   onClick={() => handleDelete(article.MaHoSo)}
                   className="text-red-500 hover:underline"
                 >
-                  Delete
+                  Xóa
                 </button>
               </td>
             </tr>

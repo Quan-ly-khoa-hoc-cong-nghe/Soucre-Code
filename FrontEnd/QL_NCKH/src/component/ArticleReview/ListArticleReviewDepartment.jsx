@@ -113,7 +113,7 @@ const ListArticleReviewDepartment = () => {
         onClick={() => setIsCreateModalOpen(true)}
         className="bg-green-500 text-white px-4 py-2 rounded-lg mb-4"
       >
-        Add New Article
+        Thêm hồ sơ bài báo
       </button>
       <table className="min-w-full">
         <thead>
@@ -163,13 +163,13 @@ const ListArticleReviewDepartment = () => {
                   onClick={() => handleEdit(article)}
                   className="text-blue-500 hover:underline mr-2"
                 >
-                  Edit
+                  Sửa hồ sơ
                 </button>
                 <button
                   onClick={() => handleDelete(article.MaHoSo)}
                   className="text-red-500 hover:underline"
                 >
-                  Delete
+                  Xóa
                 </button>
               </td>
             </tr>

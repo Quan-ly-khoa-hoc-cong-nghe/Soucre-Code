@@ -235,12 +235,12 @@ const ApplicationApprovalListAdmin = () => {
       <table className="w-full border-collapse border border-gray-200">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 border">Application ID</th>
-            <th className="px-4 py-2 border">Submission Date</th>
-            <th className="px-4 py-2 border">File</th>
-            <th className="px-4 py-2 border">Status</th>
-            <th className="px-4 py-2 border">Department</th> 
-            <th className="px-4 py-2 border">Actions</th>
+            <th className="px-4 py-2 border">Mã hồ sơ</th>
+            <th className="px-4 py-2 border">Ngày nộp</th>
+            <th className="px-4 py-2 border">File hồ sơ</th>
+            <th className="px-4 py-2 border">Trạng thái</th>
+            <th className="px-4 py-2 border">Khoa</th> 
+            <th className="px-4 py-2 border">Thao tác</th>
           </tr>
         </thead>
         <tbody>

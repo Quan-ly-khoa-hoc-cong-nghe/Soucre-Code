@@ -91,11 +91,11 @@ const ApplicationApprovalList = () => {
     // Tự động gán MaHoSo là 1 và trạng thái là "Khoa đã duyệt"
     const formDataWithAutoId = {
       ...createFormData,
-      MaHoSo: "1",  // Gán MaHoSo là 1
+      MaHoSo: "1", // Gán MaHoSo là 1
       TrangThai: "Khoa đã duyệt", // Gán trạng thái mặc định
       FileHoSo: createFormData.FileHoSo, // Lấy tên file đã chọn từ input
     };
-  
+
     axios
       .post(
         "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/HoSoNCKHSV_Api.php?action=add",
@@ -110,7 +110,7 @@ const ApplicationApprovalList = () => {
         console.error("Error adding application:", error);
       });
   };
-  
+
   // Helper function to get department name by MaKhoa
   const getDepartmentName = (maKhoa) => {
     const department = departments.find((dept) => dept.MaKhoa === maKhoa);
@@ -123,16 +123,16 @@ const ApplicationApprovalList = () => {
         onClick={() => setIsCreateModalOpen(true)}
         className="bg-green-500 text-white px-4 py-2 rounded-lg mb-4"
       >
-        Add New Application
+        Thêm đề tài
       </button>
       <table className="w-full border-collapse border border-gray-200">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 border">Application ID</th>
-            <th className="px-4 py-2 border">Submission Date</th>
-            <th className="px-4 py-2 border">File</th>
-            <th className="px-4 py-2 border">Status</th>
-            <th className="px-4 py-2 border">Department</th>{" "}
+            <th className="px-4 py-2 border">Mã hồ sơ</th>
+            <th className="px-4 py-2 border">Ngày nộp</th>
+            <th className="px-4 py-2 border">File hồ sơ</th>
+            <th className="px-4 py-2 border">trạng thái</th>
+            <th className="px-4 py-2 border">Khoa</th>{" "}
             {/* Changed to display department name */}
             <th className="px-4 py-2 border">Actions</th>
           </tr>
@@ -175,13 +175,13 @@ const ApplicationApprovalList = () => {
                     className="text-blue-500 hover:underline mr-2"
                     onClick={() => handleEdit(app)}
                   >
-                    Edit
+                    Sửa hồ sơ<a href=""></a>
                   </button>
                   <button
                     className="text-red-500 hover:underline"
                     onClick={() => handleDelete(app.MaHoSo)}
                   >
-                    Delete
+                    Xóa
                   </button>
                 </td>
               </tr>
@@ -203,12 +203,12 @@ const ApplicationApprovalList = () => {
       {isEditModalOpen && editFormData && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">Edit Application</h2>
+            <h2 className="text-2xl font-bold mb-4">Sửa đề tài</h2>
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Application ID
+                    Mã hồ sơ
                   </label>
                   <input
                     type="text"
@@ -219,7 +219,7 @@ const ApplicationApprovalList = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Submission Date
+                    Ngày nộp
                   </label>
                   <input
                     type="date"
@@ -235,23 +235,23 @@ const ApplicationApprovalList = () => {
                 </div>
 
                 <div>
-  <label className="block text-sm font-medium mb-1">File</label>
-  <input
-    type="file"
-    onChange={(e) => {
-      const fileName = e.target.files[0]?.name || ""; // Lấy tên file
-      setCreateFormData((prev) => ({
-        ...prev,
-        FileHoSo: fileName, // Lưu tên file vào state
-      }));
-    }}
-    className="w-full px-4 py-2 border rounded-lg"
-  />
-</div>
+                  <label className="block text-sm font-medium mb-1">File</label>
+                  <input
+                    type="file"
+                    onChange={(e) => {
+                      const fileName = e.target.files[0]?.name || ""; // Lấy tên file
+                      setCreateFormData((prev) => ({
+                        ...prev,
+                        FileHoSo: fileName, // Lưu tên file vào state
+                      }));
+                    }}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Status
+                    Trạng thái
                   </label>
                   <input
                     type="text"
@@ -262,7 +262,7 @@ const ApplicationApprovalList = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Department
+                    Khoa
                   </label>
                   <select
                     value={editFormData.MaKhoa}
@@ -288,13 +288,13 @@ const ApplicationApprovalList = () => {
                   className="bg-gray-500 text-white px-4 py-2 rounded-lg"
                   onClick={() => setIsEditModalOpen(false)}
                 >
-                  Cancel
+                  Hủy
                 </button>
                 <button
                   type="submit"
                   className="bg-blue-500 text-white px-4 py-2 rounded-lg"
                 >
-                  Save Changes
+                  Lưu
                 </button>
               </div>
             </form>
@@ -306,12 +306,12 @@ const ApplicationApprovalList = () => {
       {isCreateModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">Add New Application</h2>
+            <h2 className="text-2xl font-bold mb-4">Thêm đề tài</h2>
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Application ID
+                    Mã hồ sơ
                   </label>
                   <input
                     type="text"
@@ -322,7 +322,7 @@ const ApplicationApprovalList = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Submission Date
+                    Ngày nộp
                   </label>
                   <input
                     type="date"
@@ -337,23 +337,23 @@ const ApplicationApprovalList = () => {
                   />
                 </div>
                 <div>
-  <label className="block text-sm font-medium mb-1">File</label>
-  <input
-    type="file"
-    onChange={(e) => {
-      const fileName = e.target.files[0]?.name || ""; // Lấy tên file
-      setCreateFormData((prev) => ({
-        ...prev,
-        FileHoSo: fileName, // Lưu tên file vào state
-      }));
-    }}
-    className="w-full px-4 py-2 border rounded-lg"
-  />
-</div>
+                  <label className="block text-sm font-medium mb-1">File</label>
+                  <input
+                    type="file"
+                    onChange={(e) => {
+                      const fileName = e.target.files[0]?.name || ""; // Lấy tên file
+                      setCreateFormData((prev) => ({
+                        ...prev,
+                        FileHoSo: fileName, // Lưu tên file vào state
+                      }));
+                    }}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Status
+                    Trạng thái
                   </label>
                   <input
                     type="text"
@@ -364,7 +364,7 @@ const ApplicationApprovalList = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Department
+                    Khoa
                   </label>
                   <select
                     value={createFormData.MaKhoa}
@@ -390,13 +390,13 @@ const ApplicationApprovalList = () => {
                   className="bg-gray-500 text-white px-4 py-2 rounded-lg"
                   onClick={() => setIsCreateModalOpen(false)}
                 >
-                  Cancel
+                  Hủy
                 </button>
                 <button
                   type="submit"
                   className="bg-green-500 text-white px-4 py-2 rounded-lg"
                 >
-                  Save
+                  Lưu
                 </button>
               </div>
             </form>

@@ -29,9 +29,20 @@ import ApprovalOffCampusProjectDepartment from './component/OffCampusProject/App
 import EditLecturer from './component/LecturerTopicApproval/EditLecturer';
 import ApprovalOffCampusProjectSciTech from './component/OffCampusProject/ApprovalOffCampusProjectSciTech';
 import ProductLecturer from './component/LecturerTopicApproval/Product';
-import PlanManagement from './component/LecturerTopicApproval/PlanManagement';
+import ReportLecturer from './component/LecturerTopicApproval/ReportLecturer';
+import ThamDinhBaiBao from './component/ArticleReview/thamdinhbaibao';
+import Quanlydetaicapso from './component/School-LevelTopic/quanydetai';
+import Sanphamdtcs from './component/School-LevelTopic/sanphamdtcs';
+import Nhomdtcs from './component/School-LevelTopic/Nhomdtcs';
+import Quanlydondathang from './component/OffCampusProject/Quanlydondathang';
+import Sanphamngoaitruong from './component/OffCampusProject/Sanphamduanngoaitruong';
+import Nhomdtnt from './component/OffCampusProject/Nhomdtnt';
+import Quanlytailieu from './component/ScienceSeminar/tailieu';
+import HoiThaoKhoaHoc from './component/ScienceSeminar/hoithao';
+import PhienHoiThao from './component/ScienceSeminar/phienhoithao';
+import NguoiThamGia from './component/ScienceSeminar/nguoithamgia';
+import VaitroHoiThao from './component/ScienceSeminar/vaitrotronghoithao';
 
-// Component bảo vệ route
 const PrivateRoute = ({ element, layout: LayoutComponent }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated');
   return isAuthenticated ? <LayoutComponent>{element}</LayoutComponent> : <Navigate to="/" />;
@@ -48,7 +59,7 @@ function App() {
         <Route path="/admin/lecturer-topic-approval" element={<PrivateRoute element={<LecturerTopicApproval />} layout={Layout} />} />
         <Route path="/admin/student-topic-approval" element={<PrivateRoute element={<StudentTopicApproval />} layout={Layout} />} />
         <Route path="/admin/article-review" element={<PrivateRoute element={<ArticleReview />} layout={Layout} />} />
-        <Route path="/admin/science-seminar" element={<PrivateRoute element={<ScienceSeminar />} layout={Layout} />} />
+        <Route path="/admin/phienhoithao" element={<PrivateRoute element={<PhienHoiThao />} layout={Layout} />} />
         <Route path="/admin/edit-student" element={<PrivateRoute element={<StudentManager />} layout={Layout} />} />
         <Route path="/admin/product-manager" element={<PrivateRoute element={<Product />} layout={Layout} />} />
         <Route path="/admin/application-approval" element={<PrivateRoute element={<ApplicationApproval />} layout={Layout} />} />
@@ -65,7 +76,19 @@ function App() {
         <Route path="/admin/approval-off-campus-project-scitech" element={<PrivateRoute element={< ApprovalOffCampusProjectSciTech/>} layout={Layout} />} />
         <Route path="/admin/edit-lecturer" element={<PrivateRoute element={<EditLecturer />} layout={Layout} />} />
         <Route path="/admin/product-lecturer" element={<PrivateRoute element={<ProductLecturer />} layout={Layout} />} />
-        <Route path="/admin/plan-management" element={<PrivateRoute element={<PlanManagement />} layout={Layout} />} />
+        <Route path="/admin/report" element={<PrivateRoute element={<ReportLecturer />} layout={Layout} />} />
+        <Route path="/admin/thamdinhbaibao" element={<PrivateRoute element={<ThamDinhBaiBao />} layout={Layout} />} />
+        <Route path="/admin/quanlydetaicapso" element={<PrivateRoute element={<Quanlydetaicapso />} layout={Layout} />} />
+        <Route path="/admin/sanphamcapso" element={<PrivateRoute element={<Sanphamdtcs />} layout={Layout} />} />
+        <Route path="/admin/nhomdetaicapso" element={<PrivateRoute element={<Nhomdtcs />} layout={Layout} />} />
+        <Route path="/admin/dondathang" element={<PrivateRoute element={<Quanlydondathang />} layout={Layout} />} />
+        <Route path="/admin/sanphamngoaitruong" element={<PrivateRoute element={<Sanphamngoaitruong />} layout={Layout} />} />
+        <Route path="/admin/nhomduannt" element={<PrivateRoute element={<Nhomdtnt />} layout={Layout} />} />
+        <Route path="/admin/tailieu" element={<PrivateRoute element={<Quanlytailieu />} layout={Layout} />} />
+        <Route path="/admin/hoithao" element={<PrivateRoute element={<HoiThaoKhoaHoc />} layout={Layout} />} />
+        <Route path="/admin/nguoithamgia" element={<PrivateRoute element={<NguoiThamGia />} layout={Layout} />} />
+        <Route path="/admin/vaitrohoithao" element={<PrivateRoute element={<VaitroHoiThao />} layout={Layout} />} />
+
 
 
         
@@ -89,6 +112,7 @@ function App() {
         <Route path="/department/approval-of-school-topic-sciTech" element={<PrivateRoute element={< ApprovalOfSchoolTopicSciTech/>} layout={LayoutDepartment} />} />
         <Route path="/department/approval-off-campus-project-department" element={<PrivateRoute element={< ApprovalOffCampusProjectDepartment/>} layout={LayoutDepartment} />} />
         <Route path="/department/approval-off-campus-project-scitech" element={<PrivateRoute element={< ApprovalOffCampusProjectSciTech/>} layout={LayoutDepartment} />} />
+        <Route path="/department/phienhoithao" element={<PrivateRoute element={<PhienHoiThao />} layout={LayoutDepartment} />} />
 
         {/* Các route cho LayoutSciTech */}
         <Route path="/scitech" element={<PrivateRoute element={<Statistics />} layout={LayoutSciTech} />} />

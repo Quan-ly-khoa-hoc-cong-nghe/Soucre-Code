@@ -178,7 +178,7 @@ const ListArticleReviewSciTech = () => {
                         className="text-green-600 hover:underline text-sm font-medium"
                         onClick={() => openModal(app)}
                       >
-                        Thêm đề tài
+                        Thêm bài báo
                       </button>
                     )}
 

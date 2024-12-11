@@ -52,7 +52,7 @@ const ApprovalOffCampusProjectSciTech = () => {
   const fetchDepartments = () => {
     axios
       .get(
-        "http://localhost/Soucre-Code/BackEnd/Api/DuAnNCNT_Api/Khoa_Api.php?action=get"
+        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/Khoa_Api.php?action=get"
       )
       .then((response) => {
         setDepartments(response.data.Khoa || []); // Cập nhật theo cấu trúc dữ liệu API mới
@@ -167,7 +167,9 @@ const ApprovalOffCampusProjectSciTech = () => {
               const department = departments.find(
                 (dept) => dept.MaKhoa === app.MaKhoa
               );
-              const departmentName = department ? department.TenKhoa : "Không có khoa";
+              const departmentName = department
+                ? department.TenKhoa
+                : "Không có khoa";
 
               return (
                 <tr key={app.MaHoSo} className="hover:bg-gray-50">
@@ -197,9 +199,11 @@ const ApprovalOffCampusProjectSciTech = () => {
                     </span>
                   </td>
                   <td className="px-4 py-2 border">{departmentName}</td>
+
                   <td className="py-4 px-2 text-right">
                     <div className="flex justify-end space-x-2">
-                      {app.TrangThai !== "Đã duyệt" && app.TrangThai !== "Hủy" ? (
+                      {app.TrangThai !== "Đã duyệt" &&
+                      app.TrangThai !== "Hủy" ? (
                         <>
                           <button
                             className="p-2 text-green-600 hover:bg-green-100 rounded-full"
@@ -219,15 +223,22 @@ const ApprovalOffCampusProjectSciTech = () => {
                         </>
                       ) : null}
 
-                      {app.TrangThai !== "Hủy" && (
-                        <button
-                          className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
-                          title="View"
-                          onClick={() => openModal(app)}
-                        >
-                          <FaEye className="w-5 h-5" />
-                        </button>
-                      )}
+                      {app.TrangThai !== "Khoa đã duyệt" &&
+                        app.TrangThai !== "Hủy" && (
+                          <button
+                            className="text-green-600 hover:underline text-sm font-medium"
+                            onClick={() => openModal(app)}
+                          >
+                            Thêm đề tài
+                          </button>
+                        )}
+
+                      <button
+                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
+                        title="View Details"
+                      >
+                        <FaEye className="w-5 h-5" />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -281,7 +292,10 @@ const ApprovalOffCampusProjectSciTech = () => {
               >
                 <option value="">Chọn loại hình</option>
                 {loaiHinhOptions.map((option) => (
-                  <option key={option.MaLoaiHinhNCKH} value={option.MaLoaiHinhNCKH}>
+                  <option
+                    key={option.MaLoaiHinhNCKH}
+                    value={option.MaLoaiHinhNCKH}
+                  >
                     {option.TenLoaiHinh}
                   </option>
                 ))}

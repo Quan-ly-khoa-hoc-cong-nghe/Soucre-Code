@@ -207,14 +207,14 @@ const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên c
       {/* Nhóm giảng viên */}
       <div className="mb-6 p-4 border border-blue-500 rounded-lg shadow-md bg-white">
         <h2 className="text-xl font-semibold mb-2 text-blue-600">
-          Nhóm Giảng Viên
+          Nhóm Giảng Viên Nghiên cứu khoa học
         </h2>
 
         {/* Bảng thông tin đề tài và nhóm giảng viên */}
         <table className="min-w-full table-auto border-collapse border border-gray-300 mt-4">
           <thead>
             <tr className="bg-gray-100 text-sm text-left">
-              <th className="px-4 py-2 border">Mã Đề sTài</th>
+              <th className="px-4 py-2 border">Mã Đề Tài</th>
               <th className="px-4 py-2 border">Tên Đề Tài</th>
               <th className="px-4 py-2 border">Mã Nhóm</th>
               <th className="px-4 py-2 border">Giảng Viên</th>

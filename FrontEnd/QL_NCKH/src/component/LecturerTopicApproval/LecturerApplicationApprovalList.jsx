@@ -113,16 +113,16 @@ const LecturerApplicationApprovalList = () => {
         onClick={() => setIsCreateModalOpen(true)}
         className="bg-green-500 text-white px-4 py-2 rounded-lg mb-4"
       >
-        Add New Application
+        Thêm hồ sơ
       </button>
       <table className="w-full border-collapse border border-gray-200">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 border">Application ID</th>
-            <th className="px-4 py-2 border">Submission Date</th>
+            <th className="px-4 py-2 border">Mã hồ sơ</th>
+            <th className="px-4 py-2 border">Ngày nộp</th>
             <th className="px-4 py-2 border">File</th>
-            <th className="px-4 py-2 border">Status</th>
-            <th className="px-4 py-2 border">Actions</th>
+            <th className="px-4 py-2 border">Trạng thái</th>
+            <th className="px-4 py-2 border">Thao tác</th>
           </tr>
         </thead>
         <tbody>
@@ -168,13 +168,13 @@ const LecturerApplicationApprovalList = () => {
                       className="text-blue-500 hover:underline mr-2"
                       onClick={() => handleEdit(app)}
                     >
-                      Edit
+                      Sửa hồ sơ
                     </button>
                     <button
                       className="text-red-500 hover:underline"
                       onClick={() => handleDelete(app.MaHoSo)}
                     >
-                      Delete
+                      Xóa
                     </button>
                   </td>
                 </tr>
@@ -197,12 +197,12 @@ const LecturerApplicationApprovalList = () => {
       {isCreateModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">Add New Application</h2>
+            <h2 className="text-2xl font-bold mb-4">Thêm mới hồ sơ</h2>
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Submission Date
+                    Ngày nộp
                   </label>
                   <input
                     type="date"
@@ -232,7 +232,7 @@ const LecturerApplicationApprovalList = () => {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Department
+                    Khoa
                   </label>
                   <select
                     value={createFormData.MaKhoa}
