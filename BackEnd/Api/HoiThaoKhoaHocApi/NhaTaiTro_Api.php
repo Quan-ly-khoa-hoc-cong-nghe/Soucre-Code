@@ -6,13 +6,12 @@ header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json; charset=UTF-8");
 header("Content-Type: application/json");
 
-header("Content-Type: application/json");
 require_once __DIR__. '/../../config/Database.php';
-require_once __DIR__ . '/../../Model/HoiThaoKhoaHocModel/NhaTaiTroHoiThao.php';
+require_once __DIR__ . '/../../Model/HoiThaoKhoaHocModel/NhaTaiTro.php';
 
 $database = new Database();
 $db = $database->getConn();
-$nhataitrohoiThao = new NhaTaiTroHoiThao($db);
+$nhataitro = new NhaTaiTro($db);
 
 // Lấy phương thức HTTP và tham số `action`
 $method = $_SERVER['REQUEST_METHOD'];
@@ -27,7 +26,7 @@ if (!$action) {
 switch ($method) {
     case 'GET':
         if ($action === "get") {
-            $stmt = $nhataitrohoiThao->getAll();
+            $stmt = $nhataitro->getAll();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($result);
         } else {
@@ -44,21 +43,21 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaNhaTaiTro, $data->MaHoiThao, $data->LoaiTaiTro, $data->SoTien)) {
+        if (!isset($data->TenNhaTaiTro, $data->DiaChi, $data->SoDienThoai, $data->Email)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $nhataitrohoiThao->MaNhaTaiTro = $data->MaNhaTaiTro;
-        $nhataitrohoiThao->MaHoiThao = $data->MaHoiThao;
-        $nhataitrohoiThao->LoaiTaiTro = $data->LoaiTaiTro;
-        $nhataitrohoiThao->SoTien = $data->SoTien;
+        $nhataitro->TenNhaTaiTro = $data->TenNhaTaiTro;
+        $nhataitro->DiaChi = $data->DiaChi;
+        $nhataitro->SoDienThoai = $data->SoDienThoai;
+        $nhataitro->Email = $data->Email;
 
-        if ($nhataitrohoiThao->add()) {
-            echo json_encode(["message" => "Nhà tài trợ hội thảo được thêm thành công"]);
+        if ($nhataitro->add()) {
+            echo json_encode(["message" => "Nhà tài trợ được thêm thành công"]);
         } else {
-            echo json_encode(["message" => "Thêm nhà tài trợ hội thảo thất bại"]);
+            echo json_encode(["message" => "Thêm nhà tài trợ thất bại"]);
             http_response_code(500);
         }
         break;
@@ -71,21 +70,22 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaNhaTaiTro, $data->MaHoiThao, $data->LoaiTaiTro, $data->SoTien)) {
+        if (!isset($data->MaNhaTaiTro, $data->TenNhaTaiTro, $data->DiaChi, $data->SoDienThoai, $data->Email)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $nhataitrohoiThao->MaNhaTaiTro = $data->MaNhaTaiTro;
-        $nhataitrohoiThao->MaHoiThao = $data->MaHoiThao;
-        $nhataitrohoiThao->LoaiTaiTro = $data->LoaiTaiTro;
-        $nhataitrohoiThao->SoTien = $data->SoTien;
+        $nhataitro->MaNhaTaiTro = $data->MaNhaTaiTro;
+        $nhataitro->TenNhaTaiTro = $data->TenNhaTaiTro;
+        $nhataitro->DiaChi = $data->DiaChi;
+        $nhataitro->SoDienThoai = $data->SoDienThoai;
+        $nhataitro->Email = $data->Email;
 
-        if ($nhataitrohoiThao->update()) {
-            echo json_encode(["message" => "Nhà tài trợ hội thảo được cập nhật thành công"]);
+        if ($nhataitro->update()) {
+            echo json_encode(["message" => "Nhà tài trợ được cập nhật thành công"]);
         } else {
-            echo json_encode(["message" => "Cập nhật nhà tài trợ hội thảo thất bại"]);
+            echo json_encode(["message" => "Cập nhật nhà tài trợ thất bại"]);
             http_response_code(500);
         }
         break;
@@ -98,19 +98,18 @@ switch ($method) {
         }
 
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->MaNhaTaiTro, $data->MaHoiThao)) {
+        if (!isset($data->MaNhaTaiTro)) {
             echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
             http_response_code(400);
             exit;
         }
 
-        $nhataitrohoiThao->MaNhaTaiTro = $data->MaNhaTaiTro;
-        $nhataitrohoiThao->MaHoiThao = $data->MaHoiThao;
+        $nhataitro->MaNhaTaiTro = $data->MaNhaTaiTro;
 
-        if ($nhataitrohoiThao->delete()) {
-            echo json_encode(["message" => "Nhà tài trợ hội thảo được xóa thành công"]);
+        if ($nhataitro->delete()) {
+            echo json_encode(["message" => "Nhà tài trợ được xóa thành công"]);
         } else {
-            echo json_encode(["message" => "Xóa nhà tài trợ hội thảo thất bại"]);
+            echo json_encode(["message" => "Xóa nhà tài trợ thất bại"]);
             http_response_code(500);
         }
         break;
