@@ -42,7 +42,7 @@ import HoiThaoKhoaHoc from './component/ScienceSeminar/hoithao';
 import PhienHoiThao from './component/ScienceSeminar/phienhoithao';
 import NguoiThamGia from './component/ScienceSeminar/nguoithamgia';
 import VaitroHoiThao from './component/ScienceSeminar/vaitrotronghoithao';
-
+import Nhataitro from './component/ScienceSeminar/nhataitro';
 const PrivateRoute = ({ element, layout: LayoutComponent }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated');
   return isAuthenticated ? <LayoutComponent>{element}</LayoutComponent> : <Navigate to="/" />;
@@ -88,6 +88,7 @@ function App() {
         <Route path="/admin/hoithao" element={<PrivateRoute element={<HoiThaoKhoaHoc />} layout={Layout} />} />
         <Route path="/admin/nguoithamgia" element={<PrivateRoute element={<NguoiThamGia />} layout={Layout} />} />
         <Route path="/admin/vaitrohoithao" element={<PrivateRoute element={<VaitroHoiThao />} layout={Layout} />} />
+        <Route path="/admin/nhataitro" element={<PrivateRoute element={<Nhataitro />} layout={Layout} />} />
 
 
 
