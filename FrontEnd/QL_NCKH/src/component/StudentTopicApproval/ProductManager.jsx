@@ -165,7 +165,7 @@ const ProductManager = () => {
       value={searchQuery}
       onChange={(e) => setSearchQuery(e.target.value)}
       className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-      placeholder="Search by Topic or Product"
+      placeholder="Tìm kiếm theo chủ đề hoặc sản phẩm"
     />
   </div>
 
@@ -176,9 +176,9 @@ const ProductManager = () => {
       onChange={(e) => setFilterOption(e.target.value)}
       className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
     >
-      <option value="all">All Topics</option>
-      <option value="hasProduct">Has Product</option>
-      <option value="noProduct">No Product</option>
+      <option value="all">Tất cả</option>
+      <option value="hasProduct">Đã có sản phâm</option>
+      <option value="noProduct">Chưa có sản phẩm</option>
     </select>
   </div>
 </div>
@@ -190,27 +190,27 @@ const ProductManager = () => {
           className="mb-6 border border-gray-300 rounded-lg p-4 shadow-sm bg-white"
         >
           <h2 className="text-lg font-bold text-blue-600 mb-2">
-            Topic: {topic.TenDeTai}
+            Tên đề tài: {topic.TenDeTai}
           </h2>
           <p className="text-sm text-gray-600 mb-2">
-            Description: {topic.MoTa || "No Description"}
+            Mô tả: {topic.MoTa || "No Description"}
           </p>
 
           <button
             className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-green-600 transition mb-4"
             onClick={() => handleAddProduct(topic.MaDeTaiSV)}
           >
-            Add Product
+            Thêm sản phẩm
           </button>
 
           <table className="min-w-full border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-100 text-left">
-                <th className="px-4 py-2 border">Product ID</th>
-                <th className="px-4 py-2 border">Product Name</th>
-                <th className="px-4 py-2 border">Completion Date</th>
-                <th className="px-4 py-2 border">Result</th>
-                <th className="px-4 py-2 border">Actions</th>
+                <th className="px-4 py-2 border">Mã sản phẩm</th>
+                <th className="px-4 py-2 border">Tên sản phẩm</th>
+                <th className="px-4 py-2 border">Ngày hoàn thành</th>
+                <th className="px-4 py-2 border">Kết quả</th>
+                <th className="px-4 py-2 border">Chức năng</th>
               </tr>
             </thead>
             <tbody>
@@ -229,14 +229,14 @@ const ProductManager = () => {
                         className="text-blue-500 hover:text-blue-700 mr-2"
                         onClick={() => handleEditProduct(product)}
                       >
-                        Edit
+                        Sửa
                       </button>
 
                       <button
                         className="text-red-500 hover:text-red-700"
                         onClick={() => handleDeleteProduct(product)}
                       >
-                        Delete
+                        Xóa
                       </button>
                     </td>
                   </tr>

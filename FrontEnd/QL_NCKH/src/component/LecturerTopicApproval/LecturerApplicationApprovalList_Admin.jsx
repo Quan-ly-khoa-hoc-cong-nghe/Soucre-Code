@@ -160,12 +160,12 @@ const LecturerApplicationApprovalListAdmin = () => {
       <table className="w-full border-collapse border border-gray-200">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 border">Application ID</th>
-            <th className="px-4 py-2 border">Submission Date</th>
-            <th className="px-4 py-2 border">File</th>
-            <th className="px-4 py-2 border">Status</th>
-            <th className="px-4 py-2 border">Department Name</th>
-            <th className="px-4 py-2 border">Actions</th>
+            <th className="px-4 py-2 border">Mã hồ sơ</th>
+            <th className="px-4 py-2 border">Ngày nộp</th>
+            <th className="px-4 py-2 border">File hồ sơ</th>
+            <th className="px-4 py-2 border">Trạng thái</th>
+            <th className="px-4 py-2 border">Khoa</th>
+            <th className="px-4 py-2 border">Thao tác</th>
           </tr>
         </thead>
         <tbody>
@@ -204,39 +204,46 @@ const LecturerApplicationApprovalListAdmin = () => {
                   }
                 </td>
                 <td className="py-4 px-2 text-right">
-                  <div className="flex justify-end space-x-2">
-                    {app.TrangThai !== "Đã duyệt" && app.TrangThai !== "Hủy" ? (
-                      <>
-                        <button
-                          className="p-2 text-green-600 hover:bg-green-100 rounded-full"
-                          title="Approve"
-                          onClick={() => approveApplication(app)}
-                        >
-                          <FaCheck className="w-5 h-5" />
-                        </button>
-                        <button
-                          className="p-2 text-red-600 hover:bg-red-100 rounded-full"
-                          title="Reject"
-                          onClick={() => approveApplicationCancel(app)}
-                        >
-                          <FaTimes className="w-5 h-5" />
-                        </button>
-                      </>
-                    ) : null}
-                    <button
-                      className="text-green-600 hover:underline text-sm font-medium"
-                      onClick={() => openModal(app)}
-                    >
-                      Thêm đề tài
-                    </button>
-                    <button
-                      className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
-                      title="View Details"
-                    >
-                      <FaEye className="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
+  <div className="flex justify-end space-x-2">
+    {/* Kiểm tra trạng thái và hiển thị các nút tương ứng */}
+    {app.TrangThai === "Đã duyệt" ? (
+      // Trạng thái Đã duyệt, chỉ hiển thị nút "Thêm đề tài"
+      <button
+        className="text-green-600 hover:underline text-sm font-medium"
+        onClick={() => openModal(app)}
+      >
+        Thêm đề tài
+      </button>
+    ) : app.TrangThai !== "Hủy" ? (
+      // Trạng thái không phải Hủy, hiển thị các nút "Approve" và "Reject"
+      <>
+        <button
+          className="p-2 text-green-600 hover:bg-green-100 rounded-full"
+          title="Approve"
+          onClick={() => approveApplication(app)}
+        >
+          <FaCheck className="w-5 h-5" />
+        </button>
+        <button
+          className="p-2 text-red-600 hover:bg-red-100 rounded-full"
+          title="Reject"
+          onClick={() => approveApplicationCancel(app)}
+        >
+          <FaTimes className="w-5 h-5" />
+        </button>
+      </>
+    ) : null}
+    
+    {/* Nút "View Details" luôn hiển thị */}
+    <button
+      className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
+      title="View Details"
+    >
+      <FaEye className="w-5 h-5" />
+    </button>
+  </div>
+</td>
+
               </tr>
             ))
           ) : (

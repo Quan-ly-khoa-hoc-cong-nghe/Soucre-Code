@@ -131,7 +131,7 @@ const LayoutScitech = ({ children }) => {
                 className="flex items-center space-x-3"
               >
                 <FaBox />
-                <span className="font-semibold">Quan ý sản phẩm sinh viên</span>
+                <span className="font-semibold">Quan lý sản phẩm sinh viên</span>
               </Link>
             </li>
         
@@ -142,7 +142,7 @@ const LayoutScitech = ({ children }) => {
               >
                 <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ thêm đề tài role KHCNSV
+                  Duyệt hồ sơ thêm đề tài KHCN sinh viên
                 </span>
               </Link>
             </li>
@@ -153,7 +153,7 @@ const LayoutScitech = ({ children }) => {
               >
                 <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ NCKHGV role KHCN
+                  Duyệt hồ sơ thêm đề tài NCKH giảng viên
                 </span>
               </Link>
             </li>
@@ -175,7 +175,7 @@ const LayoutScitech = ({ children }) => {
               >
                 <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ thêm bài báo role KHCN
+                  Duyệt hồ sơ thêm bài báo khoa học
                 </span>
               </Link>
             </li>
@@ -185,7 +185,7 @@ const LayoutScitech = ({ children }) => {
                 className="flex items-center space-x-3"
               >
                 <FaCheckCircle />
-                <span className="font-semibold">Duyệt hồ sơ và thêm DTCS</span>
+                <span className="font-semibold">Duyệt hồ sơ và thêm đề tài cấp sở </span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -194,7 +194,7 @@ const LayoutScitech = ({ children }) => {
                 className="flex items-center space-x-3"
               >
                 <FaCheckCircle />
-                <span className="font-semibold">Duyệt hồ sơ và thêm NCNT</span>
+                <span className="font-semibold">Duyệt hồ sơ và thêm nghiên cứu ngoài trường</span>
               </Link>
             </li>
             <hr className="border-gray-400 my-4" />

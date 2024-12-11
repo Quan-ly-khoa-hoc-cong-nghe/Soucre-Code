@@ -6,8 +6,8 @@ const ScienceSeminardepartments = () => {
   const [departments, setDepartments] = useState([]);
   const [editFormData, setEditFormData] = useState(null);
   const [createFormData, setCreateFormData] = useState({
-    MaHoSo: "",
-    NgayNop: "",
+    MaKeHoachSoBo: "",
+    NgayGui: "",
     FileHoSo: "",
     TrangThai: "",
     MaKhoa: "",
@@ -24,7 +24,7 @@ const ScienceSeminardepartments = () => {
   const fetchApplications = () => {
     axios
       .get(
-        "http://localhost/Soucre-Code/BackEnd/Api/ThamDinhBaiBaoApi/HoSoBaiBaoKH_Api.php?action=get"
+        "http://localhost/Soucre-Code/BackEnd/Api/HoiThaoKhoaHocApi/KeHoachSoBoHoiThao_Api.php?action=get"
       )
       .then((response) => {
         setApplications(response.data || []);  // Ensure response is valid
@@ -79,7 +79,7 @@ const ScienceSeminardepartments = () => {
       axios
         .post(
           "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiGV/HoSoNCKHGV_Api.php?action=delete",
-          { MaHoSo: maHoSo }
+          { MaKeHoachSoBo: maHoSo }
         )
         .then((response) => {
           alert(response.data.message || "Application deleted successfully!");
@@ -118,33 +118,33 @@ const ScienceSeminardepartments = () => {
         onClick={() => setIsCreateModalOpen(true)}
         className="bg-green-500 text-white px-4 py-2 rounded-lg mb-4"
       >
-        Add New Application
+        Thêm hồ sơ hội thảo
       </button>
       <table className="w-full border-collapse border border-gray-200">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 border">Application ID</th>
-            <th className="px-4 py-2 border">Submission Date</th>
+            <th className="px-4 py-2 border">Mã hồ sơ</th>
+            <th className="px-4 py-2 border">Ngày Nộp</th>
             <th className="px-4 py-2 border">File</th>
-            <th className="px-4 py-2 border">Status</th>
-            <th className="px-4 py-2 border">Department</th>
-            <th className="px-4 py-2 border">Actions</th>
+            <th className="px-4 py-2 border">Trạng thái</th>
+            <th className="px-4 py-2 border">Khoa</th>
+            <th className="px-4 py-2 border">Thao tác</th>
           </tr>
         </thead>
         <tbody>
           {applications.length > 0 ? (
             applications.map((app) => (
-              <tr key={app.MaHoSo} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border">{app.MaHoSo}</td>
-                <td className="px-4 py-2 border">{app.NgayNop}</td>
+              <tr key={app.MaKeHoachSoBo} className="hover:bg-gray-50">
+                <td className="px-4 py-2 border">{app.MaKeHoachSoBo}</td>
+                <td className="px-4 py-2 border">{app.NgayGui}</td>
                 <td className="px-4 py-2 border">
                   <a
-                    href={`http://localhost/uploads/${app.fileHoSo}`}
+                    href={`http://localhost/uploads/${app.FileKeHoach}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
                   >
-                    {app.fileHoSo}
+                    {app.FileKeHoach}
                   </a>
                 </td>
                 <td className="px-4 py-2 border">
@@ -166,13 +166,13 @@ const ScienceSeminardepartments = () => {
                     className="text-blue-500 hover:underline mr-2"
                     onClick={() => handleEdit(app)}
                   >
-                    Edit
+                    SỬa hồ sơ 
                   </button>
                   <button
                     className="text-red-500 hover:underline"
-                    onClick={() => handleDelete(app.MaHoSo)}
+                    onClick={() => handleDelete(app.MaKeHoachSoBo)}
                   >
-                    Delete
+                    Xóa
                   </button>
                 </td>
               </tr>
@@ -201,11 +201,11 @@ const ScienceSeminardepartments = () => {
                   <label className="block text-sm font-medium mb-1">Application ID</label>
                   <input
                     type="text"
-                    value={createFormData.MaHoSo}
+                    value={createFormData.MaKeHoachSoBo}
                     onChange={(e) =>
                       setCreateFormData((prev) => ({
                         ...prev,
-                        MaHoSo: e.target.value,
+                        MaKeHoachSoBo: e.target.value,
                       }))
                     }
                     className="w-full px-4 py-2 border rounded-lg"
@@ -215,11 +215,11 @@ const ScienceSeminardepartments = () => {
                   <label className="block text-sm font-medium mb-1">Submission Date</label>
                   <input
                     type="date"
-                    value={createFormData.NgayNop}
+                    value={createFormData.NgayGui}
                     onChange={(e) =>
                       setCreateFormData((prev) => ({
                         ...prev,
-                        NgayNop: e.target.value,
+                        NgayGui: e.target.value,
                       }))
                     }
                     className="w-full px-4 py-2 border rounded-lg"
@@ -307,11 +307,11 @@ const ScienceSeminardepartments = () => {
                   </label>
                   <input
                     type="date"
-                    value={editFormData.NgayNop || ""}
+                    value={editFormData.NgayGui || ""}
                     onChange={(e) =>
                       setEditFormData((prev) => ({
                         ...prev,
-                        NgayNop: e.target.value,
+                        NgayGui: e.target.value,
                       }))
                     }
                     className="w-full px-4 py-2 border rounded-lg"

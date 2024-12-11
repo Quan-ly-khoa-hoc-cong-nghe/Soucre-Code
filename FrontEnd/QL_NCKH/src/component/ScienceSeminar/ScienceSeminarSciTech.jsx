@@ -24,7 +24,7 @@ const ScienceSeminarSciTech = () => {
   const fetchLoaiHinh = () => {
     axios
       .get(
-        "http://localhost/Soucre-Code/BackEnd/Api/ThamDinhBaiBaoApi/HoSoBaiBaoKH_Api.php?action=get"
+        "http://localhost/Soucre-Code/BackEnd/Api/HoiThaoKhoaHocApi/KeHoachSoBoHoiThao_Api.php?action=get"
       )
       .then((response) => {
         setLoaiHinhOptions(response.data);
@@ -38,7 +38,7 @@ const ScienceSeminarSciTech = () => {
   const fetchApplications = () => {
     axios
       .get(
-        "http://localhost/Soucre-Code/BackEnd/Api/ThamDinhBaiBaoApi/HoSoBaiBaoKH_Api.php?action=get"
+        "http://localhost/Soucre-Code/BackEnd/Api/HoiThaoKhoaHocApi/KeHoachSoBoHoiThao_Api.php?action=get"
       )
       .then((response) => {
         setApplications(response.data || []); // Cập nhật theo cấu trúc dữ liệu API mới
@@ -52,7 +52,7 @@ const ScienceSeminarSciTech = () => {
   const fetchDepartments = () => {
     axios
       .get(
-        "http://localhost/Soucre-Code/BackEnd/Api/ThamDinhBaiBaoApi/Khoa_Api.php?action=get"
+        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/Khoa_Api.php?action=get"
       )
       .then((response) => {
         setDepartments(response.data.Khoa || []); // Cập nhật theo cấu trúc dữ liệu API mới
@@ -65,7 +65,7 @@ const ScienceSeminarSciTech = () => {
   // Hàm duyệt ứng dụng (xác nhận hồ sơ)
   const approveApplication = (app) => {
     const requestData = {
-      MaHoSo: app.MaHoSo, // Mã hồ sơ
+      MaKeHoachSoBo: app.MaKeHoachSoBo, // Mã hồ sơ
       TrangThai: "Đã duyệt", // Trạng thái mới
     };
 
@@ -92,7 +92,7 @@ const ScienceSeminarSciTech = () => {
   // Hàm hủy duyệt ứng dụng
   const approveApplicationCancel = (app) => {
     const requestData = {
-      MaHoSo: app.MaHoSo, // Mã hồ sơ
+      MaKeHoachSoBo: app.MaKeHoachSoBo, // Mã hồ sơ
       TrangThai: "Hủy", // Trạng thái mới
     };
 
@@ -159,100 +159,101 @@ const ScienceSeminarSciTech = () => {
             <th className="px-4 py-2 border">Status</th>
             <th className="px-4 py-2 border">Department Name</th>
             <th className="px-4 py-2 border">Actions</th>
-
           </tr>
         </thead>
         <tbody>
-  {applications.length > 0 ? (
-    applications.map((app) => {
-      // Tìm tên khoa từ danh sách departments dựa trên MaKhoa của ứng dụng
-      const department = departments.find(
-        (dept) => dept.MaKhoa === app.MaKhoa
-      );
-      const departmentName = department ? department.TenKhoa : "Không có khoa";
+          {applications.length > 0 ? (
+            applications.map((app) => {
+              // Tìm tên khoa từ danh sách departments dựa trên MaKhoa của ứng dụng
+              const department = departments.find(
+                (dept) => dept.MaKhoa === app.MaKhoa
+              );
+              const departmentName = department
+                ? department.TenKhoa
+                : "Không có khoa";
 
-      return (
-        <tr key={app.MaHoSo} className="hover:bg-gray-50">
-          <td className="px-4 py-2 border">{app.MaHoSo}</td>
-          <td className="px-4 py-2 border">{app.NgayNop}</td>
-          <td className="px-4 py-2 border">
-            <a
-              href={`http://localhost/uploads/${app.fileHoSo}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline"
-            >
-              {app.fileHoSo}
-            </a>
-          </td>
-          <td className="px-4 py-2 border">
-            <span
-              className={`px-2 py-1 rounded-full text-sm ${
-                app.TrangThai === "Khoa đã duyệt"
-                  ? "bg-blue-100 text-blue-800"
-                  : app.TrangThai === "Đã duyệt"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-              }`}
-            >
-              {app.TrangThai}
-            </span>
-          </td>
-          <td className="px-4 py-2 border">{departmentName}</td> {/* Hiển thị tên khoa */}
-          <td className="py-4 px-2 text-right">
-                  <div className="flex justify-end space-x-2">
-                    {app.TrangThai !== "Đã duyệt" && app.TrangThai !== "Hủy" ? (
-                      <>
-                        <button
-                          className="p-2 text-green-600 hover:bg-green-100 rounded-full"
-                          title="Approve"
-                          onClick={() => approveApplication(app)} // Gọi hàm approveApplication với hồ sơ app
-                        >
-                          <FaCheck className="w-5 h-5" />
-                        </button>
-
-                        <button
-                          className="p-2 text-red-600 hover:bg-red-100 rounded-full"
-                          title="Reject"
-                          onClick={() => approveApplicationCancel(app)} // Gọi hàm approveApplication với hồ sơ app
-
-                        >
-                          <FaTimes className="w-5 h-5" />
-                        </button>
-                      </>
-                    ) : null}
-
-                    {/* Only show "Add Topic" button if the status is not "Khoa đã duyệt" or "Hủy" */}
-                    {app.TrangThai !== "Khoa đã duyệt" &&
-                      app.TrangThai !== "Hủy" && (
-                        <button
-                          className="text-green-600 hover:underline text-sm font-medium"
-                          onClick={() => openModal(app)}
-                        >
-                          Thêm đề tài
-                        </button>
-                      )}
-
-                    <button
-                      className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
-                      title="View Details"
+              return (
+                <tr key={app.MaKeHoachSoBo} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 border">{app.MaKeHoachSoBo}</td>
+                  <td className="px-4 py-2 border">{app.NgayGui}</td>
+                  <td className="px-4 py-2 border">
+                    <a
+                      href={`http://localhost/uploads/${app.FileKeHoach}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
                     >
-                      <FaEye className="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
-        </tr>
-      );
-    })
-  ) : (
-    <tr>
-      <td colSpan="6" className="text-center py-4">
-        Không có hồ sơ nào.
-      </td>
-    </tr>
-  )}
-</tbody>
+                      {app.FileKeHoach}
+                    </a>
+                  </td>
+                  <td className="px-4 py-2 border">
+                    <span
+                      className={`px-2 py-1 rounded-full text-sm ${
+                        app.TrangThai === "Khoa đã duyệt"
+                          ? "bg-blue-100 text-blue-800"
+                          : app.TrangThai === "Đã duyệt"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {app.TrangThai}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 border">{departmentName}</td>{" "}
+                  {/* Hiển thị tên khoa */}
+                  <td className="py-4 px-2 text-right">
+                    <td className="py-4 px-2 text-right">
+                      <div className="flex justify-end space-x-2">
+                        {/* Kiểm tra trạng thái và hiển thị các nút tương ứng */}
+                        {app.TrangThai === "Đã duyệt" ? (
+                          // Trạng thái Đã duyệt, chỉ hiển thị nút "Thêm đề tài"
+                          <button
+                            className="text-green-600 hover:underline text-sm font-medium"
+                            onClick={() => openModal(app)}
+                          >
+                            Thêm hội thảo
+                          </button>
+                        ) : app.TrangThai !== "Hủy" ? (
+                          // Trạng thái không phải Hủy, hiển thị các nút "Approve" và "Reject"
+                          <>
+                            <button
+                              className="p-2 text-green-600 hover:bg-green-100 rounded-full"
+                              title="Approve"
+                              onClick={() => approveApplication(app)}
+                            >
+                              <FaCheck className="w-5 h-5" />
+                            </button>
+                            <button
+                              className="p-2 text-red-600 hover:bg-red-100 rounded-full"
+                              title="Reject"
+                              onClick={() => approveApplicationCancel(app)}
+                            >
+                              <FaTimes className="w-5 h-5" />
+                            </button>
+                          </>
+                        ) : null}
 
+                        {/* Nút "View Details" luôn hiển thị */}
+                        <button
+                          className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
+                          title="View Details"
+                        >
+                          <FaEye className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan="6" className="text-center py-4">
+                Không có hồ sơ nào.
+              </td>
+            </tr>
+          )}
+        </tbody>
       </table>
 
       {isModalOpen && selectedApp && (

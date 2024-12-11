@@ -131,7 +131,7 @@ const LayoutDepartment = ({ children }) => {
                 className="flex items-center space-x-3"
               >
                 <FaBox />
-                <span className="font-semibold">Quan ý sản phẩm sinh viên</span>
+                <span className="font-semibold">Quan lý sản phẩm sinh viên</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -141,7 +141,7 @@ const LayoutDepartment = ({ children }) => {
               >
                 <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ NCKHSV Role khoa
+                  Duyệt hồ sơ NCKH sinh viên
                 </span>
               </Link>
             </li>
@@ -153,7 +153,7 @@ const LayoutDepartment = ({ children }) => {
               >
                 <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ NCKHGV role khoa
+                  Duyệt hồ sơ NCKH giảng viên
                 </span>
               </Link>
             </li>
@@ -165,7 +165,7 @@ const LayoutDepartment = ({ children }) => {
               >
                 <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ hội thảo role khoa
+                  Duyệt hồ sơ hội thảo 
                 </span>
               </Link>
             </li>
@@ -176,7 +176,7 @@ const LayoutDepartment = ({ children }) => {
               >
                 <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ bài báo role Khoa{" "}
+                  Duyệt hồ sơ bài báo
                 </span>
               </Link>
             </li>
@@ -187,7 +187,7 @@ const LayoutDepartment = ({ children }) => {
               >
                 <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ DTCS role khoa
+                  Duyệt hồ sơ đề tài cấp sở
                 </span>
               </Link>
             </li>
@@ -199,7 +199,7 @@ const LayoutDepartment = ({ children }) => {
               >
                 <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ NCNT role khoa
+                  Duyệt hồ sơ nghiên cứu ngoài trường
                 </span>
               </Link>
             </li>

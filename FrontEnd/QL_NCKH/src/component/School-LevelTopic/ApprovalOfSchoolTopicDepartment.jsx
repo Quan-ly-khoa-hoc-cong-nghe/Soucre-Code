@@ -107,14 +107,14 @@ const ApprovalOfSchoolTopicDepartment = () => {
         onClick={() => setIsCreateModalOpen(true)}
         className="bg-green-500 text-white px-4 py-2 rounded-lg mb-4"
       >
-        Add New Article
+        Thêm hô sơ cấp sở
       </button>
       <table className="min-w-full">
         <thead>
           <tr className="border-b">
             <th className="text-left py-4 px-2">Mã hồ sơ</th>
             <th className="text-left py-4 px-2">Ngày Nộp</th>
-            <th className="text-left py-4 px-2">File Hồ SƠ</th>
+            <th className="text-left py-4 px-2">File Hồ Sơ</th>
             <th className="text-left py-4 px-2">Khoa</th> {/* Add Khoa column */}
             <th className="text-left py-4 px-2">Trạng Thái</th>
             <th className="text-right py-4 px-2">Thao Tác</th>
@@ -157,13 +157,13 @@ const ApprovalOfSchoolTopicDepartment = () => {
                   onClick={() => handleEdit(article)}
                   className="text-blue-500 hover:underline mr-2"
                 >
-                  Edit
+                  Sửa hồ sơ
                 </button>
                 <button
                   onClick={() => handleDelete(article.MaHoSo)}
                   className="text-red-500 hover:underline"
                 >
-                  Delete
+                  Xóa
                 </button>
               </td>
             </tr>

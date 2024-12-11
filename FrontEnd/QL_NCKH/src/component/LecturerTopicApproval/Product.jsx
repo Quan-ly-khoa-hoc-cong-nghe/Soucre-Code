@@ -1,347 +1,454 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const ProductLecturer = () => {
-  const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
-  const [isAddLecturerModalOpen, setIsAddLecturerModalOpen] = useState(false); // State for adding lecturer
-  const [selectedGroup, setSelectedGroup] = useState(null); // Track the selected group
-  const [projects, setProjects] = useState([]); // State to hold project data
-  const [groups, setGroups] = useState([]); // State to hold group data
-  const [lecturers, setLecturers] = useState([]); // State to hold lecturer data
-  const [fullLecturerData, setFullLecturerData] = useState([]); // State to hold full lecturer details (HoTenGV)
-  const [selectedLecturer, setSelectedLecturer] = useState(""); // State for selected lecturer in the modal
-  const [isRemoveLecturerModalOpen, setIsRemoveLecturerModalOpen] = useState(false); // Modal xóa giảng viên
-const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên chọn xóa
+  const [products, setProducts] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [filterOption, setFilterOption] = useState("all"); // "all", "hasProduct", "noProduct"
+  const [searchQuery, setSearchQuery] = useState("");
 
-
-  // Fetch data from APIs on component mount
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch project data
-        const projectResponse = await fetch(
-          "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/DeTaiNCKHGiangVien_Api.php?action=GET"
-        );
-        const projectData = await projectResponse.json();
-
-        // Fetch group data
-        const groupResponse = await fetch(
-          "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/NhomNCKHGV_Api.php?action=GET"
-        );
-        const groupData = await groupResponse.json();
-
-        // Fetch lecturer data from the first API (GiangVienNCKHGV_Api)
-        const lecturerResponse = await fetch(
-          "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/GiangVienNCKHGV_Api.php?action=GET"
-        );
-        const lecturerData = await lecturerResponse.json();
-
-        // Fetch full lecturer details from the second API (GiangVien_Api)
-        const fullLecturerResponse = await fetch(
-          "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/GiangVien_Api.php?action=get"
-        );
-        const fullLecturerData = await fullLecturerResponse.json();
-
-        // Map fullLecturerData to a lookup table by MaGV for easy access
-        const lecturerLookup = fullLecturerData.GiangVien.reduce(
-          (acc, lecturer) => {
-            acc[lecturer.MaGV] = lecturer.HoTenGV;
-            return acc;
-          },
-          {}
-        );
-
-        // Combine project, group, and lecturer data
-        const combinedData = projectData.map((project) => {
-          // Find group data related to the project
-          const group = groupData.find(
-            (group) => group.MaDeTaiNCKHGV === project.MaDeTaiNCKHGV
-          );
-
-          // Find all lecturers for the group's MaNhomNCKHGV
-          const groupLecturers = lecturerData.filter(
-            (lecturer) => lecturer.MaNhomNCKHGV === group?.MaNhomNCKHGV
-          );
-
-          // Map lecturer codes to full names using the lookup
-          const lecturerNames = groupLecturers
-            .map((lecturer) => lecturerLookup[lecturer.MaGV] || "Unknown")
-            .join(", ");
-
-          return {
-            ...project,
-            MaNhomNCKHGV: group ? group.MaNhomNCKHGV : "N/A",
-            lecturers: lecturerNames, // Add full lecturer names to the project
-            lecturerIds: groupLecturers.map((lecturer) => lecturer.MaGV), // Store lecturer IDs for easy exclusion
-          };
-        });
-
-        setProjects(combinedData); // Set the combined data into the state
-        setGroups(groupData);
-        setLecturers(lecturerData);
-        setFullLecturerData(fullLecturerData.GiangVien);
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-  const handleOpenRemoveLecturerModal = (group) => {
-    setSelectedGroup(group);
-    setIsRemoveLecturerModalOpen(true);
-  };
-  
-  const handleAddLecturerToGroup = (group) => {
-    setSelectedGroup(group);
-    setIsAddLecturerModalOpen(true);
-  };
-  const handleAddLecturer = async () => {
-    if (selectedLecturer && selectedGroup) {
-      const lecturerLimit = 3; // Maximum number of lecturers per group
-
-      // Check if the group already has 3 lecturers
-      if (selectedGroup.lecturerIds.length >= lecturerLimit) {
-        alert("Nhóm này đã có đủ giảng viên (3 giảng viên).");
-        return; // Don't proceed if the limit is reached
-      }
-
-      const newLecturer = {
-        SoGioQuyDoi: 1,
-        MaNhomNCKHGV: selectedGroup.MaNhomNCKHGV,
-        MaGV: selectedLecturer, // The selected lecturer ID
-      };
-
-      try {
-        // Send POST request to the API
-        const response = await fetch(
-          "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/GiangVienNCKHGV_Api.php?action=POST",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newLecturer),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Không thể thêm giảng viên vào nhóm.");
-        }
-
-        const result = await response.json();
-        if (result.success) {
-          alert("Giảng viên đã được thêm thành công.");
-          // Optionally reload the group data or update the UI
-          setIsAddLecturerModalOpen(false);
-        } else {
-          // Display the specific error message from the server
-          alert(result.message || "Đã xảy ra lỗi khi thêm giảng viên.");
-        }
-      } catch (error) {
-        console.error("Error adding lecturer:", error);
-        // Display detailed error message
-        alert("Có lỗi xảy ra khi thêm giảng viên: " + error.message);
-      }
-    } else {
-      alert("Vui lòng chọn giảng viên và nhóm trước.");
-    }
-  };
-
-  // Filter out lecturers that have already been added to the group
-  const availableLecturers = fullLecturerData.filter((lecturer) => {
-    // Check if the lecturer is already in the group by comparing their MaGV with the added lecturers
-    return !selectedGroup?.lecturerIds.includes(lecturer.MaGV);
+  const [formData, setFormData] = useState({
+    MaDeTaiSV: "",
+    TenSanPham: "",
+    NgayHoanThanh: "",
+    KetQua: "",
+    FileSanPham: "",
   });
-  const handleRemoveLecturerFromGroup = async (lecturerId) => {
-    if (!lecturerId || !selectedGroup) {
-      alert("Vui lòng chọn giảng viên và nhóm trước.");
-      return;
+
+  const handleEditProduct = (product) => {
+    setEditFormData(product);
+    setIsEditModalOpen(true);
+  };
+  const searchFilter = (topic) => {
+    // Kiểm tra tên đề tài và tên sản phẩm có chứa từ khóa tìm kiếm không
+    return (
+      topic.TenDeTai.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      products.some(
+        (product) =>
+          product.TenSanPham.toLowerCase().includes(
+            searchQuery.toLowerCase()
+          ) && product.MaDeTaiSV === topic.MaDeTaiSV
+      )
+    );
+  };
+
+  useEffect(() => {
+    // Lấy danh sách sản phẩm
+    axios
+      .get(
+        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SanPhamNCKHSV_Api.php?action=get"
+      )
+      .then((response) => {
+        setProducts(response.data.SanPhamNCKHSV || []);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+      });
+
+    // Lấy danh sách đề tài
+    axios
+      .get(
+        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/DeTaiNCKHSV_Api.php?action=get"
+      )
+      .then((response) => {
+        setTopics(response.data.DeTaiNCKHSV || []);
+      })
+      .catch((error) => {
+        console.error("Error fetching topics:", error);
+      });
+  }, []);
+
+  const handleCancel = () => {
+    setFormData({
+      MaDeTaiSV: "",
+      TenSanPham: "",
+      NgayHoanThanh: "",
+      KetQua: "",
+      FileSanPham: "",
+    });
+    setIsModalOpen(false);
+  };
+
+  const handleAddProduct = (maDeTaiSV) => {
+    // Kiểm tra nếu đề tài đã có sản phẩm
+    const existingProduct = products.find(
+      (product) => product.MaDeTaiSV === maDeTaiSV
+    );
+
+    if (existingProduct) {
+      alert("This topic already has a product. You cannot add another.");
+      return; // Dừng nếu đã có sản phẩm
     }
-  
-    try {
-      const response = await fetch(
-        "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/GiangVienNCKHGV_Api.php?action=DELETE",
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            MaNhomNCKHGV: selectedGroup.MaNhomNCKHGV, // Use the selected group's MaNhomNCKHGV
-            MaGV: lecturerId, // The lecturer's ID to remove
-          }),
-        }
-      );
-  
-      if (response.ok) {
-        alert("Giảng viên đã được xóa thành công.");
-        
-        // Update the state to remove the lecturer from the group
-        setProjects((prevProjects) =>
-          prevProjects.map((project) => {
-            if (project.MaNhomNCKHGV === selectedGroup.MaNhomNCKHGV) {
-              return {
-                ...project,
-                lecturers: project.lecturers
-                  .split(", ")
-                  .filter((name) => name !== lecturerId) // Remove the lecturer from the list
-                  .join(", "),
-                lecturerIds: project.lecturerIds.filter((id) => id !== lecturerId), // Remove the lecturer ID from the list
-              };
-            }
-            return project;
-          })
-        );
-        setIsRemoveLecturerModalOpen(false); // Close the modal after removal
-      } else {
-        alert("Không thể xóa giảng viên.");
-      }
-    } catch (error) {
-      console.error("Error removing lecturer:", error);
-      alert("Có lỗi xảy ra khi xóa giảng viên.");
+
+    // Nếu chưa có sản phẩm, mở modal thêm sản phẩm
+    setFormData({
+      MaDeTaiSV: maDeTaiSV,
+      TenSanPham: "",
+      NgayHoanThanh: "",
+      KetQua: "",
+      FileSanPham: "",
+    });
+    setIsModalOpen(true);
+  };
+  const handleDeleteProduct = (product) => {
+    if (
+      window.confirm(
+        `Are you sure you want to delete product "${product.TenSanPham}"?`
+      )
+    ) {
+      axios
+        .post(
+          "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SanPhamNCKHSV_Api.php?action=delete",
+          { MaDeTaiSV: product.MaDeTaiSV } // Gửi thông tin sản phẩm cần xóa
+        )
+        .then((response) => {
+          alert(response.data.message || "Product deleted successfully!");
+          // Cập nhật danh sách sản phẩm sau khi xóa
+          setProducts((prevProducts) =>
+            prevProducts.filter((p) => p.MaDeTaiSV !== product.MaDeTaiSV)
+          );
+        })
+        .catch((error) => {
+          console.error("Error deleting product:", error);
+        });
     }
   };
-  
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post(
+        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SanPhamNCKHSV_Api.php?action=add",
+        formData
+      )
+      .then((response) => {
+        alert(response.data.message || "Product added successfully!");
+        const newProduct = { ...formData };
+        setProducts([...products, newProduct]);
+        handleCancel();
+      })
+      .catch((error) => {
+        console.error("Error adding product:", error);
+      });
+  };
+
+  // Lọc danh sách đề tài dựa trên lựa chọn
+  const filteredTopics = topics.filter((topic) => {
+    const hasProduct = products.some(
+      (product) => product.MaDeTaiSV === topic.MaDeTaiSV
+    );
+
+    // Lọc theo bộ lọc sản phẩm và từ khóa tìm kiếm
+    const matchesSearch = searchFilter(topic);
+
+    if (filterOption === "hasProduct") {
+      return hasProduct && matchesSearch; // Đề tài có sản phẩm và khớp tìm kiếm
+    }
+    if (filterOption === "noProduct") {
+      return !hasProduct && matchesSearch; // Đề tài chưa có sản phẩm và khớp tìm kiếm
+    }
+    return matchesSearch; // Hiển thị tất cả khi không có bộ lọc cụ thể
+  });
+
   return (
-    <div className="p-6">
-      {/* Nhóm giảng viên */}
-      <div className="mb-6 p-4 border border-blue-500 rounded-lg shadow-md bg-white">
-        <h2 className="text-xl font-semibold mb-2 text-blue-600">
-         Sản phẩm NCKHGV
-        </h2>
-
-        {/* Bảng thông tin đề tài và nhóm giảng viên */}
-        <table className="min-w-full table-auto border-collapse border border-gray-300 mt-4">
-          <thead>
-            <tr className="bg-gray-100 text-sm text-left">
-              <th className="px-4 py-2 border">Mã Đề sTài</th>
-              <th className="px-4 py-2 border">Tên Đề Tài</th>
-              <th className="px-4 py-2 border">Mã Nhóm</th>
-              <th className="px-4 py-2 border">Giảng Viên</th>
-              <th className="px-4 py-2 border">Thao Tác</th>{" "}
-              {/* New column for actions */}
-            </tr>
-          </thead>
-          <tbody>
-            {projects.map((project) => (
-              <tr key={project.MaDeTaiNCKHGV} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border">{project.MaDeTaiNCKHGV}</td>
-                <td className="px-4 py-2 border">{project.TenDeTai}</td>
-                <td className="px-4 py-2 border">{project.MaNhomNCKHGV}</td>
-                <td className="px-4 py-2 border">{project.lecturers}</td>
-                <td className="px-4 py-2 border">
-                  {/* Add Lecturer button */}
-                  <button
-                    onClick={() => handleAddLecturerToGroup(project)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
-                    Thêm Thành Viên
-                  </button>
-                  <button
-  onClick={() => handleOpenRemoveLecturerModal(project)}
-  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
->
-  Xóa thành viên
-</button>
-
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="p-6 bg-gray-100 rounded-lg shadow-lg max-w-6xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold">Quản lý sản phẩm giảng viên</h1>
       </div>
-      {isRemoveLecturerModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-    <div className="bg-white p-6 rounded-md shadow-lg w-96">
-      <h2 className="text-xl font-semibold mb-4 text-center">
-        Chọn Giảng Viên Cần Xóa
-      </h2>
-      <form className="space-y-4">
-        <div>
-          <label className="block font-medium mb-2">
-            Chọn Giảng Viên:
-          </label>
+      <div className="mb-4 flex items-center space-x-4">
+        {/* Thanh tìm kiếm */}
+        <div className="flex-1">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            placeholder="Tìm kiếm theo chủ đề hoặc sản phẩm"
+          />
+        </div>
+
+        {/* Dropdown filter */}
+        <div className="flex-1">
           <select
-            onChange={(e) => setLecturerToRemove(e.target.value)}
-            value={lecturerToRemove}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            value={filterOption}
+            onChange={(e) => setFilterOption(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
-            <option value="">Chọn Giảng Viên</option>
-            {selectedGroup?.lecturerIds.map((lecturerId) => {
-              const lecturer = fullLecturerData.find(
-                (item) => item.MaGV === lecturerId
-              );
-              return (
-                <option key={lecturer.MaGV} value={lecturer.MaGV}>
-                  {lecturer.HoTenGV} - {lecturer.MaGV}
-                </option>
-              );
-            })}
+            <option value="all">Tất cả</option>
+            <option value="hasProduct">Đã có sản phâm</option>
+            <option value="noProduct">Chưa có sản phẩm</option>
           </select>
         </div>
-        <div className="text-center mt-4">
-          <button
-            type="button"
-            onClick={() => handleRemoveLecturerFromGroup(lecturerToRemove)}
-            className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Xóa
-          </button>
+      </div>
+
+      {/* Hiển thị danh sách đề tài và các sản phẩm */}
+      {filteredTopics.map((topic) => (
+        <div
+          key={topic.MaDeTaiSV}
+          className="mb-6 border border-gray-300 rounded-lg p-4 shadow-sm bg-white"
+        >
+          <h2 className="text-lg font-bold text-blue-600 mb-2">
+            Tên đề tài: {topic.TenDeTai}
+          </h2>
+          <p className="text-sm text-gray-600 mb-2">
+            Mô tả: {topic.MoTa || "No Description"}
+          </p>
 
           <button
-            type="button"
-            onClick={() => setIsRemoveLecturerModalOpen(false)}
-            className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 ml-4"
+            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-green-600 transition mb-4"
+            onClick={() => handleAddProduct(topic.MaDeTaiSV)}
           >
-            Đóng
+            Thêm sản phẩm
           </button>
+
+          <table className="min-w-full border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100 text-left">
+                <th className="px-4 py-2 border">Mã sản phẩm</th>
+                <th className="px-4 py-2 border">Tên sản phẩm</th>
+                <th className="px-4 py-2 border">Ngày hoàn thành</th>
+                <th className="px-4 py-2 border">Kết quả</th>
+                <th className="px-4 py-2 border">Chức năng</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products
+                .filter((product) => product.MaDeTaiSV === topic.MaDeTaiSV)
+                .map((product) => (
+                  <tr key={product.MaDeTaiSV} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 border">{product.MaDeTaiSV}</td>
+                    <td className="px-4 py-2 border">{product.TenSanPham}</td>
+                    <td className="px-4 py-2 border">
+                      {product.NgayHoanThanh}
+                    </td>
+                    <td className="px-4 py-2 border">{product.KetQua}</td>
+                    <td className="px-4 py-2 border">
+                      <button
+                        className="text-blue-500 hover:text-blue-700 mr-2"
+                        onClick={() => handleEditProduct(product)}
+                      >
+                        Sửa
+                      </button>
+
+                      <button
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => handleDeleteProduct(product)}
+                      >
+                        Xóa
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
         </div>
-      </form>
-    </div>
-  </div>
-)}
+      ))}
 
-      {/* Modal thêm giảng viên */}
-      {isAddLecturerModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-          <div className="bg-white p-6 rounded-md shadow-lg w-96">
-            <h2 className="text-xl font-semibold mb-4 text-center">
-              Thêm Giảng Viên Vào Nhóm
+      {isEditModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-lg">
+            <h2 className="text-2xl font-bold mb-4 text-center">
+              Edit Product
             </h2>
-            <form className="space-y-4">
-              <div>
-                <label className="block font-medium mb-2">
-                  Chọn Giảng Viên:
-                </label>
-                <select
-                  onChange={(e) => setSelectedLecturer(e.target.value)}
-                  value={selectedLecturer}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="">Chọn Giảng Viên</option>
-                  {availableLecturers.map((lecturer) => (
-                    <option key={lecturer.MaGV} value={lecturer.MaGV}>
-                      {lecturer.HoTenGV} - {lecturer.MaGV}{" "}
-                      {/* Hiển thị tên giảng viên và mã giảng viên */}
-                    </option>
-                  ))}
-                </select>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                axios
+                  .post(
+                    "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SanPhamNCKHSV_Api.php?action=update",
+                    editFormData
+                  )
+                  .then((response) => {
+                    alert(
+                      response.data.message || "Product updated successfully!"
+                    );
+                    setProducts((prev) =>
+                      prev.map((product) =>
+                        product.MaDeTaiSV === editFormData.MaDeTaiSV
+                          ? { ...editFormData } // Cập nhật sản phẩm trong danh sách
+                          : product
+                      )
+                    );
+                    setIsEditModalOpen(false); // Đóng modal chỉnh sửa
+                  })
+                  .catch((error) => {
+                    console.error("Error editing product:", error);
+                  });
+              }}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Product Name
+                  </label>
+                  <input
+                    type="text"
+                    name="TenSanPham"
+                    value={editFormData.TenSanPham}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        TenSanPham: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Completion Date
+                  </label>
+                  <input
+                    type="date"
+                    name="NgayHoanThanh"
+                    value={editFormData.NgayHoanThanh}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        NgayHoanThanh: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Result
+                  </label>
+                  <input
+                    type="text"
+                    name="KetQua"
+                    value={editFormData.KetQua}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        KetQua: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Topic ID
+                  </label>
+                  <input
+                    type="text"
+                    name="MaDeTaiSV"
+                    value={editFormData.MaDeTaiSV}
+                    readOnly
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm bg-gray-100"
+                  />
+                </div>
               </div>
-              <div className="text-center mt-4">
+              <div className="flex justify-center mt-6">
                 <button
-                  type="button"
-                  onClick={handleAddLecturer}
-                  className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-600 transition"
                 >
-                  Thêm
+                  Save
                 </button>
-
                 <button
                   type="button"
-                  onClick={() => setIsAddLecturerModalOpen(false)}
-                  className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 ml-4"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-600 transition"
                 >
-                  Đóng
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-lg">
+            <h2 className="text-2xl font-bold mb-4 text-center">Add Product</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Product Name
+                  </label>
+                  <input
+                    type="text"
+                    name="TenSanPham"
+                    value={formData.TenSanPham}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        TenSanPham: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Completion Date
+                  </label>
+                  <input
+                    type="date"
+                    name="NgayHoanThanh"
+                    value={formData.NgayHoanThanh}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        NgayHoanThanh: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Result
+                  </label>
+                  <input
+                    type="text"
+                    name="KetQua"
+                    value={formData.KetQua}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        KetQua: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Topic ID
+                  </label>
+                  <input
+                    type="text"
+                    name="MaDeTaiSV"
+                    value={formData.MaDeTaiSV}
+                    readOnly
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm bg-gray-100"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-center mt-6">
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-600 transition"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-600 transition"
+                >
+                  Cancel
                 </button>
               </div>
             </form>

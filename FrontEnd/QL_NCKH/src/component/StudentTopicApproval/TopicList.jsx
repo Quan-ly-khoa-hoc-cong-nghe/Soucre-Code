@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaCheck, FaTimes, FaEye } from "react-icons/fa";
+import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 // Base API URL
 const API_BASE = "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV";
 
@@ -144,7 +144,7 @@ const TopicList = () => {
               <th className="text-left py-4 px-2">Tên Đề Tài</th>
               <th className="text-left py-4 px-2">Tên Chủ Nhiệm Đề Tài</th>
               <th className="text-left py-4 px-2">Trạng Thái</th>
-              <th className="text-right py-4 px-2">Actions</th>
+              <th className="text-right py-4 px-2">Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -155,7 +155,7 @@ const TopicList = () => {
                 <td className="py-4 px-2">
                   <span
                     className={`px-2 py-1 rounded-full text-sm ${
-                      topic.TrangThai === "Đã duyệt"
+                      topic.TrangThai === "Hoàn thành"
                         ? "bg-green-100 text-green-800"
                         : topic.TrangThai === "Hủy"
                         ? "bg-red-100 text-red-800"
@@ -166,13 +166,32 @@ const TopicList = () => {
                   </span>
                 </td>
                 <td className="py-4 px-2 text-right">
-                  <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-2">
+                    {/* Icon mắt để xem chi tiết */}
                     <button
                       onClick={() => handleViewDetails(topic)}
                       className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
                       title="Xem chi tiết"
                     >
                       <FaEye className="w-5 h-5" />
+                    </button>
+
+                    {/* Icon xóa để xóa đề tài */}
+                    <button
+                      onClick={() => handleDeleteTopic(topic.MaDeTaiNCKHGV)} // Hàm xóa sẽ gọi với mã đề tài
+                      className="p-2 text-red-600 hover:bg-red-100 rounded-full"
+                      title="Xóa"
+                    >
+                      <FaTrash className="w-5 h-5" />
+                    </button>
+
+                    {/* Icon sửa để sửa đề tài */}
+                    <button
+                      onClick={() => handleEditTopic(topic)} // Hàm sửa sẽ gọi với đối tượng topic
+                      className="p-2 text-green-600 hover:bg-green-100 rounded-full"
+                      title="Sửa"
+                    >
+                      <FaEdit className="w-5 h-5" />
                     </button>
                   </div>
                 </td>
