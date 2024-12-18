@@ -4,15 +4,18 @@ import axios from "axios";
 
 const ApplicationApprovalListAdmin = () => {
   const [applications, setApplications] = useState([]);
+  const [departments, setDepartments] = useState([]); // Danh sách Khoa
+  const [studentInfo, setStudentInfo] = useState({}); // Thông tin Sinh Viên
   const [students, setStudents] = useState([]); // Danh sách sinh viên được thêm
+  const [lecturerInfo, setLecturerInfo] = useState({}); // Thông tin Giảng Viên
   const [lecturers, setLecturers] = useState([]); // Danh sách giảng viên được thêm
   const [selectedApp, setSelectedApp] = useState(null);
   const [showAddTopicModal, setShowAddTopicModal] = useState(false);
-  const [departments, setDepartments] = useState([]);
   const [files, setFiles] = useState({
     FileHopDong: null,
     FileKeHoach: null,
   });
+  const [loading, setLoading] = useState(false);
   const [tenDeTai, setTenDeTai] = useState("");
   const [moTa, setMoTa] = useState("");
   const [ngayBatDau, setNgayBatDau] = useState("");
@@ -30,20 +33,20 @@ const ApplicationApprovalListAdmin = () => {
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ]; // Allowed file types
-  
+
     if (!allowedTypes.includes(file.type)) {
       alert("Chỉ chấp nhận các tệp PDF hoặc DOCX.");
       // Clear the file input field
-      event.target.value = ""; 
+      event.target.value = "";
       return;
     }
-  
+
     // If file type is valid, update the state
     setFiles((prevFiles) => ({
       ...prevFiles,
       [fieldName]: file,
     }));
-  };  
+  };
 
   const fetchApplications = () => {
     axios
@@ -71,7 +74,76 @@ const ApplicationApprovalListAdmin = () => {
       });
   };
 
+  const addStudent = (studentId) => {
+    const trimmedStudentId = studentId.trim(); // Xóa khoảng trắng thừa
+    if (!trimmedStudentId) {
+      alert("Vui lòng nhập mã sinh viên hợp lệ!");
+      return;
+    }
+    if (students.some((student) => student.MaSinhVien === trimmedStudentId)) {
+      alert("Sinh viên đã có trong danh sách!");
+      return;
+    }
 
+    axios
+      .get(
+        `http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SinhVien_Api.php?action=getById&MaSinhVien=${trimmedStudentId}`
+      )
+      .then((response) => {
+        if (response.data && response.data.SinhVien) {
+          const newStudent = response.data.SinhVien;
+          if (
+            students.some(
+              (student) => student.MaSinhVien === newStudent.MaSinhVien
+            )
+          ) {
+            alert("Sinh viên đã có trong danh sách!");
+            return;
+          }
+
+          // Thêm sinh viên vào danh sách nếu không trùng
+          setStudents((prevStudents) => [...prevStudents, newStudent]);
+        } else {
+          alert("Không tìm thấy thông tin sinh viên!");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching student info:", error);
+        alert("Có lỗi xảy ra khi tải thông tin sinh viên.");
+      });
+  };
+
+  const addLecturer = (lecturerId) => {
+    const trimmedLecturerId = lecturerId.trim(); 
+
+    if (!trimmedLecturerId) {
+      alert("Vui lòng nhập mã giảng viên hợp lệ!");
+      return;
+    }
+
+    if (lecturers.length > 0) {
+      alert("Chỉ được thêm một giảng viên duy nhất!");
+      return;
+    }
+    axios
+      .get(
+        `http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/GiangVien_Api.php?action=getById&MaGV=${trimmedLecturerId}`
+      )
+      .then((response) => {
+        if (response.data && response.data.GiangVien) {
+          const newLecturer = response.data.GiangVien;
+
+          setLecturers([newLecturer]);
+          alert("Giảng viên đã được thêm thành công!");
+        } else {
+          alert("Không tìm thấy thông tin giảng viên!");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching lecturer info:", error);
+        alert("Có lỗi xảy ra khi tải thông tin giảng viên.");
+      });
+  };
 
   const approveApplication = (app) => {
     const requestData = {
@@ -133,7 +205,6 @@ const ApplicationApprovalListAdmin = () => {
         alert("Đã xảy ra lỗi khi gửi yêu cầu: " + error.message); // Thông báo lỗi khi gặp sự cố
       });
   };
-
   const handleAddTopicClick = (app) => {
     setSelectedApp(app); // Lưu hồ sơ được chọn
     setShowAddTopicModal(true);
@@ -235,12 +306,11 @@ const ApplicationApprovalListAdmin = () => {
       <table className="w-full border-collapse border border-gray-200">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 border">Mã hồ sơ</th>
-            <th className="px-4 py-2 border">Ngày nộp</th>
-            <th className="px-4 py-2 border">File hồ sơ</th>
-            <th className="px-4 py-2 border">Trạng thái</th>
-            <th className="px-4 py-2 border">Khoa</th> 
-            <th className="px-4 py-2 border">Thao tác</th>
+            <th className="px-4 py-2 border">Application ID</th>
+            <th className="px-4 py-2 border">Submission Date</th>
+            <th className="px-4 py-2 border">File</th>
+            <th className="px-4 py-2 border">Status</th>
+            <th className="px-4 py-2 border">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -272,12 +342,6 @@ const ApplicationApprovalListAdmin = () => {
                     {app.TrangThai}
                   </span>
                 </td>
-                <td className="px-4 py-2 border">
-                {
-                  // Tìm tên khoa từ danh sách departments
-                  departments.find((dept) => dept.MaKhoa === app.MaKhoa)?.TenKhoa || "Chưa có"
-                }
-              </td>
                 <td className="py-4 px-2 text-right">
                   <div className="flex justify-end space-x-2">
                     {app.TrangThai !== "Đã duyệt" && app.TrangThai !== "Hủy" ? (
@@ -353,10 +417,11 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={tenDeTai}
+                      onChange={(e) => setTenDeTai(e.target.value)}
                     />
                   </div>
                   <div>
-                    <label classNaame="block text-sm font-medium mb-1">
+                    <label className="block text-sm font-medium mb-1">
                       Mô Tả
                     </label>
                     <textarea
@@ -364,6 +429,7 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={moTa}
+                      onChange={(e) => setMoTa(e.target.value)}
                     />
                   </div>
                   <div>
@@ -374,6 +440,7 @@ const ApplicationApprovalListAdmin = () => {
                       type="file"
                       name="FileHopDong"
                       className="w-full px-4 py-2 border rounded-lg"
+                      onChange={(e) => handleFileUpload(e, "FileHopDong")}
                       required
                     />
                   </div>
@@ -396,6 +463,7 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={ngayBatDau}
+                      onChange={(e) => setNgayBatDau(e.target.value)}
                     />
                   </div>
                   <div>
@@ -421,6 +489,7 @@ const ApplicationApprovalListAdmin = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                       required
                       value={kinhPhi}
+                      onChange={(e) => setKinhPhi(e.target.value)}
                     />
                   </div>
                   <div>
@@ -451,7 +520,13 @@ const ApplicationApprovalListAdmin = () => {
                     <input
                       type="text"
                       className="w-full px-4 py-2 border rounded-lg"
-
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addStudent(e.target.value); // Thêm sinh viên vào danh sách
+                          e.target.value = ""; // Xóa nội dung ô input sau khi thêm
+                        }
+                      }}
                     />
                   </div>
                 </div>
@@ -506,7 +581,13 @@ const ApplicationApprovalListAdmin = () => {
                     <input
                       type="text"
                       className="w-full px-4 py-2 border rounded-lg"
-                     
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addLecturer(e.target.value); // Thêm giảng viên vào danh sách
+                          e.target.value = ""; // Xóa nội dung ô input sau khi thêm
+                        }
+                      }}
                     />
                   </div>
                 </div>
@@ -528,6 +609,11 @@ const ApplicationApprovalListAdmin = () => {
                           </span>
                           <button
                             className="text-red-600 hover:underline ml-2"
+                            onClick={() =>
+                              setLecturers((prevLecturers) =>
+                                prevLecturers.filter((_, i) => i !== index)
+                              )
+                            }
                           >
                             Xóa
                           </button>
@@ -547,6 +633,7 @@ const ApplicationApprovalListAdmin = () => {
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  onClick={handleSubmit}
                 >
                   Lưu Đề Tài
                 </button>
@@ -566,4 +653,3 @@ const ApplicationApprovalListAdmin = () => {
 };
 
 export default ApplicationApprovalListAdmin;
-

@@ -169,7 +169,8 @@ switch ($action) {
                         foreach ($_POST['GiangViens'] as $MaGV) {
                             $giangVienData = [
                                 'MaNhomNCKHSV' => $maNhomNCKHSV,
-                                'MaGV' => $MaGV
+                                'MaGV' => $MaGV,
+                                'VaiTro' => "Chủ nhiệm"
                             ];
                             error_log("Dữ liệu gửi đến GiangVienNCKHSV_Api: " . print_r($giangVienData, true));
                             $giangVienResponse = callApi('GiangVienNCKHSV_Api.php', 'add', $giangVienData);

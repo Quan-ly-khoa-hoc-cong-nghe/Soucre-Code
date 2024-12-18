@@ -62,7 +62,7 @@ const Quanlytailieu = () => {
           onClick={() => setIsCreateModalOpen(true)}
           className="bg-green-500 text-white px-4 py-2 rounded-lg mb-4"
         >
-          Thêm hồ sơ hội thảo
+          Thêm tài liệu
         </button>
 
         {/* Dropdown chọn hội thảo */}
