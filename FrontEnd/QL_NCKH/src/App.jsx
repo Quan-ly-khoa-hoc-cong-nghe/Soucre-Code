@@ -43,6 +43,9 @@ import PhienHoiThao from './component/ScienceSeminar/phienhoithao';
 import NguoiThamGia from './component/ScienceSeminar/nguoithamgia';
 import VaitroHoiThao from './component/ScienceSeminar/vaitrotronghoithao';
 import Nhataitro from './component/ScienceSeminar/nhataitro';
+import KeHoach from './component/LecturerTopicApproval/Kehoach';
+import LayoutScitech from './component/LayoutSciTech';
+import User from './component/User/User';
 const PrivateRoute = ({ element, layout: LayoutComponent }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated');
   return isAuthenticated ? <LayoutComponent>{element}</LayoutComponent> : <Navigate to="/" />;
@@ -89,7 +92,10 @@ function App() {
         <Route path="/admin/nguoithamgia" element={<PrivateRoute element={<NguoiThamGia />} layout={Layout} />} />
         <Route path="/admin/vaitrohoithao" element={<PrivateRoute element={<VaitroHoiThao />} layout={Layout} />} />
         <Route path="/admin/nhataitro" element={<PrivateRoute element={<Nhataitro />} layout={Layout} />} />
+        <Route path="/admin/kehoach" element={<PrivateRoute element={<KeHoach />} layout={Layout} />} />
+        <Route path="/admin/user" element={<PrivateRoute element={<User />} layout={Layout} />} />
 
+       
 
 
         
@@ -135,6 +141,10 @@ function App() {
         <Route path="/scitech/approval-of-school-topic-sciTech" element={<PrivateRoute element={< ApprovalOfSchoolTopicSciTech/>} layout={LayoutSciTech} />} />
         <Route path="/scitech/approval-off-campus-project-department" element={<PrivateRoute element={< ApprovalOffCampusProjectDepartment/>} layout={LayoutSciTech} />} />
         <Route path="/scitech/approval-off-campus-project-scitech" element={<PrivateRoute element={< ApprovalOffCampusProjectSciTech/>} layout={LayoutSciTech} />} />
+        <Route path="/scitech/kehoach" element={<PrivateRoute element={<KeHoach />} layout={LayoutScitech} />} />
+        <Route path="/scitech/edit-lecturer" element={<PrivateRoute element={<EditLecturer />} layout={LayoutScitech} />} />
+        <Route path="/scitech/report" element={<PrivateRoute element={<ReportLecturer />} layout={LayoutScitech} />} />
+        <Route path="/scitech/product-lecturer" element={<PrivateRoute element={<ProductLecturer />} layout={LayoutScitech} />} />
 
         {/* Các route không có Layout */}
         <Route path="/authcallback" element={<LecturerApplicationApprovalList element={<AuthCallback />} />} />

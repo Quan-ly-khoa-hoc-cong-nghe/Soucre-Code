@@ -31,26 +31,43 @@ class SanPhamNCKHGV
     }
 
     // Thêm sản phẩm mới
-    public function addProduct($tenSanPham, $ngayHoanThanh, $ketQua, $maDeTai)
-    {
-        // Kiểm tra dữ liệu đầu vào
-        if (empty($tenSanPham) || empty($ngayHoanThanh) || empty($ketQua) || empty($maDeTai)) {
-            return false; // Nếu dữ liệu không hợp lệ, không thực hiện thêm
-        }
+   // Thêm sản phẩm mới
+public function addProduct($tenSanPham, $ngayHoanThanh, $ketQua, $maDeTai, $fileSanPham)
+{
+    // Kiểm tra dữ liệu đầu vào
+    if (empty($tenSanPham) || empty($ngayHoanThanh) || empty($ketQua) || empty($maDeTai) || empty($fileSanPham)) {
+        return false; // Nếu dữ liệu không hợp lệ, không thực hiện thêm
+    }
 
-        $stmt = $this->db->prepare("INSERT INTO SanPhamNCKHGV (TenSanPham, NgayHoanThanh, KetQua, MaDeTaiNCKHGV) 
-                                    VALUES (:tenSanPham, :ngayHoanThanh, :ketQua, :maDeTai)");
-        $stmt->bindParam(':tenSanPham', $tenSanPham);
-        $stmt->bindParam(':ngayHoanThanh', $ngayHoanThanh);
-        $stmt->bindParam(':ketQua', $ketQua);
-        $stmt->bindParam(':maDeTai', $maDeTai);
+    $stmt = $this->db->prepare("INSERT INTO SanPhamNCKHGV (TenSanPham, NgayHoanThanh, KetQua, MaDeTaiNCKHGV, FileSanPham) 
+                                VALUES (:tenSanPham, :ngayHoanThanh, :ketQua, :maDeTai, :fileSanPham)");
+    $stmt->bindParam(':tenSanPham', $tenSanPham);
+    $stmt->bindParam(':ngayHoanThanh', $ngayHoanThanh);
+    $stmt->bindParam(':ketQua', $ketQua);
+    $stmt->bindParam(':maDeTai', $maDeTai);
+    $stmt->bindParam(':fileSanPham', $fileSanPham);
 
-        if ($stmt->execute()) {
-            return true;
-        }
+    if ($stmt->execute()) {
+        return true;
+    }
 
+    return false;
+}
+public function updateKetQua($maSanPham, $ketQua)
+{
+    // Kiểm tra mã sản phẩm có tồn tại không
+    if (!$this->checkMaSanPhamExists($maSanPham)) {
         return false;
     }
+
+    // Cập nhật KetQua
+    $stmt = $this->db->prepare("UPDATE SanPhamNCKHGV SET KetQua = :ketQua WHERE MaSanPhamNCKHGV = :maSanPham");
+    $stmt->bindParam(':ketQua', $ketQua);
+    $stmt->bindParam(':maSanPham', $maSanPham);
+
+    return $stmt->execute();
+}
+
 
     // Kiểm tra mã đề tài có tồn tại không
     public function checkMaDeTaiExists($maDeTai)

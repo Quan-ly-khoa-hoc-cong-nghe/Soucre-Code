@@ -9,9 +9,9 @@ const EditLecturer = () => {
   const [lecturers, setLecturers] = useState([]); // State to hold lecturer data
   const [fullLecturerData, setFullLecturerData] = useState([]); // State to hold full lecturer details (HoTenGV)
   const [selectedLecturer, setSelectedLecturer] = useState(""); // State for selected lecturer in the modal
-  const [isRemoveLecturerModalOpen, setIsRemoveLecturerModalOpen] = useState(false); // Modal xóa giảng viên
-const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên chọn xóa
-
+  const [isRemoveLecturerModalOpen, setIsRemoveLecturerModalOpen] =
+    useState(false); // Modal xóa giảng viên
+  const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên chọn xóa
 
   // Fetch data from APIs on component mount
   useEffect(() => {
@@ -90,7 +90,7 @@ const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên c
     setSelectedGroup(group);
     setIsRemoveLecturerModalOpen(true);
   };
-  
+
   const handleAddLecturerToGroup = (group) => {
     setSelectedGroup(group);
     setIsAddLecturerModalOpen(true);
@@ -157,7 +157,7 @@ const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên c
       alert("Vui lòng chọn giảng viên và nhóm trước.");
       return;
     }
-  
+
     try {
       const response = await fetch(
         "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/GiangVienNCKHGV_Api.php?action=DELETE",
@@ -172,10 +172,10 @@ const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên c
           }),
         }
       );
-  
+
       if (response.ok) {
         alert("Giảng viên đã được xóa thành công.");
-        
+
         // Update the state to remove the lecturer from the group
         setProjects((prevProjects) =>
           prevProjects.map((project) => {
@@ -186,7 +186,9 @@ const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên c
                   .split(", ")
                   .filter((name) => name !== lecturerId) // Remove the lecturer from the list
                   .join(", "),
-                lecturerIds: project.lecturerIds.filter((id) => id !== lecturerId), // Remove the lecturer ID from the list
+                lecturerIds: project.lecturerIds.filter(
+                  (id) => id !== lecturerId
+                ), // Remove the lecturer ID from the list
               };
             }
             return project;
@@ -201,7 +203,7 @@ const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên c
       alert("Có lỗi xảy ra khi xóa giảng viên.");
     }
   };
-  
+
   return (
     <div className="p-6">
       {/* Nhóm giảng viên */}
@@ -238,12 +240,11 @@ const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên c
                     Thêm Thành Viên
                   </button>
                   <button
-  onClick={() => handleOpenRemoveLecturerModal(project)}
-  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
->
-  Xóa thành viên
-</button>
-
+                    onClick={() => handleOpenRemoveLecturerModal(project)}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+                  >
+                    Xóa thành viên
+                  </button>
                 </td>
               </tr>
             ))}
@@ -251,55 +252,57 @@ const [lecturerToRemove, setLecturerToRemove] = useState(""); // Giảng viên c
         </table>
       </div>
       {isRemoveLecturerModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-    <div className="bg-white p-6 rounded-md shadow-lg w-96">
-      <h2 className="text-xl font-semibold mb-4 text-center">
-        Chọn Giảng Viên Cần Xóa
-      </h2>
-      <form className="space-y-4">
-        <div>
-          <label className="block font-medium mb-2">
-            Chọn Giảng Viên:
-          </label>
-          <select
-            onChange={(e) => setLecturerToRemove(e.target.value)}
-            value={lecturerToRemove}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md"
-          >
-            <option value="">Chọn Giảng Viên</option>
-            {selectedGroup?.lecturerIds.map((lecturerId) => {
-              const lecturer = fullLecturerData.find(
-                (item) => item.MaGV === lecturerId
-              );
-              return (
-                <option key={lecturer.MaGV} value={lecturer.MaGV}>
-                  {lecturer.HoTenGV} - {lecturer.MaGV}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-        <div className="text-center mt-4">
-          <button
-            type="button"
-            onClick={() => handleRemoveLecturerFromGroup(lecturerToRemove)}
-            className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Xóa
-          </button>
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+          <div className="bg-white p-6 rounded-md shadow-lg w-96">
+            <h2 className="text-xl font-semibold mb-4 text-center">
+              Chọn Giảng Viên Cần Xóa
+            </h2>
+            <form className="space-y-4">
+              <div>
+                <label className="block font-medium mb-2">
+                  Chọn Giảng Viên:
+                </label>
+                <select
+                  onChange={(e) => setLecturerToRemove(e.target.value)}
+                  value={lecturerToRemove}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="">Chọn Giảng Viên</option>
+                  {selectedGroup?.lecturerIds.map((lecturerId) => {
+                    const lecturer = fullLecturerData.find(
+                      (item) => item.MaGV === lecturerId
+                    );
+                    return (
+                      <option key={lecturer.MaGV} value={lecturer.MaGV}>
+                        {lecturer.HoTenGV} - {lecturer.MaGV}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <div className="text-center mt-4">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleRemoveLecturerFromGroup(lecturerToRemove)
+                  }
+                  className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Xóa
+                </button>
 
-          <button
-            type="button"
-            onClick={() => setIsRemoveLecturerModalOpen(false)}
-            className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 ml-4"
-          >
-            Đóng
-          </button>
+                <button
+                  type="button"
+                  onClick={() => setIsRemoveLecturerModalOpen(false)}
+                  className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 ml-4"
+                >
+                  Đóng
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
 
       {/* Modal thêm giảng viên */}
       {isAddLecturerModalOpen && (

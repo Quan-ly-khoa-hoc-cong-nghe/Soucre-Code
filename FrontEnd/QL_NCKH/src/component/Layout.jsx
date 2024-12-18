@@ -91,11 +91,29 @@ const Layout = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
+                to="/admin/user"
+                className="flex items-center space-x-3"
+              >
+                <FaUserFriends />
+                <span className="font-semibold">Quản lý tài khoản </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
                 to="/admin/lecturer-topic-approval"
                 className="flex items-center space-x-3"
               >
                 <FaClipboardList />
                 <span className="font-semibold">Chi tiết đề tài giảng viên</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/admin/kehoach"
+                className="flex items-center space-x-3"
+              >
+                <FaClipboardList />
+                <span className="font-semibold">Kế hoạch nckh giảng viên</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -176,7 +194,7 @@ const Layout = ({ children }) => {
                 className="flex items-center space-x-3"
               >
                 <FaUserFriends />
-                <span className="font-semibold">Chỉnh nhóm giảng viên</span>
+                <span className="font-semibold">Quản lý nhóm giảng viên NCKH</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
