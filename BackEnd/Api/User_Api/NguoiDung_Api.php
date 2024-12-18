@@ -1,5 +1,14 @@
 <?php
 header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");  // Cho phép tất cả domain
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");  // Các phương thức được phép
+header("Access-Control-Allow-Headers: Content-Type, Authorization");  // Các header cho phép
+
+// Xử lý yêu cầu OPTIONS (Preflight request)
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../../Model/NguoiDung/NguoiDung.php';
@@ -43,7 +52,9 @@ switch ($method) {
 
     case 'POST':
         if ($action === "post") {
+            // Thêm người dùng mới
             $data = json_decode(file_get_contents("php://input"));
+            error_log(print_r($data, true));
             if (!isset($data->MaNguoiDung, $data->VaiTro, $data->MatKhau, $data->MaNhanVien)) {
                 echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
                 http_response_code(400);
@@ -52,7 +63,7 @@ switch ($method) {
 
             $nguoidung->MaNguoiDung = $data->MaNguoiDung;
             $nguoidung->VaiTro = $data->VaiTro;
-            $nguoidung->MatKhau = password_hash($data->MatKhau, PASSWORD_BCRYPT); // Mã hóa mật khẩu
+            $nguoidung->MatKhau = $data->MatKhau; // Không mã hóa mật khẩu
             $nguoidung->MaNhanVien = $data->MaNhanVien;
 
             if ($nguoidung->add()) {
@@ -69,22 +80,23 @@ switch ($method) {
 
     case 'PUT':
         if ($action === "put") {
-            $data = json_decode(file_get_contents("php://input"));
-            if (!isset($data->MaNguoiDung, $data->VaiTro, $data->MatKhau, $data->MaNhanVien)) {
+            // Lấy dữ liệu từ query string
+            $MaNguoiDung = isset($_GET['MaNguoiDung']) ? $_GET['MaNguoiDung'] : null;
+            $MatKhau = isset($_GET['MatKhau']) ? $_GET['MatKhau'] : null;
+
+            if (!$MaNguoiDung || !$MatKhau) {
                 echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
                 http_response_code(400);
                 exit;
             }
 
-            $nguoidung->MaNguoiDung = $data->MaNguoiDung;
-            $nguoidung->VaiTro = $data->VaiTro;
-            $nguoidung->MatKhau = password_hash($data->MatKhau, PASSWORD_BCRYPT);
-            $nguoidung->MaNhanVien = $data->MaNhanVien;
+            $nguoidung->MaNguoiDung = $MaNguoiDung;
+            $nguoidung->MatKhau = $MatKhau;
 
-            if ($nguoidung->update()) {
-                echo json_encode(["message" => "Người dùng đã được cập nhật"]);
+            if ($nguoidung->update()) { // Cập nhật mật khẩu
+                echo json_encode(["message" => "Mật khẩu đã được cập nhật"]);
             } else {
-                echo json_encode(["message" => "Cập nhật người dùng thất bại"]);
+                echo json_encode(["message" => "Cập nhật mật khẩu thất bại"]);
                 http_response_code(500);
             }
         } else {
@@ -95,14 +107,14 @@ switch ($method) {
 
     case 'DELETE':
         if ($action === "delete") {
-            $data = json_decode(file_get_contents("php://input"));
-            if (!isset($data->MaNguoiDung)) {
-                echo json_encode(["message" => "Dữ liệu không đầy đủ"]);
+            // Lấy MaNguoiDung từ query string
+            $nguoidung->MaNguoiDung = isset($_GET['MaNguoiDung']) ? $_GET['MaNguoiDung'] : null;
+
+            if (!$nguoidung->MaNguoiDung) {
+                echo json_encode(["message" => "Thiếu MaNguoiDung"]);
                 http_response_code(400);
                 exit;
             }
-
-            $nguoidung->MaNguoiDung = $data->MaNguoiDung;
 
             if ($nguoidung->delete()) {
                 echo json_encode(["message" => "Người dùng đã được xóa thành công"]);
@@ -116,9 +128,9 @@ switch ($method) {
         }
         break;
 
+
     default:
         echo json_encode(["message" => "Phương thức không được hỗ trợ"]);
         http_response_code(405);
         break;
 }
-?>
