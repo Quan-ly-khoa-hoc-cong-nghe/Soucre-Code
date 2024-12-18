@@ -11,38 +11,22 @@ const ProductLecturer = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [formData, setFormData] = useState({
-    MaDeTaiSV: "",
+    MaDeTaiNCKHGV: "",
     TenSanPham: "",
     NgayHoanThanh: "",
     KetQua: "",
     FileSanPham: "",
   });
 
-  const handleEditProduct = (product) => {
-    setEditFormData(product);
-    setIsEditModalOpen(true);
-  };
-  const searchFilter = (topic) => {
-    // Kiểm tra tên đề tài và tên sản phẩm có chứa từ khóa tìm kiếm không
-    return (
-      topic.TenDeTai.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      products.some(
-        (product) =>
-          product.TenSanPham.toLowerCase().includes(
-            searchQuery.toLowerCase()
-          ) && product.MaDeTaiSV === topic.MaDeTaiSV
-      )
-    );
-  };
-
+  // Fetch data
   useEffect(() => {
     // Lấy danh sách sản phẩm
     axios
       .get(
-        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SanPhamNCKHSV_Api.php?action=get"
+        "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/SanPhamNCKHGV_Api.php?action=get"
       )
       .then((response) => {
-        setProducts(response.data.SanPhamNCKHSV || []);
+        setProducts(response.data || []);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
@@ -51,19 +35,20 @@ const ProductLecturer = () => {
     // Lấy danh sách đề tài
     axios
       .get(
-        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/DeTaiNCKHSV_Api.php?action=get"
+        "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/DeTaiNCKHGiangVien_Api.php?action=get"
       )
       .then((response) => {
-        setTopics(response.data.DeTaiNCKHSV || []);
+        setTopics(response.data || []);
       })
       .catch((error) => {
         console.error("Error fetching topics:", error);
       });
   }, []);
 
+  // Modal thêm sản phẩm
   const handleCancel = () => {
     setFormData({
-      MaDeTaiSV: "",
+      MaDeTaiNCKHGV: "",
       TenSanPham: "",
       NgayHoanThanh: "",
       KetQua: "",
@@ -72,173 +57,437 @@ const ProductLecturer = () => {
     setIsModalOpen(false);
   };
 
-  const handleAddProduct = (maDeTaiSV) => {
+  const handleAddProduct = (maDeTaiNCKHGV) => {
     // Kiểm tra nếu đề tài đã có sản phẩm
-    const existingProduct = products.find(
-      (product) => product.MaDeTaiSV === maDeTaiSV
+    const hasProduct = products.some(
+      (product) => product.MaDeTaiNCKHGV === maDeTaiNCKHGV
     );
 
-    if (existingProduct) {
-      alert("This topic already has a product. You cannot add another.");
-      return; // Dừng nếu đã có sản phẩm
+    if (hasProduct) {
+      alert("Đề tài này đã có sản phẩm. Bạn không thể thêm sản phẩm mới!");
+      return; // Dừng lại, không mở modal
     }
 
     // Nếu chưa có sản phẩm, mở modal thêm sản phẩm
     setFormData({
-      MaDeTaiSV: maDeTaiSV,
       TenSanPham: "",
       NgayHoanThanh: "",
-      KetQua: "",
-      FileSanPham: "",
+      KetQua: "Đang làm", // Giá trị mặc định
+      MaDeTaiNCKHGV: maDeTaiNCKHGV,
     });
-    setIsModalOpen(true);
+    setIsModalOpen(true); // Mở modal
   };
-  const handleDeleteProduct = (product) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete product "${product.TenSanPham}"?`
-      )
-    ) {
+
+  const handleDeleteProduct = (maDeTaiNCKHGV) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
+      // Gửi yêu cầu DELETE tới API
       axios
         .post(
-          "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SanPhamNCKHSV_Api.php?action=delete",
-          { MaDeTaiSV: product.MaDeTaiSV } // Gửi thông tin sản phẩm cần xóa
+          "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/SanPhamNCKHGV_Api.php?action=delete",
+          { MaDeTaiNCKHGV: maDeTaiNCKHGV }, // Gửi mã đề tài trong body
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         )
         .then((response) => {
-          alert(response.data.message || "Product deleted successfully!");
+          alert("Sản phẩm đã được xóa thành công!");
           // Cập nhật danh sách sản phẩm sau khi xóa
           setProducts((prevProducts) =>
-            prevProducts.filter((p) => p.MaDeTaiSV !== product.MaDeTaiSV)
+            prevProducts.filter(
+              (product) => product.MaDeTaiNCKHGV !== maDeTaiNCKHGV
+            )
           );
         })
         .catch((error) => {
-          console.error("Error deleting product:", error);
+          console.error("Lỗi khi xóa sản phẩm:", error);
+          alert("Đã xảy ra lỗi khi xóa sản phẩm.");
         });
     }
   };
 
+  const handleEditProduct = (product) => {
+    setEditFormData(product);
+    setIsEditModalOpen(true);
+  };
+
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Ngăn chặn hành vi mặc định của form
+
+    // Gửi dữ liệu tới API
     axios
       .post(
-        "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SanPhamNCKHSV_Api.php?action=add",
-        formData
+        "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/SanPhamNCKHGV_Api.php?action=post",
+        formData, // Dữ liệu sản phẩm trong state
+        {
+          headers: {
+            "Content-Type": "application/json", // Định dạng JSON
+          },
+        }
       )
       .then((response) => {
-        alert(response.data.message || "Product added successfully!");
-        const newProduct = { ...formData };
-        setProducts([...products, newProduct]);
-        handleCancel();
+        // Xử lý phản hồi thành công
+        alert("Thêm sản phẩm thành công!");
+        console.log(response.data); // In ra phản hồi từ API
+        setIsModalOpen(false); // Đóng modal
       })
       .catch((error) => {
-        console.error("Error adding product:", error);
+        // Xử lý lỗi
+        console.error("Lỗi khi thêm sản phẩm:", error);
+        alert("Đã xảy ra lỗi khi thêm sản phẩm!");
       });
   };
 
-  // Lọc danh sách đề tài dựa trên lựa chọn
   const filteredTopics = topics.filter((topic) => {
     const hasProduct = products.some(
-      (product) => product.MaDeTaiSV === topic.MaDeTaiSV
+      (product) => product.MaDeTaiNCKHGV === topic.MaDeTaiNCKHGV
     );
 
-    // Lọc theo bộ lọc sản phẩm và từ khóa tìm kiếm
-    const matchesSearch = searchFilter(topic);
+    const matchesSearch = topic.TenDeTai.toLowerCase().includes(
+      searchQuery.toLowerCase()
+    );
 
     if (filterOption === "hasProduct") {
-      return hasProduct && matchesSearch; // Đề tài có sản phẩm và khớp tìm kiếm
+      return hasProduct && matchesSearch;
     }
     if (filterOption === "noProduct") {
-      return !hasProduct && matchesSearch; // Đề tài chưa có sản phẩm và khớp tìm kiếm
+      return !hasProduct && matchesSearch;
     }
-    return matchesSearch; // Hiển thị tất cả khi không có bộ lọc cụ thể
+    return matchesSearch;
   });
+  const [isEvaluateModalOpen, setIsEvaluateModalOpen] = useState(false);
+  const [evaluateFormData, setEvaluateFormData] = useState({
+    MaSanPhamNCKHGV: "",
+    DanhGia: "",
+  });
+
+  const handleEvaluate = (product) => {
+    setEvaluateFormData({
+      MaSanPhamNCKHGV: product.MaSanPhamNCKHGV, // Lưu mã sản phẩm
+      DanhGia: "", // Đặt mặc định đánh giá rỗng
+    });
+    setIsEvaluateModalOpen(true); // Mở modal
+  };
+
+  const handleSubmitEvaluation = (e) => {
+    e.preventDefault(); // Ngăn chặn hành vi mặc định của form
+  
+    // Chuẩn bị dữ liệu để gửi đến API
+    const payload = {
+      MaSanPhamNCKHGV: evaluateFormData.MaSanPhamNCKHGV,
+      KetQua: evaluateFormData.DanhGia, // Giá trị đánh giá sẽ được gửi dưới dạng 'KetQua'
+    };
+  
+    // Gửi yêu cầu POST đến API
+    axios
+      .post(
+        "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/SanPhamNCKHGV_Api.php?action=update_ketqua",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json", // Định dạng JSON
+          },
+        }
+      )
+      .then((response) => {
+        // Xử lý phản hồi thành công
+        if (response.data.message) {
+          alert(response.data.message); // Thông báo từ API
+        }
+        setIsEvaluateModalOpen(false); // Đóng modal
+      })
+      .catch((error) => {
+        // Xử lý lỗi
+        console.error("Lỗi khi cập nhật kết quả:", error);
+        alert("Đã xảy ra lỗi khi cập nhật kết quả.");
+      });
+  };
+  
 
   return (
     <div className="p-6 bg-gray-100 rounded-lg shadow-lg max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Quản lý sản phẩm giảng viên</h1>
-      </div>
+      <h1 className="text-2xl font-semibold mb-6">
+        Quản lý sản phẩm giảng viên
+      </h1>
       <div className="mb-4 flex items-center space-x-4">
-        {/* Thanh tìm kiếm */}
-        <div className="flex-1">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Tìm kiếm theo chủ đề hoặc sản phẩm"
-          />
-        </div>
-
-        {/* Dropdown filter */}
-        <div className="flex-1">
-          <select
-            value={filterOption}
-            onChange={(e) => setFilterOption(e.target.value)}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          >
-            <option value="all">Tất cả</option>
-            <option value="hasProduct">Đã có sản phâm</option>
-            <option value="noProduct">Chưa có sản phẩm</option>
-          </select>
-        </div>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500"
+          placeholder="Tìm kiếm theo chủ đề"
+        />
+        <select
+          value={filterOption}
+          onChange={(e) => setFilterOption(e.target.value)}
+          className="flex-1 p-2 border border-gray-300 rounded-md shadow-sm"
+        >
+          <option value="all">Tất cả</option>
+          <option value="hasProduct">Đã có sản phẩm</option>
+          <option value="noProduct">Chưa có sản phẩm</option>
+        </select>
       </div>
+      {isEvaluateModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-lg">
+            <h2 className="text-2xl font-bold mb-4 text-center">
+              Đánh giá sản phẩm
+            </h2>
+            <form onSubmit={handleSubmitEvaluation}>
+              {/* Hiển thị mã sản phẩm */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Mã sản phẩm
+                </label>
+                <input
+                  type="text"
+                  value={evaluateFormData.MaSanPhamNCKHGV}
+                  readOnly
+                  className="w-full px-4 py-2 border rounded-lg shadow-sm bg-gray-100 cursor-not-allowed"
+                />
+              </div>
 
-      {/* Hiển thị danh sách đề tài và các sản phẩm */}
+              {/* Nhập đánh giá */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Đánh giá
+                </label>
+                <textarea
+                  value={evaluateFormData.DanhGia}
+                  onChange={(e) =>
+                    setEvaluateFormData({
+                      ...evaluateFormData,
+                      DanhGia: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 border rounded-lg shadow-sm"
+                  placeholder="Nhập đánh giá của bạn"
+                  required
+                />
+              </div>
+
+              {/* Nút lưu và hủy */}
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-600"
+                  onClick={() => setIsEvaluateModalOpen(false)}
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-600"
+                >
+                  Lưu
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {filteredTopics.map((topic) => (
         <div
-          key={topic.MaDeTaiSV}
-          className="mb-6 border border-gray-300 rounded-lg p-4 shadow-sm bg-white"
+          key={topic.MaDeTaiNCKHGV}
+          className="mb-6 border border-gray-300 rounded-lg p-4 bg-white"
         >
           <h2 className="text-lg font-bold text-blue-600 mb-2">
             Tên đề tài: {topic.TenDeTai}
           </h2>
           <p className="text-sm text-gray-600 mb-2">
-            Mô tả: {topic.MoTa || "No Description"}
+            Mô tả: {topic.MoTa || "Chưa có mô tả"}
           </p>
-
           <button
-            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-green-600 transition mb-4"
-            onClick={() => handleAddProduct(topic.MaDeTaiSV)}
+            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-green-600"
+            onClick={() => handleAddProduct(topic.MaDeTaiNCKHGV)} // Truyền mã đề tài đang chọn
           >
             Thêm sản phẩm
           </button>
 
-          <table className="min-w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100 text-left">
-                <th className="px-4 py-2 border">Mã sản phẩm</th>
+          <table className="mt-4 w-full border border-gray-300">
+            <thead className="bg-gray-100">
+              <tr>
                 <th className="px-4 py-2 border">Tên sản phẩm</th>
                 <th className="px-4 py-2 border">Ngày hoàn thành</th>
                 <th className="px-4 py-2 border">Kết quả</th>
-                <th className="px-4 py-2 border">Chức năng</th>
+                <th className="px-4 py-2 border">File sản phẩm</th>
+
+                <th className="px-4 py-2 border">Thao tác</th>
+                
               </tr>
             </thead>
             <tbody>
+              {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                  <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-lg">
+                    <h2 className="text-2xl font-bold mb-4 text-center">
+                      Thêm sản phẩm
+                    </h2>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        axios
+                          .post(
+                            "http://localhost/Soucre-Code/BackEnd/Api/DeTaiNCKHGiangVien_Api/SanPhamNCKHGV_Api.php?action=post",
+                            formData
+                          )
+                          .then((response) => {
+                            alert("Thêm sản phẩm thành công!");
+                            setIsModalOpen(false);
+                          })
+                          .catch((error) => {
+                            console.error("Lỗi khi thêm sản phẩm:", error);
+                          });
+                      }}
+                    >
+                      {/* Tên sản phẩm */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium mb-1">
+                          Tên sản phẩm
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.TenSanPham}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              TenSanPham: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-2 border rounded-lg shadow-sm"
+                          placeholder="Nhập tên sản phẩm"
+                          required
+                        />
+                      </div>
+
+                      {/* Ngày hoàn thành */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium mb-1">
+                          Ngày hoàn thành
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.NgayHoanThanh}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              NgayHoanThanh: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-2 border rounded-lg shadow-sm"
+                          required
+                        />
+                      </div>
+
+                      {/* Kết quả */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium mb-1">
+                          Kết quả
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.KetQua}
+                          readOnly // Không cho phép chỉnh sửa
+                          className="w-full px-4 py-2 border rounded-lg shadow-sm bg-gray-100 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Chọn file */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium mb-1">
+                          Chọn file
+                        </label>
+                        <input
+                          type="file"
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              FileSanPham: e.target.files[0].name,
+                            })
+                          }
+                          className="w-full px-4 py-2 border rounded-lg shadow-sm"
+                          accept=".pdf,.doc,.docx,.txt" // Chỉ cho phép chọn một số loại file
+                        />
+                      </div>
+
+                      {/* Mã đề tài (ẩn) */}
+                      <input
+                        type="hidden"
+                        value={formData.MaDeTaiNCKHGV} // Lấy mã đề tài tự động
+                      />
+
+                      {/* Nút lưu và hủy */}
+                      <div className="flex justify-end space-x-4">
+                        <button
+                          type="button"
+                          className="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-600"
+                          onClick={() => setIsModalOpen(false)}
+                        >
+                          Hủy
+                        </button>
+                        <button
+                          type="submit"
+                          className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-600"
+                        >
+                          Lưu
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
               {products
-                .filter((product) => product.MaDeTaiSV === topic.MaDeTaiSV)
+                .filter(
+                  (product) => product.MaDeTaiNCKHGV === topic.MaDeTaiNCKHGV
+                )
                 .map((product) => (
-                  <tr key={product.MaDeTaiSV} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 border">{product.MaDeTaiSV}</td>
+                  <tr key={product.MaSanPhamNCKHGV}>
                     <td className="px-4 py-2 border">{product.TenSanPham}</td>
                     <td className="px-4 py-2 border">
                       {product.NgayHoanThanh}
                     </td>
                     <td className="px-4 py-2 border">{product.KetQua}</td>
-                    <td className="px-4 py-2 border">
-                      <button
-                        className="text-blue-500 hover:text-blue-700 mr-2"
-                        onClick={() => handleEditProduct(product)}
-                      >
-                        Sửa
-                      </button>
+                    <td className="px-4 py-2 border">{product.FileSanPham}</td>
 
-                      <button
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDeleteProduct(product)}
-                      >
-                        Xóa
-                      </button>
+                    <td className="px-4 py-2 border">
+                      <div className="flex items-center justify-center space-x-4">
+                        {product.KetQua === "Đang làm" ? (
+                          // Nút "Đánh giá" nếu sản phẩm có trạng thái "Đang làm"
+                          <button
+                            className="text-orange-500 hover:text-orange-700"
+                            onClick={() => handleEvaluate(product)}
+                          >
+                            Đánh giá
+                          </button>
+                        ) : (
+                          // Nút "Sửa", "Xóa" nếu không phải trạng thái "Đang làm"
+                          <>
+                            <button
+                              className="text-blue-500 hover:text-blue-700"
+                              onClick={() => handleEditProduct(product)}
+                            >
+                              Sửa
+                            </button>
+                            <button
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() =>
+                                handleDeleteProduct(product.MaDeTaiNCKHGV)
+                              }
+                            >
+                              Xóa
+                            </button>
+                            <button
+                              className="text-green-500 hover:text-green-700"
+                              onClick={() => handleViewDetails(product)}
+                            >
+                              Xem chi tiết
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -246,215 +495,6 @@ const ProductLecturer = () => {
           </table>
         </div>
       ))}
-
-      {isEditModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-lg">
-            <h2 className="text-2xl font-bold mb-4 text-center">
-              Edit Product
-            </h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                axios
-                  .post(
-                    "http://localhost/Soucre-Code/BackEnd/Api/DuyetDeTaiSV/SanPhamNCKHSV_Api.php?action=update",
-                    editFormData
-                  )
-                  .then((response) => {
-                    alert(
-                      response.data.message || "Product updated successfully!"
-                    );
-                    setProducts((prev) =>
-                      prev.map((product) =>
-                        product.MaDeTaiSV === editFormData.MaDeTaiSV
-                          ? { ...editFormData } // Cập nhật sản phẩm trong danh sách
-                          : product
-                      )
-                    );
-                    setIsEditModalOpen(false); // Đóng modal chỉnh sửa
-                  })
-                  .catch((error) => {
-                    console.error("Error editing product:", error);
-                  });
-              }}
-              className="space-y-4"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Product Name
-                  </label>
-                  <input
-                    type="text"
-                    name="TenSanPham"
-                    value={editFormData.TenSanPham}
-                    onChange={(e) =>
-                      setEditFormData((prev) => ({
-                        ...prev,
-                        TenSanPham: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Completion Date
-                  </label>
-                  <input
-                    type="date"
-                    name="NgayHoanThanh"
-                    value={editFormData.NgayHoanThanh}
-                    onChange={(e) =>
-                      setEditFormData((prev) => ({
-                        ...prev,
-                        NgayHoanThanh: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Result
-                  </label>
-                  <input
-                    type="text"
-                    name="KetQua"
-                    value={editFormData.KetQua}
-                    onChange={(e) =>
-                      setEditFormData((prev) => ({
-                        ...prev,
-                        KetQua: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Topic ID
-                  </label>
-                  <input
-                    type="text"
-                    name="MaDeTaiSV"
-                    value={editFormData.MaDeTaiSV}
-                    readOnly
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm bg-gray-100"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-center mt-6">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-600 transition"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-600 transition"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-lg">
-            <h2 className="text-2xl font-bold mb-4 text-center">Add Product</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Product Name
-                  </label>
-                  <input
-                    type="text"
-                    name="TenSanPham"
-                    value={formData.TenSanPham}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        TenSanPham: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Completion Date
-                  </label>
-                  <input
-                    type="date"
-                    name="NgayHoanThanh"
-                    value={formData.NgayHoanThanh}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        NgayHoanThanh: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Result
-                  </label>
-                  <input
-                    type="text"
-                    name="KetQua"
-                    value={formData.KetQua}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        KetQua: e.target.value,
-                      }))
-                    }
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Topic ID
-                  </label>
-                  <input
-                    type="text"
-                    name="MaDeTaiSV"
-                    value={formData.MaDeTaiSV}
-                    readOnly
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm bg-gray-100"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-center mt-6">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-600 transition"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-600 transition"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -91,6 +91,17 @@ const LayoutScitech = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
+                to="/scitech/lecturer-application-approval-admin"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ thêm đề tài NCKH giảng viên
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
                 to="/scitech/lecturer-topic-approval"
                 className="flex items-center space-x-3"
               >
@@ -100,20 +111,62 @@ const LayoutScitech = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
+                to="/scitech/kehoach"
+                className="flex items-center space-x-3"
+              >
+                <FaClipboardList />
+                <span className="font-semibold">Kế hoạch nckh giảng viên</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/scitech/edit-Lecturer"
+                className="flex items-center space-x-3"
+              >
+                <FaUserFriends />
+                <span className="font-semibold">
+                  Quản lý nhóm giảng viên NCKH
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/scitech/report"
+                className="flex items-center space-x-3"
+              >
+                <FaBox />
+                <span className="font-semibold">Quản lý báo cáo định kỳ</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/scitech/product-lecturer"
+                className="flex items-center space-x-3"
+              >
+                <FaBox />
+                <span className="font-semibold">
+                  Quản lý sản phẩm giảng viên
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/scitech/application-approval-admin"
+                className="flex items-center space-x-3"
+              >
+                <FaCheckCircle />
+                <span className="font-semibold">
+                  Duyệt hồ sơ thêm đề tài KHCN sinh viên
+                </span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
                 to="/scitech/student-topic-approval"
                 className="flex items-center space-x-3"
               >
                 <FaClipboardList />
                 <span className="font-semibold">Chi tiết đề tài SV</span>
-              </Link>
-            </li>
-            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-              <Link
-                to="/scitech/science-seminar"
-                className="flex items-center space-x-3"
-              >
-                <FaLaptopCode />
-                <span className="font-semibold"> hội thảo khoa học</span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
@@ -131,32 +184,41 @@ const LayoutScitech = ({ children }) => {
                 className="flex items-center space-x-3"
               >
                 <FaBox />
-                <span className="font-semibold">Quan lý sản phẩm sinh viên</span>
-              </Link>
-            </li>
-        
-            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-              <Link
-                to="/scitech/application-approval-admin"
-                className="flex items-center space-x-3"
-              >
-                <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ thêm đề tài KHCN sinh viên
+                  Quản lý sản phẩm sinh viên
                 </span>
               </Link>
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
-                to="/scitech/lecturer-application-approval-admin"
+                to="/scitech/approval-of-school-topic-sciTech"
                 className="flex items-center space-x-3"
               >
                 <FaCheckCircle />
                 <span className="font-semibold">
-                  Duyệt hồ sơ thêm đề tài NCKH giảng viên
+                  Duyệt hồ sơ và thêm đề tài cấp sở{" "}
                 </span>
               </Link>
             </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/scitech/quanlydetaicapso"
+                className="flex items-center space-x-3"
+              >
+                <FaClipboardList />
+                <span className="font-semibold">Quản lý đề tài cấp sở</span>
+              </Link>
+            </li>
+            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
+              <Link
+                to="/scitech/science-seminar"
+                className="flex items-center space-x-3"
+              >
+                <FaLaptopCode />
+                <span className="font-semibold"> hội thảo khoa học</span>
+              </Link>
+            </li>
+
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
                 to="/scitech/science-seminar-sciTech"
@@ -181,26 +243,18 @@ const LayoutScitech = ({ children }) => {
             </li>
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
               <Link
-                to="/scitech/approval-of-school-topic-sciTech"
-                className="flex items-center space-x-3"
-              >
-                <FaCheckCircle />
-                <span className="font-semibold">Duyệt hồ sơ và thêm đề tài cấp sở </span>
-              </Link>
-            </li>
-            <li className="flex items-center space-x-3 hover:bg-[#8AADE0] text-black hover:text-[#419a7c] p-2 rounded">
-              <Link
                 to="/scitech/approval-off-campus-project-scitech"
                 className="flex items-center space-x-3"
               >
                 <FaCheckCircle />
-                <span className="font-semibold">Duyệt hồ sơ và thêm nghiên cứu ngoài trường</span>
+                <span className="font-semibold">
+                  Duyệt hồ sơ và thêm nghiên cứu ngoài trường
+                </span>
               </Link>
             </li>
             <hr className="border-gray-400 my-4" />
 
             <li className="flex items-center space-x-3 hover:bg-[#8AADE0] p-2 rounded hover:text-[#d95959]"></li>
-            
           </ul>
         </div>
       </div>

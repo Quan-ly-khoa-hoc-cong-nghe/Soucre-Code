@@ -81,22 +81,22 @@ switch ($action) {
         }
         break;
 
-    case 'DELETE':
-        // Xóa kế hoạch theo MaDeTaiNCKHGV
-        $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['MaDeTaiNCKHGV'])) {
-            if ($keHoach->deletePlanByMaDeTai($data['MaDeTaiNCKHGV'])) {
-                echo json_encode(["message" => "Xóa kế hoạch thành công."]);
+        case 'DELETE':
+            $data = json_decode(file_get_contents("php://input"), true);
+            if (isset($data['MaKeHoachNCKHGV'])) {
+                $maKeHoach = $data['MaKeHoachNCKHGV'];
+                $stmt = $db->prepare("DELETE FROM KeHoachNCKHGV WHERE MaKeHoachNCKHGV = :maKeHoach");
+                $stmt->bindParam(':maKeHoach', $maKeHoach);
+        
+                if ($stmt->execute()) {
+                    echo json_encode(["message" => "Xóa kế hoạch thành công."]);
+                } else {
+                    echo json_encode(["message" => "Xóa thất bại."]);
+                }
             } else {
-                echo json_encode(["message" => "Xóa thất bại hoặc MaDeTaiNCKHGV không tồn tại."]);
+                echo json_encode(["message" => "Thiếu MaKeHoachNCKHGV để xóa."]);
             }
-        } else {
-            echo json_encode(["message" => "Thiếu MaDeTaiNCKHGV để xóa."]);
-        }
-        break;
-
-    default:
-        echo json_encode(["message" => "Action không hợp lệ."]);
-        break;
+            break;
+        
 }
 ?>

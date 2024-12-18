@@ -42,20 +42,36 @@ switch ($action) {
         }
         break;
 
-    case 'POST':
-        // Thêm sản phẩm mới
-        $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'], $data['MaDeTaiNCKHGV'])) {
-            if ($sanPham->addProduct($data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'], $data['MaDeTaiNCKHGV'])) {
-                echo json_encode(["message" => "Thêm sản phẩm thành công."]);
+        case 'POST':
+            // Thêm sản phẩm mới
+            $data = json_decode(file_get_contents("php://input"), true);
+            if (isset($data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'], $data['MaDeTaiNCKHGV'], $data['FileSanPham'])) {
+                if ($sanPham->addProduct($data['TenSanPham'], $data['NgayHoanThanh'], $data['KetQua'], $data['MaDeTaiNCKHGV'], $data['FileSanPham'])) {
+                    echo json_encode(["message" => "Thêm sản phẩm thành công."]);
+                } else {
+                    echo json_encode(["message" => "Thêm sản phẩm thất bại."]);
+                }
             } else {
-                echo json_encode(["message" => "Thêm sản phẩm thất bại."]);
+                echo json_encode(["message" => "Thiếu thông tin sản phẩm để tạo."]);
             }
-        } else {
-            echo json_encode(["message" => "Thiếu thông tin sản phẩm để tạo."]);
-        }
-        break;
-
+            break;
+        
+            case 'UPDATE_KETQUA':
+                $data = json_decode(file_get_contents("php://input"), true);
+                
+                if (isset($data['MaSanPhamNCKHGV'], $data['KetQua'])) {
+                    $maSanPham = $data['MaSanPhamNCKHGV'];
+                    $ketQua = $data['KetQua'];
+            
+                    if ($sanPham->updateKetQua($maSanPham, $ketQua)) {
+                        echo json_encode(["message" => "Cập nhật kết quả thành công."]);
+                    } else {
+                        echo json_encode(["message" => "Cập nhật kết quả thất bại hoặc mã sản phẩm không tồn tại."]);
+                    }
+                } else {
+                    echo json_encode(["message" => "Thiếu thông tin mã sản phẩm hoặc kết quả."]);
+                }
+                break;
     case 'PUT':
         // Cập nhật sản phẩm theo MaDeTaiNCKHGV
         $data = json_decode(file_get_contents("php://input"), true);
