@@ -1,5 +1,6 @@
 <?php
-class NguoiDung {
+class NguoiDung
+{
     private $conn;
     private $table = "NguoiDung";
 
@@ -8,12 +9,14 @@ class NguoiDung {
     public $MatKhau;
     public $MaNhanVien;
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->conn = $db;
     }
 
     // Kiểm tra xem người dùng đã tồn tại hay chưa
-    private function isUserExist() {
+    private function isUserExist()
+    {
         $query = "SELECT MaNguoiDung FROM " . $this->table . " WHERE MaNguoiDung = :MaNguoiDung";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":MaNguoiDung", $this->MaNguoiDung);
@@ -22,7 +25,8 @@ class NguoiDung {
     }
 
     // Kiểm tra xem mã nhân viên có tồn tại trong bảng NhanVien
-    private function isNhanVienExist() {
+    private function isNhanVienExist()
+    {
         $query = "SELECT MaNhanVien FROM NhanVien WHERE MaNhanVien = :MaNhanVien";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":MaNhanVien", $this->MaNhanVien);
@@ -31,7 +35,8 @@ class NguoiDung {
     }
 
     // Thêm người dùng mới
-    public function add() {
+    public function add()
+    {
         // Kiểm tra mã nhân viên hợp lệ
         if (!$this->isNhanVienExist()) {
             return $this->sendErrorResponse("Mã nhân viên không tồn tại");
@@ -54,32 +59,28 @@ class NguoiDung {
 
         if ($stmt->execute()) {
             return true;
+        } else {
+            error_log("Lỗi khi thêm người dùng: " . print_r($stmt->errorInfo(), true)); // Ghi lỗi SQL nếu có
         }
         return false;
     }
 
     // Cập nhật người dùng
-    public function update() {
+    public function update()
+    {
         // Kiểm tra mã nhân viên hợp lệ
-        if (!$this->isNhanVienExist()) {
-            return $this->sendErrorResponse("Mã nhân viên không tồn tại");
-        }
-
-        // Kiểm tra người dùng có tồn tại để cập nhật
         if (!$this->isUserExist()) {
-            return $this->sendErrorResponse("Người dùng không tồn tại");
+            return false; // Người dùng không tồn tại
         }
 
         $query = "UPDATE " . $this->table . " 
-                  SET VaiTro = :VaiTro, MatKhau = :MatKhau, MaNhanVien = :MaNhanVien 
+                  SET MatKhau = :MatKhau 
                   WHERE MaNguoiDung = :MaNguoiDung";
         $stmt = $this->conn->prepare($query);
 
         // Ràng buộc tham số
         $stmt->bindParam(":MaNguoiDung", $this->MaNguoiDung);
-        $stmt->bindParam(":VaiTro", $this->VaiTro);
-        $stmt->bindParam(":MatKhau", $this->MatKhau);  // Không mã hóa mật khẩu
-        $stmt->bindParam(":MaNhanVien", $this->MaNhanVien);
+        $stmt->bindParam(":MatKhau", $this->MatKhau);
 
         if ($stmt->execute()) {
             return true;
@@ -88,7 +89,8 @@ class NguoiDung {
     }
 
     // Xóa người dùng
-    public function delete() {
+    public function delete()
+    {
         // Kiểm tra người dùng có tồn tại để xóa
         if (!$this->isUserExist()) {
             return $this->sendErrorResponse("Người dùng không tồn tại");
@@ -107,7 +109,8 @@ class NguoiDung {
     }
 
     // Lấy tất cả người dùng
-    public function getAll() {
+    public function getAll()
+    {
         $query = "SELECT * FROM " . $this->table;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -115,7 +118,8 @@ class NguoiDung {
     }
 
     // Lấy người dùng theo ID
-    public function getById() {
+    public function getById()
+    {
         $query = "SELECT * FROM " . $this->table . " WHERE MaNguoiDung = :MaNguoiDung";
         $stmt = $this->conn->prepare($query);
 
@@ -126,10 +130,10 @@ class NguoiDung {
     }
 
     // Gửi thông báo lỗi dưới dạng JSON
-    private function sendErrorResponse($message) {
+    private function sendErrorResponse($message)
+    {
         echo json_encode(["message" => $message]);
         http_response_code(400);
         return false;
     }
 }
-?>
