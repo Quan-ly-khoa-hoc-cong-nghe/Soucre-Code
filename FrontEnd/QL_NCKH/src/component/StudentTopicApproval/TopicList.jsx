@@ -166,7 +166,7 @@ const TopicList = () => {
                   </span>
                 </td>
                 <td className="py-4 px-2 text-right">
-                <div className="flex justify-end space-x-2">
+                  <div className="flex justify-end space-x-2">
                     {/* Icon mắt để xem chi tiết */}
                     <button
                       onClick={() => handleViewDetails(topic)}
@@ -183,15 +183,6 @@ const TopicList = () => {
                       title="Xóa"
                     >
                       <FaTrash className="w-5 h-5" />
-                    </button>
-
-                    {/* Icon sửa để sửa đề tài */}
-                    <button
-                      onClick={() => handleEditTopic(topic)} // Hàm sửa sẽ gọi với đối tượng topic
-                      className="p-2 text-green-600 hover:bg-green-100 rounded-full"
-                      title="Sửa"
-                    >
-                      <FaEdit className="w-5 h-5" />
                     </button>
                   </div>
                 </td>
@@ -363,27 +354,6 @@ const TopicList = () => {
               ) : (
                 <p>Chưa có sản phẩm nghiên cứu.</p>
               )}
-            </div>
-            {/* Action Buttons */}
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={() => handleEdit(selectedTopic)}
-                className="h-10 px-4 bg-yellow-500 text-white rounded transition duration-300 ease-in-out hover:bg-yellow-600"
-              >
-                Chỉnh Sửa Đề Tài
-              </button>
-              <button
-                onClick={() => handleDelete(selectedTopic.id)}
-                className="h-10 px-4 bg-red-500 text-white rounded transition duration-300 ease-in-out hover:bg-red-600"
-              >
-                Xóa Đề Tài
-              </button>
-              <button
-                onClick={closeDetailView}
-                className="h-10 px-4 bg-blue-500 text-white rounded"
-              >
-                Đóng
-              </button>
             </div>
           </div>
         </div>
